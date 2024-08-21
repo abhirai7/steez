@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% set title = 'STEEZ™ - Login' %}
+
+{% block script %}
+<script>
+    function glitchText() {
+        let heading = document.getElementById('heading');
+
+        function generateRandomText() {
+            let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
+            let Os = ["ó", "ò", "ô", "ö", "õ", "ō"];
+            let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
+            let randomOs = Os[Math.floor(Math.random() * Os.length)];
+            return `ST${randomEs}Z<sup>TM</sup> - ADMIN L${randomOs}GIN`;
+        }
+
+        let iterations = 9;
+        let interval = 80;
+
+        let randomHtmls = [];
+
+        for (let i = 0; i < iterations; i++) {
+            randomHtmls.push(generateRandomText());
+        }
+
+        let reversedRandomHtmls = randomHtmls.slice().reverse();
+
+        var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
+        allRandomHtmls.push('STEEZ<sup>TM</sup> - ADMIN LOGIN');
+
+
+        allRandomHtmls.forEach((randomHtml, index) => {
+            setTimeout(() => {
+                heading.innerHTML = randomHtml;
+            }, index * interval);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            glitchText();
+        }, 14000);
+    });
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+    .fs {
+        font-size: 7rem;
+    }
+
+    .type-animation {
+        overflow: hidden;
+        border-right: .15em solid black;
+        white-space: nowrap;
+        letter-spacing: .15em;
+        animation:
+            typing 2.5s steps(40, end),
+            blink-caret .75s step-end infinite;
+    }
+
+    @keyframes typing {
+        from {
+            width: 0
+        }
+
+        to {
+            width: 100%
+        }
+    }
+
+    @keyframes blink-caret {
+
+        from,
+        to {
+            border-color: transparent
+        }
+
+        50% {
+            border-color: black;
+        }
+    }
+</style>
+<style>
+    #password::placeholder,
+    #show-password,
+    #email::placeholder {
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="p-4 mt-5 d-none d-lg-block d-xl-block d-xxl-block">
+    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - ADMIN LOGIN</p>
+    <div class="container">
+        <form action="{{ url_for('admin_login') }}" method="POST" class="mt-5">
+            {{ form.csrf_token }}
+
+            <div class="input-group mb-2">
+                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
+            </div>
+            {% if form.password.errors %}
+                <div class="alert alert-danger mt-2" role="alert">
+                    {% for error in form.password.errors %}
+                        <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    {%endfor%}
+                </div>
+            {% endif %}
+
+            <div class="text-center">
+                {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

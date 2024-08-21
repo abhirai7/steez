@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% set title = 'STEEZ™ - Admin' %}
+
+{% block style %}
+<style>
+.consolas {
+    font-family: 'Courier New', Courier, monospace
+}
+</style>
+{% endblock %}
+
+
+{% block body %}
+<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - ADMIN DASHBORD</p>
+
+<div class="row border border-1 p-3">
+    <div class="col text-center consolas">
+        <h3>Products</h3>
+        <p class="text-muted fs-4">{{ products | length }}</p>
+        <a href="{{ url_for('admin_manage_product') }}" class="btn btn-primary">View</a>
+    </div>
+    <div class="col text-center consolas">
+        <h3>Orders</h3>
+        <p class="text-muted fs-4">{{ orders | length }}</p>
+    </div>
+    <div class="col text-center consolas">
+        <h3>Users</h3>
+        <p class="text-muted fs-4">{{ users | length }}</p>
+    </div>
+</div>
+{% endblock %}

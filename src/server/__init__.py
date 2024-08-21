@@ -35,6 +35,8 @@ app = Flask(__name__)
 conn: sqlite3.Connection = sqlite3.connect("database.sqlite", check_same_thread=False)
 conn.executescript(schema)
 
+from src import first_run  # noqa
+
 app.secret_key = f"{SECRET_KEY}"
 login_manager.init_app(app)
 

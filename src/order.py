@@ -80,3 +80,10 @@ class Order:
         from .product import Product
 
         return Product.from_id(self.connection, self.product_id)
+
+    @classmethod
+    def all(cls, connection: sqlite3.Connection) -> list[Order]:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM orders")
+        rows = cursor.fetchall()
+        return [cls(connection, **row) for row in rows]

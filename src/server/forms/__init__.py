@@ -79,3 +79,15 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Email already registered")
 
         return True
+
+
+class AdminForm(FlaskForm):
+    def __init__(self, connection: sqlite3.Connection, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.conn = connection
+
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    submit = SubmitField("Login")
+
+
+from .product_form import *

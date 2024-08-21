@@ -18,7 +18,6 @@ class Product:
         name: str,
         price: float,
         description: str,
-        image_dir: str,
         stock: int,
     ):
         self.__conn = connection
@@ -26,7 +25,7 @@ class Product:
         self.name = name
         self.price = price
         self.description = description
-        self.image_dir = get_product_pictures(id)
+        self.images = get_product_pictures(id)
         self.stock = stock
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str | None):
@@ -80,15 +79,14 @@ class Product:
         name: str,
         price: float,
         description: str,
-        image_dir: str,
         stock: int = 0,
     ) -> Product:
         cursor = connection.cursor()
         query = r"""
-            INSERT INTO PRODUCTS (NAME, PRICE, DESCRIPTION, IMAGE_DIR, STOCK) VALUES (?, ?, ?, ?, ?)
+            INSERT INTO PRODUCTS (NAME, PRICE, DESCRIPTION, STOCK) VALUES (?, ?, ?, ?)
             RETURNING *
         """
-        result = cursor.execute(query, (name, price, description, image_dir, stock))
+        result = cursor.execute(query, (name, price, description, stock))
         data = result.fetchone()
         connection.commit()
 
@@ -130,7 +128,6 @@ class Product:
             "name": self.name,
             "price": self.price,
             "description": self.description,
-            "image_dir": self.image_dir,
             "stock": self.stock,
         }
 

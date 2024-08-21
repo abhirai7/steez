@@ -39,17 +39,18 @@ class User:
         self.is_active = True
         self.is_anonymous = False
         self.is_authenticated = True
+        self.__role = role
     
     def get_id(self):
         return str(self.id)
 
     @property
     def is_admin(self):
-        return False
+        return self.role == "ADMIN"
 
     @property
     def role(self):
-        return "USER"
+        return self.__role
 
     @property
     def cart(self) -> Cart:
@@ -68,7 +69,7 @@ class User:
     ) -> User:
         cursor = connection.cursor()
         query = r"""
-            SELECT * FROM USERS WHERE EMAIL = ? AND PASSWORD = ?
+            SELECT * FROM USERS WHERE EMAIL = ? AND PASSWORD = ? AND ROLE = 'USER'
         """
         hashed_password = Password(password)
 
@@ -77,9 +78,11 @@ class User:
             (email, hashed_password.hex),
         )
         row = cursor.fetchone()
+
         if row is None:
             error = "User not found. Either email or password is incorrect."
             raise ValueError(error) from None
+
         return cls(connection, **row)
 
     @classmethod
@@ -229,15 +232,54 @@ class User:
         """
         cursor.execute(query, (email,))
         return cursor.fetchone() is not None
+    
+    @classmethod
+    def all(cls, connection: sqlite3.Connection) -> list[User]:
+        cursor = connection.cursor()
+        query = r"""
+            SELECT * FROM USERS WHERE ROLE = 'USER'
+        """
+        cursor.execute(query)
+        return [cls(connection, **row) for row in cursor.fetchall()]
+
 
 class Admin(User):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @property
-    def role(self):
-        return "ADMIN"
+    @classmethod
+    def from_email(cls, connection: sqlite3.Connection, *, email: str = "", password: str) -> Admin:
+        cursor = connection.cursor()
+        query = r"""
+            SELECT * FROM USERS WHERE EMAIL = "" AND PASSWORD = ? AND ROLE = 'ADMIN'
+        """
+        hashed_password = Password(password)
 
-    @property
-    def is_admin(self):
-        return True
+        cursor.execute(
+            query,
+            (hashed_password.hex,),
+        )
+        row = cursor.fetchone()
+        if row is None:
+            error = "Admin not found. Either email or password is incorrect."
+            raise ValueError(error) from None
+        return cls(connection, **row)
+
+    @classmethod
+    def delete_user(cls, connection: sqlite3.Connection, user_id: int) -> None:
+        cursor = connection.cursor()
+        query = r"""
+            DELETE FROM USERS WHERE ID = ? AND ROLE = 'USER'
+        """
+        cursor.execute(query, (user_id,))
+        connection.commit()
+    
+    @classmethod
+    def delete_product(cls, connection: sqlite3.Connection, product_id: int) -> None:
+        cursor = connection.cursor()
+        query = r"""
+            DELETE FROM PRODUCTS WHERE ID = ?
+        """
+
+        cursor.execute(query, (product_id,))
+        connection.commit()

@@ -2,15 +2,18 @@ from flask import redirect, url_for
 from werkzeug import Response
 
 from src.server import conn, login_manager
-from src.user import User
+from src.user import User, Admin
 
 
 @login_manager.user_loader
 def load_user(user_id: int) -> User | None:
+    user_id = int(user_id)
+
     try:
+        if user_id == 1:
+            return Admin.from_id(conn, user_id)
+
         usr = User.from_id(conn, user_id)
-        if usr.is_admin:
-            return None
         return usr
 
     except ValueError:
@@ -19,7 +22,7 @@ def load_user(user_id: int) -> User | None:
 
 @login_manager.unauthorized_handler
 def unauthorized() -> Response:
-    return redirect(url_for("login"))
+    return redirect(url_for("login_route"))
 
 
 @login_manager.request_loader

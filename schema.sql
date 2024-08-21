@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS `USERS` (
     `EMAIL`     VARCHAR(255)    UNIQUE          NOT NULL,
     `PASSWORD`  CHAR(64)        NOT NULL,
     `NAME`      VARCHAR(255)    NOT NULL,
-    `ROLE`      VARCHAR(255)    DEFAULT        'USER',
+    `ROLE`      CHAR(5)         DEFAULT        'USER',
     `ADDRESS`   TEXT            NOT NULL,
-    `PHONE`     CHAR(10)     NOT NULL,
+    `PHONE`     CHAR(10)        NOT NULL,
 
     `CREATED_AT` TIMESTAMP      DEFAULT         CURRENT_TIMESTAMP
 );
@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS `PRODUCTS` (
     `NAME`      VARCHAR(255)    NOT NULL,
     `PRICE`     DECIMAL(10, 2)  NOT NULL,
     `DESCRIPTION` TEXT          NOT NULL,
-    `IMAGE_DIR` TEXT            NOT NULL,
     `STOCK`     INTEGER         DEFAULT         0
 );
 
