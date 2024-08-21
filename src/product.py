@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import sqlite3
 from typing import Literal, overload
-
+from .utils import get_product_pictures
+from fuzzywuzzy import fuzz
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
 QUANTITY = int
@@ -25,7 +26,7 @@ class Product:
         self.name = name
         self.price = price
         self.description = description
-        self.image_dir = image_dir
+        self.image_dir = get_product_pictures(id)
         self.stock = stock
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str | None):
@@ -103,8 +104,27 @@ class Product:
             error = "Product not found."
             raise ValueError(error) from None
         return cls(connection, **row)
+    
+    @classmethod
+    def all(cls, connection: sqlite3.Connection) -> list[Product]:
+        query = r"SELECT * FROM PRODUCTS"
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        return [cls(connection, **row) for row in rows]
 
-    def json(self) -> dict[str, str | int | float]:
+    @classmethod
+    def search(cls, connection: sqlite3.Connection, query: str) -> list[Product]:
+        all_products = cls.all(connection)
+        fuzz_sort = sorted(
+            all_products,
+            key=lambda product: fuzz.partial_ratio(query, product.name),
+            reverse=True,
+        )
+        return fuzz_sort
+
+
+    def json(self) -> dict:
         return {
             "id": self.id,
             "name": self.name,
@@ -113,7 +133,6 @@ class Product:
             "image_dir": self.image_dir,
             "stock": self.stock,
         }
-
 
 class Cart:
     def __init__(

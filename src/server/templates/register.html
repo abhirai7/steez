@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% set title = 'STEEZ™ - Register' %}
+
+{% block script %}
+<script>
+    function glitchText() {
+        let heading = document.getElementById('heading');
+
+        function generateRandomText() {
+            let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
+            let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
+            let randomE1 = Es[Math.floor(Math.random() * Es.length)];
+            let randomE2 = Es[Math.floor(Math.random() * Es.length)];
+            return `ST${randomEs}Z<sup>TM</sup> - R${randomE1}GIST${randomE2}R`;
+        }
+
+        let iterations = 9;
+        let interval = 80;
+
+        let randomHtmls = [];
+
+        for (let i = 0; i < iterations; i++) {
+            randomHtmls.push(generateRandomText());
+        }
+
+        let reversedRandomHtmls = randomHtmls.slice().reverse();
+
+        var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
+        allRandomHtmls.push('STEEZ<sup>TM</sup> - REGISTER');
+
+
+        allRandomHtmls.forEach((randomHtml, index) => {
+            setTimeout(() => {
+                heading.innerHTML = randomHtml;
+            }, index * interval);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            glitchText();
+        }, 14000);
+    });
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+    .fs {
+        font-size: 7rem;
+    }
+
+    .type-animation {
+        overflow: hidden;
+        border-right: .15em solid black;
+        white-space: nowrap;
+        letter-spacing: .15em;
+        animation:
+            typing 2.5s steps(40, end),
+            blink-caret .75s step-end infinite;
+    }
+
+    @keyframes typing {
+        from {
+            width: 0
+        }
+
+        to {
+            width: 100%
+        }
+    }
+
+    @keyframes blink-caret {
+
+        from,
+        to {
+            border-color: transparent
+        }
+
+        50% {
+            border-color: black;
+        }
+    }
+</style>
+<style>
+    *::placeholder {
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="p-4 mt-5 d-none d-lg-block d-xl-block d-xxl-block">
+    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - REGISTER</p>
+    <div class="container">
+        <form action="{{ url_for('register') }}" method="POST">
+            {{ form.csrf_token }}
+            <p class="alert alert-info rounded rounded-0" role="alert" style="font-family: 'Courier New', Courier, monospace"><i class="bi bi-check-circle"></i> All fields marked with [*] are mandatory.</p>
+            {% if error %}
+                <p class="alert alert-danger" role="alert"><i class="bi bi-exclamation-circle"></i> {{ error }}</p>
+            {% endif %}
+    
+            <div class="mb-3">
+                {{ form.name.label(class="form-label fs-4") }}
+
+                {{ form.name(class="form-control rounded rounded-0", id="username", placeholder="[*] Enter your Name") }}
+                {% if form.name.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.Name.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+    
+            <div class="mb-3">
+                {{ form.email(class="form-control rounded rounded-0", id="email", placeholder="[*] Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
+                {% if form.email.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.email.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+    
+            <div class="mb-3">
+                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="[*] Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
+                {% if form.password.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.password.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div id="passwordHelp" class="form-text">Password must contain at least 8 characters.</div>
+            </div>
+    
+            <div class="mb-4">
+                {{ form.confirm_password(class="form-control rounded rounded-0", id="confirm_password", placeholder="[*] Confirm your Password") }}
+                    {% if form.confirm_password.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.confirm_password.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.address_line1.label(class="form-label fs-4", id="address_line1") }}
+                {{ form.address_line1(class="form-control rounded rounded-0", id="address_line1", placeholder="[*] Enter your Address Line 1") }}
+                {% if form.address_line1.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.address_line1.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.address_line2(class="form-control rounded rounded-0", id="address_line2", placeholder="Enter your Address Line 2") }}
+                {% if form.address_line2.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.address_line2.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                {{ form.pincode(class="form-control rounded rounded-0", id="pincode", placeholder="[*] Enter your Pincode") }}
+                {% if form.pincode.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.pincode.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.city(class="form-control rounded rounded-0 disable", id="city", placeholder="[*] Enter your City") }}
+                {% if form.city.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.city.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                {{ form.state(class="form-control rounded rounded-0 disable", id="state", placeholder="[*] Enter your State") }}
+                {% if form.state.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.state.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.phone(class="form-control rounded rounded-0", id="phone", placeholder="[*] Enter your Phone Number") }}
+                {% if form.phone.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in form.phone.errors %}
+                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="text-center mb-3">
+                <p class="fs-5">Already have an account? <a href="{{ url_for('login_route') }}" class="link-secondary">Login here</a></p>
+                {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+            </div>
+        </form>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block script_bottom %}
+<script>
+    function autofillCityState() {
+        const pincode = document.getElementById('pincode');
+        if (!pincode.value) {
+            return;
+        }
+        if (pincode.value.length !== 6) {
+            return;
+        }
+        let api = `https://api.postalpincode.in/pincode/${pincode.value}`;
+
+        response = fetch(api);
+        response.then((response) => {
+            let json = response.json();
+            return json;
+        }).then((data) => {
+            if (data[0].Status === 'Success') {
+                let city = data[0].PostOffice[0].District;
+                let state = data[0].PostOffice[0].State;
+                
+                const cityField = document.getElementById('city');
+                const stateField = document.getElementById('state');
+
+                cityField.value = city;
+                stateField.value = state;
+
+                city.innerHTML = city;
+                state.innerHTML = state;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('pincode').addEventListener('focusout', () => {
+            autofillCityState();
+        });
+    });
+    
+</script>
+{% endblock %}

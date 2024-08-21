@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import doctest
 import hashlib
 import os
+import pathlib
 import random
 import secrets
 import string
@@ -240,5 +240,57 @@ def sqlite_row_factory(cursor: Cursor, row: Row) -> IndexedDict:
     return d
 
 
-if __name__ == "__main__":
-    doctest.testmod()
+special_letters = {
+    "a": ["á", "à", "â", "ä", "ã", "å", "ā"],
+    "b": ["b"],
+    "c": ["ç", "ć", "č"],
+    "d": ["ď", "ð"],
+    "e": ["é", "è", "ê", "ë", "ē", "ė", "ę"],
+    "f": ["f"],
+    "g": ["ğ"],
+    "h": ["ħ"],
+    "i": ["í", "ì", "î", "ï", "ī"],
+    "j": ["j"],
+    "k": ["ķ"],
+    "l": ["ł"],
+    "m": ["m"],
+    "n": ["ñ", "ń"],
+    "o": ["ó", "ò", "ô", "ö", "õ", "ō"],
+    "p": ["p"],
+    "q": ["q"],
+    "r": ["ř"],
+    "s": ["ś", "š"],
+    "t": ["ť"],
+    "u": ["ú", "ù", "û", "ü", "ū"],
+    "v": ["v"],
+    "w": ["w"],
+    "x": ["x"],
+    "y": ["ý", "ÿ"],
+    "z": ["ž", "ź", "ż"],
+}
+
+
+def format_to_special(text: str, /) -> str:
+    result = []
+    text = text.lower()
+    for char in text:
+        if char in special_letters:
+            result.append(random.choice(special_letters[char]))
+        else:
+            result.append(char)
+    return "".join(result)
+
+
+def get_product_pictures(product_id: int) -> list[str]:
+    this_path = pathlib.Path(__file__).parent
+    path = this_path / "server" / "static" / "product_pictures" / str(product_id)
+
+    if not path.exists():
+        return []
+
+    files = []
+    for file in path.iterdir():
+        path_from_static = file.relative_to(this_path / "server")
+        files.append("/" + str(path_from_static))
+
+    return files

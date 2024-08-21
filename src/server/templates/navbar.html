@@ -1,0 +1,32 @@
+{% macro navbar() -%}
+<script>
+    function loadSearchFunction() {
+        document.getElementById('searchBar').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const searchBar = document.getElementById('searchBar');
+                const searchQuery = searchBar.value;
+                window.location.href = `/search/${searchQuery}`;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSearchFunction();
+    });
+
+</script>
+<style>
+    .search-input::placeholder {
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+<nav class="navbar navbar-expand-lg bg-body-tertiary mt-3">
+    <div class="container-fluid">
+        <a class="nav-link active horizon-font fs-4" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
+        <form class="m-auto" role="search">
+            <input class="form-control me-2 rounded rounded-0 search-input" type="search" id="searchBar" placeholder="Search STEEZ™" aria-label="Search" style="width: 500px; height: 45px">
+        </form>
+    </div>
+</nav>
+
+{%- endmacro %}

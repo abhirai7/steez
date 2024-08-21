@@ -6,7 +6,7 @@ from src.user import User
 
 
 @login_manager.user_loader
-def load_user(user_id) -> User | None:
+def load_user(user_id: int) -> User | None:
     try:
         usr = User.from_id(conn, user_id)
         if usr.is_admin:

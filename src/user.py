@@ -39,6 +39,9 @@ class User:
         self.is_active = True
         self.is_anonymous = False
         self.is_authenticated = True
+    
+    def get_id(self):
+        return str(self.id)
 
     @property
     def is_admin(self):
@@ -87,7 +90,7 @@ class User:
         """
         cursor.execute(
             query,
-            (user_id,),
+            (int(user_id),),
         )
         row = cursor.fetchone()
         if row is None:
@@ -218,6 +221,14 @@ class User:
 
         return amount_correct and currency_correct and notes_correct and status_correct
 
+    @staticmethod
+    def exists(connection: sqlite3.Connection, email: str) -> bool:
+        cursor = connection.cursor()
+        query = r"""
+            SELECT 1 FROM USERS WHERE EMAIL = ?
+        """
+        cursor.execute(query, (email,))
+        return cursor.fetchone() is not None
 
 class Admin(User):
     def __init__(self, *args, **kwargs):
