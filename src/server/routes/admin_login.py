@@ -23,7 +23,7 @@ def admin_login():
         login_user(admin)
         return redirect(url_for("admin_dashboard"))
 
-    return render_template("admin_login.html", form=form)
+    return render_template("admin_login.html", form=form, current_user=current_user)
 
 
 @app.route("/admin/logout")
@@ -42,4 +42,4 @@ def admin_dashboard():
     users = User.all(conn)
     orders = Order.all(conn)
 
-    return render_template("admin_dashboard.html", products=products, users=users, orders=orders)
+    return render_template("admin_dashboard.html", products=products, users=users, orders=orders, current_user=current_user)

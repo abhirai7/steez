@@ -1,4 +1,4 @@
-{% macro navbar() -%}
+{% macro navbar(current_user) -%}
 <script>
     function loadSearchFunction() {
         document.getElementById('searchBar').addEventListener('keypress', function (e) {
@@ -26,6 +26,17 @@
         <form class="m-auto" role="search">
             <input class="form-control me-2 rounded rounded-0 search-input" type="search" id="searchBar" placeholder="Search STEEZ™" aria-label="Search" style="width: 500px; height: 45px">
         </form>
+        {% if current_user.is_authenticated %}
+            <div class="d-flex">
+                <p class="me-3">Logged in as {{ current_user.name }}</p>
+                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        {% else %}
+            <div class="d-flex">
+                <a class="nav-link me-3" href="{{ url_for('login_route') }}">Login</a>
+                <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+            </div>
+        {% endif %}
     </div>
 </nav>
 

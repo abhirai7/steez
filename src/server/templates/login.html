@@ -122,7 +122,7 @@
             {% endif %}
 
             <div class="text-center">
-                <p class="fs-5 mt-3">Don't have an account? <a href="#" class="link-secondary">Register here</a></p>
+                <p class="fs-5 mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="link-secondary">Register here</a></p>
                 {% if error %}
                 <p class="alert alert-danger" role="alert"><i class="bi bi-exclamation-circle"></i> {{ error }}</p>
                 {% endif %}

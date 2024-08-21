@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import razorpay
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, session
 from flask_login import LoginManager, current_user
 
 from src.user import User
@@ -34,8 +34,6 @@ with open("schema.sql") as f:
 app = Flask(__name__)
 conn: sqlite3.Connection = sqlite3.connect("database.sqlite", check_same_thread=False)
 conn.executescript(schema)
-
-from src import first_run  # noqa
 
 app.secret_key = f"{SECRET_KEY}"
 login_manager.init_app(app)

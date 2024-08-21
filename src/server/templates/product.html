@@ -4,6 +4,6 @@
 {% import 'footer.html' as footer %}
 
 {% block body %}
-{{ navbar.navbar() }}
+{{ navbar.navbar(current_user) }}
 {{ footer.footer() }}
-{% endblock %}
+{% endblock %}  
