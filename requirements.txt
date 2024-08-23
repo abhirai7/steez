@@ -24,3 +24,5 @@ six==1.16.0
 urllib3==2.2.2
 wcwidth==0.2.13
 Werkzeug==3.0.3
+flask_wtf==0.15.1
+fuzzywuzzy==0.18.0

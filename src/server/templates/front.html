@@ -30,7 +30,7 @@
 
         var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
         allRandomHtmls.push('STEEZ<sup>TM</sup>');
-        
+
 
         allRandomHtmls.forEach((randomHtml, index) => {
             setTimeout(() => {
@@ -48,59 +48,94 @@
 {% endblock %}
 
 {% block style %}
-<style>
-    .fs {
-        font-size: 7rem;
-    }
-
-    .type-animation {
-        overflow: hidden;
-        border-right: .15em solid black;
-        white-space: nowrap;
-        letter-spacing: .15em;
-        animation: 
-            typing 2.5s steps(40, end),
-            blink-caret .75s step-end infinite;
-    }
-
-    @keyframes typing {
-        from { width: 0 }
-        to { width: 100% }
-      }
-      
-    @keyframes blink-caret {
-        from, to { border-color: transparent }
-        50% { border-color: black; }
-    }
-</style>
-
-<style>
-    .zoom-on-hover:hover {
-        transform: scale(1.05);
-        transition: transform 0.3s;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/Home.css') }}">
 {% endblock %}
 
 {% block body %}
 {{ navbar.navbar(current_user) }}
-
-<div>
-    <div class="mt-5">
-        <h2 class="text-center horizon-font fs-2 mb-4">Featured Products</h2>
-        <div class="row row-cols-lg-5">
-        {% for product in products %}
-            <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-                <div class="card rounded rounded-0">
-                    <img src="{{ product.images[0] }}" class="card-img-top rounded rounded-0" alt="{{ product.name }}">
-                    <div class="card-body">
-                        <h5 class="card-title text-center horizon-font fs-5">{{ product.name }}</h5>
+<section class="hero-section">
+    <div class="container card-container">
+        <input type="radio" name="slider" id="item-1" checked>
+        <input type="radio" name="slider" id="item-2">
+        <input type="radio" name="slider" id="item-3">
+        <div class="cards">
+            <label class="card" for="item-1" id="card-1">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 text-left">
+                        <h1>FLAT <strong>60%</strong> off on T-shirts</h1>
+                        <p class="lead">Explore our collection of products and services.</p>
+                    </div>
+                    <div class="col-lg-4 text-right">
+                        <button type="button" class="btn btn-outline-light">
+                            <img src="/static/images/product1.jpeg" alt="Product 1" class="img-fluid">
+                        </button>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            </label>
+            <label class="card" for="item-2" id="card-2">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 text-left">
+                        <h1>Welcome to Our Website</h1>
+                        <p class="lead">Explore our collection of products and services.</p>
+                    </div>
+                    <div class="col-lg-4 text-right">
+                        <button type="button" class="btn btn-outline-light">Get Started</button>
+                    </div>
+                </div>
+            </label>
+            <label class="card" for="item-3" id="card-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 text-left">
+                        <h1>Welcome 3</h1>
+                        <p class="lead">Explore our collection of products and services.</p>
+                    </div>
+                    <div class="col-lg-4 text-right">
+                        <button type="button" class="btn btn-outline-light">Get Started</button>
+                    </div>
+                </div>
+            </label>
         </div>
     </div>
+</section>
+<div>
+    <section class="featured-products">
+        <div class="container-fluid">
+            <h2 class="section-title text-center">Featured Products</h2>
+            {% set product = products[0] %}
+            {% set total_products = products | length %}
+            {% for i in range((total_products/4) | int) %}
+            <div class="row">
+                {% for j in range(4) %}
+                <div class="col-lg-3">
+                    <div class="product-card">
+                        <a href="Product.html">
+                            <img src="{{ product.images[0] }}" alt="Product 1" class="img-fluid main-image">
+                            <img src="{{ product.images[1] }}" alt="Product 1" class="img-fluid hover-image">
+                        </a>
+                        <h5 class="product-title p-3">{{ product.name }}</h5>
+                        <p class="product-price"> {{ product.price }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <div class="row">
+                {% for i in range((total_products%4)) %}
+                <div class="col-lg-3">
+                    <div class="product-card">
+                        <a href="Product.html">
+                            <img src="{{ product.images[0] }}" alt="Product 1" class="img-fluid main-image">
+                            <img src="{{ product.images[1] }}" alt="Product 1" class="img-fluid hover-image">
+                        </a>
+                        <h5 class="product-title p-3">{{ product.name }}</h5>
+                        <p class="product-price"> {{ product.price }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </section>
 </div>
 
 {{ footer.footer() }}
