@@ -40,7 +40,6 @@ app.secret_key = f"{SECRET_KEY}"
 csrf = CSRFProtect(app)
 login_manager.init_app(app)
 
-conn.set_trace_callback(print)
 conn.row_factory = sqlite_row_factory
 
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))

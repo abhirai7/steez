@@ -129,14 +129,11 @@ def razorpay_webhook():
 
 @app.route("/payment-success")
 def payment_success():
-    html = r"SUCCESS! Your payment was successful. You can now close this tab."
-    return html
+    return render_template("payment_status.html", status="ok")
 
 
 @app.route("/payment-failure")
 def payment_failure():
-    html = r"FAILURE! Your payment was unsuccessful. You can now close this tab."
-    return html
-
+    return render_template("payment_status.html", status="error")
 
 csrf.exempt(razorpay_webhook)

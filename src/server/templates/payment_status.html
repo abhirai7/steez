@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% set title = 'STEEZ™ - Payment Status' %}
+
+{% block body %}
+{% if status == 'ok' %}
+    <div class="alert alert-success" role="alert">
+        Payment Successful! Redirecting in <span id="countdown">5</span> seconds...
+    </div>
+{% else %}
+    <div class="alert alert-danger" role="alert">
+        Payment Failed! Redirecting in <span id="countdown">5</span> seconds...
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block script_bottom %}
+
+<script>
+    var countdown = 5;
+    var x = setInterval(function () {
+        countdown--;
+        document.getElementById("countdown").innerText = countdown;
+        if (countdown <= 0) {
+            clearInterval(x);
+            window.location.href = `{{ url_for('home') }}`;
+        }
+    }, 1000);
+</script>
+
+{% endblock %}
