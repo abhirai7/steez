@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.product import Product
+from src.order import Order
 from src.server import app, conn
 from src.server.forms import ProductAddForm
 
@@ -65,3 +66,10 @@ def admin_delete_product(id):
         os.remove(f"{UPLOAD_FOLDER}/{id}/{file}")
 
     return redirect(url_for("admin_manage_product"))
+
+
+@app.route("/admin/manage/order", methods=["GET"])
+@login_required
+def admin_manage_order():
+    orders = Order.all(conn)
+    return render_template("admin_manage_order.html", orders=orders)

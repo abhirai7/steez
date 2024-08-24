@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% set title = 'STEEZ™ - Admin' %}
+
+
+{% block body %}
+<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - Orders</p>
+
+<div class="container consolas">
+    <div class="row mt-3">
+        <div class="col">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Razorpay Order ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        {% set product = order.product %}
+
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.name }}</td>
+                        <td><a href="{{ url_for('product', product_id=product.id) }}">{{ product.name }}</a></td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.total_price }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.razorpay_order_id }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

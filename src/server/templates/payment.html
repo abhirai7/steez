@@ -27,7 +27,7 @@
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
-                if (data.status === 'success') {
+                if (data.status === 'ok') {
                     window.location.href = `{{ url_for('payment_success') }}`;
                 } else {
                     window.location.href = `{{ url_for('payment_failure') }}`;
