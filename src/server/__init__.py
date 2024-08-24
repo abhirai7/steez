@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING
 
 import razorpay
 from dotenv import load_dotenv
-from flask import Flask, session
+from flask import Flask
 from flask_login import LoginManager, current_user
+from flask_wtf import CSRFProtect
 
 from src.user import User
 from src.utils import sqlite_row_factory
@@ -36,6 +37,7 @@ conn: sqlite3.Connection = sqlite3.connect("database.sqlite", check_same_thread=
 conn.executescript(schema)
 
 app.secret_key = f"{SECRET_KEY}"
+csrf = CSRFProtect(app)
 login_manager.init_app(app)
 
 conn.set_trace_callback(print)

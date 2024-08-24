@@ -2,14 +2,6 @@
 
 {% set title = 'STEEZ™ - Admin' %}
 
-{% block style %}
-<style>
-.consolas {
-    font-family: 'Courier New', Courier, monospace
-}
-</style>
-{% endblock %}
-
 
 {% block body %}
 <p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - Product Management</p>
@@ -34,19 +26,19 @@
                 </thead>
                 <tbody>
                     {% for product in products %}
-                        <tr>
-                            <td>{{ product.id }}</td>
-                            <td>{{ product.name }}</td>
-                            <td>{{ product.price }}</td>
-                            <td>{{ product.stock }}</td>
-                            <td>
-                                <a href="{{ url_for('admin_edit_product', id=product.id) }}" class="btn btn-warning rounded rounded-0">Edit</a>
-                                <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger rounded rounded-0">Delete</a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_edit_product', id=product.id) }}" class="btn btn-warning rounded rounded-0">Edit</a>
+                            <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger rounded rounded-0">Delete</a>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}

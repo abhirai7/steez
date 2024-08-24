@@ -1,14 +1,11 @@
-from flask import redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user, current_user
-from werkzeug import Response
-
-from src.server import app, conn
-from src.server.forms import ProductAddForm, ProductEditForm
-from src.user import Admin
-from src.product import Product
-from src.user import User
-from src.order import Order
 import os
+
+from flask import redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+
+from src.product import Product
+from src.server import app, conn
+from src.server.forms import ProductAddForm
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
 
@@ -26,9 +23,11 @@ def admin_add_product():
     addform: ProductAddForm = ProductAddForm()
 
     if addform.validate_on_submit() and request.method == "POST":
-
         assert (
-            addform.name.data and addform.price.data and addform.stock.data and addform.description.data 
+            addform.name.data
+            and addform.price.data
+            and addform.stock.data
+            and addform.description.data
         )
 
         product = Product.create(
@@ -61,6 +60,8 @@ def admin_edit_product(id):
 @login_required
 def admin_delete_product(id):
     current_user.delete_product(conn, id)
+
+    for file in os.listdir(f"{UPLOAD_FOLDER}/{id}/"):
+        os.remove(f"{UPLOAD_FOLDER}/{id}/{file}")
+
     return redirect(url_for("admin_manage_product"))
-
-

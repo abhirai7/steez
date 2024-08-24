@@ -8,8 +8,6 @@ from src.user import User
 
 @app.route("/login", methods=["GET", "POST"])
 @app.route("/login/", methods=["GET", "POST"])
-@app.route("/signin", methods=["GET", "POST"])
-@app.route("/signin/", methods=["GET", "POST"])
 def login_route():
     login: LoginForm = LoginForm(conn)
 
@@ -36,8 +34,6 @@ def logout():
 
 @app.route("/register", methods=["GET", "POST"])
 @app.route("/register/", methods=["GET", "POST"])
-@app.route("/signup", methods=["GET", "POST"])
-@app.route("/signup/", methods=["GET", "POST"])
 def register():
     register: RegisterForm = RegisterForm(conn)
 
@@ -60,7 +56,7 @@ def register():
             email=register.email.data,
             password=register.password.data,
             address=address,
-            phone=register.phone.data,
+            phone=str(register.phone.data),
         )
 
         login_user(user)

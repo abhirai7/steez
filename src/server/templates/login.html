@@ -50,50 +50,11 @@
     .fs {
         font-size: 7rem;
     }
-
-    .type-animation {
-        overflow: hidden;
-        border-right: .15em solid black;
-        white-space: nowrap;
-        letter-spacing: .15em;
-        animation:
-            typing 2.5s steps(40, end),
-            blink-caret .75s step-end infinite;
-    }
-
-    @keyframes typing {
-        from {
-            width: 0
-        }
-
-        to {
-            width: 100%
-        }
-    }
-
-    @keyframes blink-caret {
-
-        from,
-        to {
-            border-color: transparent
-        }
-
-        50% {
-            border-color: black;
-        }
-    }
-</style>
-<style>
-    #password::placeholder,
-    #show-password,
-    #email::placeholder {
-        font-family: 'Courier New', Courier, monospace;
-    }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="p-4 mt-5 d-none d-lg-block d-xl-block d-xxl-block">
+<div class="p-4 mt-5">
     <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - LOGIN</p>
     <div class="container">
         <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">

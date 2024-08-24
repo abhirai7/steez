@@ -1,21 +1,10 @@
 import sqlite3
 
 from flask_wtf import FlaskForm
-from wtforms import EmailField, PasswordField, StringField, SubmitField
+from wtforms import EmailField, IntegerField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from src.user import User
-
-
-class IntegerNumber:
-    def __init__(self, message: str = "Not a valid number"):
-        self.message = message
-
-    def __call__(self, form, field):
-        try:
-            int(field.data)
-        except ValueError:
-            raise ValidationError(self.message)
 
 
 class LoginForm(FlaskForm):
@@ -64,8 +53,8 @@ class RegisterForm(FlaskForm):
 
     city = StringField("", validators=[DataRequired()])
     state = StringField("", validators=[DataRequired()])
-    pincode = StringField("", validators=[DataRequired(), Length(min=6), Length(max=6)])
-    phone = StringField("", validators=[DataRequired(), Length(min=10), Length(max=10), IntegerNumber()])
+    pincode = IntegerField("", validators=[DataRequired()])
+    phone = IntegerField("", validators=[DataRequired()])
 
     submit = SubmitField("Register")
 
@@ -80,6 +69,24 @@ class RegisterForm(FlaskForm):
 
         return True
 
+    def validate_phone(self, phone: IntegerField):
+        assert phone.data
+
+        phone_str = str(phone.data)
+        if len(phone_str) != 10:
+            raise ValidationError("Phone number must be 10 digits long")
+
+        return True
+
+    def validate_pincode(self, pincode: IntegerField):
+        assert pincode.data
+
+        pincode_str = str(pincode.data)
+        if len(pincode_str) != 6:
+            raise ValidationError("Pincode must be 6 digits long")
+
+        return True
+
 
 class AdminForm(FlaskForm):
     def __init__(self, connection: sqlite3.Connection, *args, **kwargs):
@@ -90,4 +97,5 @@ class AdminForm(FlaskForm):
     submit = SubmitField("Login")
 
 
-from .product_form import *
+from .cart import *  # noqa
+from .product_form import *  # noqa

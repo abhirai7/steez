@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% set title = 'STEEZ™ - Contact' %}
+
+{% import 'navbar.html' as navbar %}
+{% import 'footer.html' as footer %}
+
+{% block script %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    function razorPayCallback(response) {
+        const url = `{{ url_for('razorpay_webhook') }}`;
+
+        const data = {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                if (data.status === 'success') {
+                    window.location.href = `{{ url_for('payment_success') }}`;
+                } else {
+                    window.location.href = `{{ url_for('payment_failure') }}`;
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                window.location.href = `{{ url_for('payment_failure') }}`;
+            });
+    }
+    var options = {
+        key: `{{ razorpay_key }}`,
+        amount: `{{ amount }}`,
+        currency: "INR",
+        name: "STEEZ™",
+        description: "Payment",
+        order_id: `{{ order_id }}`,
+        prefill: {
+            name: `{{ current_user.name }}`,
+            email: `{{ current_user.email }}`,
+            contact: `{{ current_user.phone }}`
+        },
+        notes: {
+            address: `{{ current_user.address }}`
+        },
+        handler: function (response) {
+            razorPayCallback(response);
+        },
+        timeout: 900,
+    }
+    var rzpy = new Razorpay(options);
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById(`rzp-button`).onclick = function (e) {
+            rzpy.open();
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}
+
+
+{% block body %}
+{{ navbar.navbar(current_user) }}
+
+<div class="container text-center mt-5">
+    <hr>
+    <div>
+        <h3>Your Order has being recorded.</h3>
+        <h4>Thank you for shopping with us.</h4>
+    </div>
+    <button type="button" class="btn btn-primary rounded rounded-0 mt-5" id="rzp-button">Pay with Razor</button>
+</div>
+
+{% endblock %}

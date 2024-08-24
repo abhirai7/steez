@@ -52,26 +52,6 @@
     .fs {
         font-size: 7rem;
     }
-
-    .type-animation {
-        overflow: hidden;
-        border-right: .15em solid black;
-        white-space: nowrap;
-        letter-spacing: .15em;
-        animation: 
-            typing 2.5s steps(40, end),
-            blink-caret .75s step-end infinite;
-    }
-
-    @keyframes typing {
-        from { width: 0 }
-        to { width: 100% }
-      }
-      
-    @keyframes blink-caret {
-        from, to { border-color: transparent }
-        50% { border-color: black; }
-    }
 </style>
 
 <style>
@@ -89,16 +69,17 @@
     <div class="mt-5">
         <h2 class="text-center horizon-font fs-2 mb-4">Featured Products</h2>
         <div class="row row-cols-lg-5">
-        {% for product in products %}
-            <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-                <div class="card rounded rounded-0">
-                    <img src="{{ product.images[0] }}" class="card-img-top rounded rounded-0" alt="{{ product.name }}">
-                    <div class="card-body">
-                        <h5 class="card-title text-center horizon-font fs-5">{{ product.name }}</h5>
+            {% for product in products %}
+                <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
+                    <div class="card rounded rounded-0">
+                        <img src="{{ product.images[0] }}" class="card-img-top rounded rounded-0" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title text-center horizon-font fs-5">{{ product.name }}</h5>
+                        </div>
+                        <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </div>

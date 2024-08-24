@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import datetime
 import sqlite3
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from .product import Product
     from .user import User
+
+
+VALID_STATUS = Literal["PEND", "CONF", "PAID"]
 
 
 class Order:
@@ -56,13 +59,27 @@ class Order:
     @classmethod
     def delete(cls, connection: sqlite3.Connection, order_id: int) -> None:
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM orders WHERE id = ?", (order_id,))
+        cursor.execute("DELETE FROM ORDERS WHERE id = ?", (order_id,))
         connection.commit()
 
     @classmethod
     def from_id(cls, connection: sqlite3.Connection, order_id: int) -> Order:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM orders WHERE id = ?", (order_id,))
+        cursor.execute("SELECT * FROM ORDERS WHERE id = ?", (order_id,))
+        row = cursor.fetchone()
+        if row is None:
+            error = "Order not found."
+            raise ValueError(error) from None
+        return cls(connection, **row)
+
+    @classmethod
+    def from_razorpay_order_id(
+        cls, connection: sqlite3.Connection, razorpay_order_id: str
+    ) -> Order:
+        cursor = connection.cursor()
+        cursor.execute(
+            "SELECT * FROM ORDERS WHERE razorpay_order_id = ?", (razorpay_order_id,)
+        )
         row = cursor.fetchone()
         if row is None:
             error = "Order not found."
@@ -84,6 +101,20 @@ class Order:
     @classmethod
     def all(cls, connection: sqlite3.Connection) -> list[Order]:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM orders")
+        cursor.execute("SELECT * FROM ORDERS")
         rows = cursor.fetchall()
         return [cls(connection, **row) for row in rows]
+
+    def update_order_status(
+        self, *, status: VALID_STATUS, razorpay_order_id: str
+    ) -> None:
+        cursor = self.connection.cursor()
+        assert razorpay_order_id == self.razorpay_order_id
+
+        cursor.execute(
+            r"UPDATE ORDERS SET STATUS = ? WHERE RAZORPAY_ORDER_ID = ? AND ID = ? AND STATUS = 'CONF' AND USER_ID = ?",
+            (status, razorpay_order_id, self.id, self.user_id),
+        )
+        self.connection.commit()
+        self.status = status
+        self.razorpay_order_id = razorpay_order_id

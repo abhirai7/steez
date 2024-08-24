@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% set title = 'STEEZ™ - Contact' %}
+
+{% import 'navbar.html' as navbar %}
+{% import 'footer.html' as footer %}
+
+
+{% block body %}
+{{ navbar.navbar(current_user) }}
+
+<div class="container-xxl mt-4">    
+    <h3>Return Policy</h3>
+
+    <hr>
+
+    <div class="row mb-5">
+        <div class="col-3 d-flex justify-content-end">
+            <h2 class="fs-5">Eligibility</h2>
+        </div>
+        <div class="col-9">
+            <ul class="">
+                <li>Items must be returned within 10 days of the delivery date.</li>
+                <li>Products must be unworn, unwashed, and in their original packaging with all tags attached.</li>
+                <li>Sale items and customized products are not eligible for returns or exchanges unless they are defective or damaged.</li>
+            </ul>
+        </div>
+
+        <div class="col-3 d-flex justify-content-end">
+            <h2 class="fs-5">Return Process</h2>
+        </div>
+        <div class="col-9">
+            <ul class="">
+                <li>Contact our customer support team at [email/contact form link] to initiate a return</li>
+                <li>Provide your order number and reason for return.</li>
+                <li>Once your return request is approved, we will provide you with a return shipping label.</li>
+                <li>Please pack the items securely and include a copy of the receipt or proof of purchase.</li>
+            </ul>
+        </div>
+
+        <div class="col-3 d-flex justify-content-end">
+            <h2 class="fs-5">Return Shipping</h2>
+        </div>
+        <div class="col-9">
+            <ul class="">
+                <li>We offer free return shipping for domestic orders. For international returns, the customer is responsible for return shipping costs.</li>
+                <li>Returns should be shipped within 7 days of receiving the return shipping label.</li>
+            </ul>
+        </div>
+
+        <div class="col-3 d-flex justify-content-end">
+            <h2 class="fs-5">Refunds</h2>
+        </div>
+        <div class="col-9">
+            <ul class="">
+                <li>Once we receive and inspect the returned item(s), we will notify you of the approval or rejection of your refund.</li>
+                <li>If approved, your refund will be processed within 7-10 business days, and a credit will automatically be applied to your original method of payment</li>
+                <li>Please note that the original shipping cost is non-refundable unless the return is due to an error on our part.</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Exchange Policy</h3>
+
+    <hr>
+
+    <div class="row mb-5">
+        <div class="col-3 d-flex justify-content-end">
+            <h2 class="fs-5">Eligibility</h2>
+        </div>
+        <div class="col-9">
+            <ul class="">
+                <li>Items can be exchanged for a different size or color within 10 days of the delivery date.</li>
+                <li>The item must meet the same conditions as returns (unworn, unwashed, and in original packaging)</li>
+            </ul>
+        </div>
+
+        <div class="col-3 d-flex justify-content-end">
+            <h2 class="fs-5">Exchange Process</h2>
+        </div>
+        <div class="col-9">
+            <ul class="">
+                <li>Contact our customer support to initiate an exchange.</li>
+                <li>Once your exchange request is approved, we will provide instructions for returning the original item.</li>
+                <li>We will ship the new item after receiving the original item and confirming its condition.</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Defective or Damaged Products</h3>
+
+    <hr>
+
+    <div class="mb-5">
+        If you receive a defective or damaged product, please contact us immediately at [email/contact form link]. We will arrange for a replacement or full refund, including shipping costs
+    </div>
+
+    <h3>Non-Returnable Items</h3>
+
+    <hr>
+
+    <div class="mb-5">
+        <ul class="">
+            <li>Gift cards</li>
+            <li>Final Sale Items</li>
+            <li>Customized or personalized products</li>
+        </ul>
+    </div>
+</div>
+
+{{ footer.footer() }}
+{% endblock %}

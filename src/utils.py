@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import locale
 import os
 import pathlib
 import random
@@ -15,6 +16,8 @@ load_dotenv()
 
 KT = TypeVar("KT")
 VT = TypeVar("VT")
+
+REGION = "en_IN"
 
 
 class IndexedDict(Generic[KT, VT]):
@@ -294,3 +297,19 @@ def get_product_pictures(product_id: int) -> list[str]:
         files.append("/" + str(path_from_static))
 
     return files
+
+
+size_chart = {
+    "XX-SMALL": {"CHEST": "37''", "LENGTH": "26.5''"},
+    "X-SMALL": {"CHEST": "39''", "LENGTH": "27''"},
+    "SMALL": {"CHEST": "41''", "LENGTH": "27.5''"},
+    "MEDIUM": {"CHEST": "43''", "LENGTH": "28''"},
+    "LARGE": {"CHEST": "45''", "LENGTH": "29''"},
+    "X-LARGE": {"CHEST": "47''", "LENGTH": "30''"},
+    "XX-LARGE": {"CHEST": "51''", "LENGTH": "31''"},
+    "XXX-LARGE": {"CHEST": "53''", "LENGTH": "32''"},
+}
+
+
+def format_number(number: int, /) -> str:
+    return locale.format_string("%d", number, grouping=True)

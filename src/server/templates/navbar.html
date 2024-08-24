@@ -15,11 +15,7 @@
     });
 
 </script>
-<style>
-    .search-input::placeholder {
-        font-family: 'Courier New', Courier, monospace;
-    }
-</style>
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary mt-3">
     <div class="container-fluid">
         <a class="nav-link active horizon-font fs-4" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
@@ -28,7 +24,8 @@
         </form>
         {% if current_user.is_authenticated %}
             <div class="d-flex">
-                <p class="me-3">Logged in as {{ current_user.name }}</p>
+                <p class="me-3">{{ current_user.name }}</p>
+                <a class="nav-link me-3" href="{{ url_for('checkout') }}">Checkout {% set total = current_user.cart.count %}{% if total %}<sup>{{ total }}</sup>{% endif %}</a>
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
             </div>
         {% else %}

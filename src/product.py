@@ -1,12 +1,93 @@
 from __future__ import annotations
 
 import sqlite3
-from typing import Literal, overload
-from .utils import get_product_pictures
+from typing import TYPE_CHECKING, Literal
+
 from fuzzywuzzy import fuzz
+
+from .utils import get_product_pictures
+
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
 QUANTITY = int
+
+if TYPE_CHECKING:
+    from .user import User
+
+
+class Review:
+    def __init__(
+        self,
+        connection: sqlite3.Connection,
+        *,
+        id: int,
+        user_id: int,
+        product_id: int,
+        review: str | None = None,
+        stars: VALID_STARS,
+        created_at: str | None = None,
+    ):
+        self.__conn = connection
+        self.id = id
+        self.user_id = user_id
+        self.product_id = product_id
+        self.stars = stars
+        self.review = review
+        self.created_at = created_at
+
+    @property
+    def user(self) -> User:
+        from .user import User
+
+        return User.from_id(self.__conn, self.user_id)
+
+    @property
+    def product(self) -> Product:
+        return Product.from_id(self.__conn, self.product_id)
+
+    @classmethod
+    def create(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        user_id: int,
+        product_id: int,
+        review: str,
+        stars: VALID_STARS,
+    ) -> Review:
+        query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?) RETURNING *"
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, product_id, stars, review))
+        data = cursor.fetchone()
+        connection.commit()
+
+        return cls(connection, **data)
+
+    @classmethod
+    def from_user(cls, connection: sqlite3.Connection, *, user_id: int) -> list[Review]:
+        query = r"SELECT * FROM REVIEWS WHERE USER_ID = ?"
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id,))
+        rows = cursor.fetchall()
+
+        return [cls(connection, **row) for row in rows]
+
+    @classmethod
+    def from_product(
+        cls, connection: sqlite3.Connection, *, product_id: int
+    ) -> list[Review]:
+        query = r"SELECT * FROM REVIEWS WHERE PRODUCT_ID = ?"
+        cursor = connection.cursor()
+        cursor.execute(query, (product_id,))
+        rows = cursor.fetchall()
+
+        return [cls(connection, **row) for row in rows]
+
+    def delete(self) -> None:
+        query = r"DELETE FROM REVIEWS WHERE `USER_ID` = ? AND `PRODUCT_ID` = ?"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.user_id, self.product_id))
+        self.__conn.commit()
 
 
 class Product:
@@ -28,11 +109,14 @@ class Product:
         self.images = get_product_pictures(id)
         self.stock = stock
 
-    def add_review(self, *, user_id: int, stars: VALID_STARS, review: str | None):
-        query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?)"
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (user_id, self.id, stars, review))
-        self.__conn.commit()
+    @property
+    def reviews(self) -> list[Review]:
+        return Review.from_product(self.__conn, product_id=self.id)
+
+    def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
+        return Review.create(
+            self.__conn, user_id=user_id, product_id=self.id, stars=stars, review=review
+        )
 
     def del_review(self, *, user_id: int) -> None:
         query = r"DELETE FROM REVIEWS WHERE `USER_ID` = ? AND `PRODUCT_ID` = ?"
@@ -50,7 +134,7 @@ class Product:
             return False
 
         stock = stock[0]
-        return stock > count
+        return stock >= count and stock > 0
 
     def use(self, count: QUANTITY = 1) -> None:
         query = r"UPDATE PRODUCTS SET STOCK = STOCK - ? WHERE ID = ? AND STOCK >= ?"
@@ -102,7 +186,7 @@ class Product:
             error = "Product not found."
             raise ValueError(error) from None
         return cls(connection, **row)
-    
+
     @classmethod
     def all(cls, connection: sqlite3.Connection) -> list[Product]:
         query = r"SELECT * FROM PRODUCTS"
@@ -121,7 +205,6 @@ class Product:
         )
         return fuzz_sort
 
-
     def json(self) -> dict:
         return {
             "id": self.id,
@@ -130,6 +213,7 @@ class Product:
             "description": self.description,
             "stock": self.stock,
         }
+
 
 class Cart:
     def __init__(
@@ -140,74 +224,54 @@ class Cart:
     ):
         self.__conn = connection
         self.user_id = user_id
-        self._products: dict[PRODUCT_ID, QUANTITY] = {}
-
-        self.init()
 
     def get_product(self, product_id: PRODUCT_ID) -> Product:
         return Product.from_id(self.__conn, product_id)
 
-    @overload
-    def get_products(self, json: Literal[False]) -> dict[Product, QUANTITY]: ...
-
-    @overload
-    def get_products(self, json: Literal[True]) -> list: ...
-
-    def get_products(self, json: bool = False) -> dict[Product, QUANTITY] | list:
-        if not json:
-            return [
-                self.get_product(product_id).json()
-                for product_id, _ in self._products.items()
-            ]
-
-        return {
-            self.get_product(product_id): quantity
-            for product_id, quantity in self._products.items()
-        }
-
-    def init(self) -> None:
-        query = r"SELECT PRODUCT_ID, QUANTITY FROM CARTS WHERE USER_ID = ?"
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (self.user_id,))
-        rows = cursor.fetchall()
-        self._products = {product_id: quantity for product_id, quantity in rows}
-
-    def add_product(self, *, product: Product, quantity: QUANTITY = 1) -> None:
+    def add_product(self, *, product: Product, quantity: QUANTITY | None = 1) -> None:
+        quantity = quantity or 1
         if not product.is_available(quantity):
             error = "Product is not available."
             raise ValueError(error)
 
-        if product.id in self._products:
-            self._products[product.id] += quantity
-        else:
-            self._products[product.id] = quantity
+        query = "INSERT INTO CARTS (USER_ID, PRODUCT_ID, QUANTITY) VALUES (?, ?, ?) ON CONFLICT(USER_ID, PRODUCT_ID) DO UPDATE SET QUANTITY = QUANTITY + ?"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.user_id, product.id, quantity, quantity))
+        self.__conn.commit()
 
         product.use(quantity)
 
-    def remove_product(self, *, product: Product, quantity: QUANTITY = 1) -> None:
-        if product.id in self._products:
-            if self._products[product.id] <= 0:
-                del self._products[product.id]
-            else:
-                self._products[product.id] -= quantity
-        else:
-            error = "Product not found in cart."
-            raise ValueError(error)
-
-        product.release(quantity)
-
-    def _sql_update_cart(self) -> None:
-        query = r"INSERT OR REPLACE INTO CARTS (USER_ID, PRODUCT_ID, QUANTITY) VALUES (?, ?, ?)"
+    def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
+        query = (
+            r"DELETE FROM CARTS WHERE USER_ID = ? AND PRODUCT_ID = ? RETURNING QUANTITY"
+        )
         cursor = self.__conn.cursor()
-
-        for product_id, quantity in self._products.items():
-            cursor.execute(query, (self.user_id, product_id, quantity))
-
+        cursor.execute(query, (self.user_id, product.id))
+        row = cursor.fetchone()
         self.__conn.commit()
 
-    def update_to_database(self) -> None:
-        self._sql_update_cart()
+        product.release(int(row[0]))
 
+    def total(self) -> float:
+        query = r"""
+            SELECT SUM(QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID))
+            FROM CARTS
+            WHERE USER_ID = ?
+        """
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.user_id,))
+        total = cursor.fetchone()
+        return float(total[0] or 0.0)
+
+    @property
+    def count(self) -> int:
+        query = r"SELECT SUM(DISTINCT PRODUCT_ID) FROM CARTS WHERE USER_ID = ?"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.user_id,))
+        count = cursor.fetchone()
+        return int(count[0] or 0)
+
+    def update_to_database(self) -> None:
         query = r"""
             INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE)
                 SELECT USER_ID, PRODUCT_ID, QUANTITY, QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)
@@ -227,14 +291,27 @@ class Cart:
             raise e
 
     def clear(self, *, product: Product | None = None) -> None:
-        if product is None:
-            self._products.clear()
-            return
+        query = r"DELETE FROM CARTS WHERE USER_ID = ?"
+        args = (self.user_id,)
 
-        if product.id in self._products:
-            count = self._products[product.id]
-            del self._products[product.id]
-            product.release(count)
-        else:
-            error = "Product not found in cart."
-            raise ValueError(error)
+        if product:
+            query += " AND PRODUCT_ID = ?"
+            args += (product.id,)
+
+        cursor = self.__conn.cursor()
+        cursor.execute(query, args)
+        self.__conn.commit()
+
+    def products(self) -> list[Product]:
+        query = r"SELECT PRODUCT_ID, QUANTITY FROM CARTS WHERE USER_ID = ?"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.user_id,))
+
+        products = []
+
+        while row := cursor.fetchone():
+            product = Product.from_id(self.__conn, row[0])
+            product.stock = row[1]
+            products.append(product)
+
+        return products

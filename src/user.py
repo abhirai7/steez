@@ -40,9 +40,20 @@ class User:
         self.is_anonymous = False
         self.is_authenticated = True
         self.__role = role
-    
+
     def get_id(self):
         return str(self.id)
+
+    @property
+    def orders(self) -> list[Order]:
+        from .order import Order
+
+        cursor = self.__conn.cursor()
+        query = r"""
+            SELECT * FROM ORDERS WHERE USER_ID = ?
+        """
+        cursor.execute(query, (self.id,))
+        return [Order(self.__conn, **row) for row in cursor.fetchall()]
 
     @property
     def is_admin(self):
@@ -130,17 +141,17 @@ class User:
 
         return cls(connection, **data)
 
-    def add_review(self, *, product: Product, stars: VALID_STARS, review: str | None):
+    def add_review(self, *, product: Product, stars: VALID_STARS, review: str):
         product.add_review(user_id=self.id, stars=stars, review=review)
 
     def del_review(self, *, product: Product) -> None:
         product.del_review(user_id=self.id)
 
-    def add_to_cart(self, *, product: Product, quantity: int = 1) -> None:
+    def add_to_cart(self, *, product: Product, quantity: int | None = 1) -> None:
         self.cart.add_product(product=product, quantity=quantity)
 
     def remove_from_cart(self, *, product: Product, quantity: int = 1) -> None:
-        self.cart.remove_product(product=product, quantity=quantity)
+        self.cart.remove_product(product=product)
 
     def clear_cart(self, *, product: Product | None = None) -> None:
         self.cart.clear(product=product)
@@ -166,16 +177,21 @@ class User:
         while row := cursor.fetchone():
             orders.append(Order(self.__conn, **row))
 
-        # cursor.execute("UPDATE `ORDERS` SET `STATUS` = 'CONF' WHERE `USER_ID` = ? AND `STATUS` = 'PEND'", (self.id,))
-        # self.__conn.commit()
-
         return orders
 
     def full_checkout(self, razorpay_client: RazorpayClient) -> RazorPayOrderDict:
-        orders = self.partial_checkout()
+        orders: list[Order] = self.partial_checkout()
 
         if not orders:
             error = "No orders found to checkout."
+            query = r"SELECT RAZORPAY_ORDER_ID FROM ORDERS WHERE USER_ID = ? AND STATUS != 'PAID' AND RAZORPAY_ORDER_ID IS NOT NULL"
+            cursor = self.__conn.cursor()
+            cursor.execute(query, (self.id,))
+            row = cursor.fetchone()
+            if row:
+                order_id = row[0]
+                return razorpay_client.order.fetch(order_id)
+
             raise ValueError(error)
 
         total_price = sum(order.total_price for order in orders)
@@ -190,7 +206,9 @@ class User:
         final_payload = {
             "amount": int(total_price * 100),
             "currency": "INR",
-            "notes": notes,
+            "notes": {
+                "products": notes,
+            },
         }
 
         api_response: dict = razorpay_client.order.create(final_payload)
@@ -232,7 +250,7 @@ class User:
         """
         cursor.execute(query, (email,))
         return cursor.fetchone() is not None
-    
+
     @classmethod
     def all(cls, connection: sqlite3.Connection) -> list[User]:
         cursor = connection.cursor()
@@ -248,7 +266,9 @@ class Admin(User):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def from_email(cls, connection: sqlite3.Connection, *, email: str = "", password: str) -> Admin:
+    def from_email(
+        cls, connection: sqlite3.Connection, *, email: str = "", password: str
+    ) -> Admin:
         cursor = connection.cursor()
         query = r"""
             SELECT * FROM USERS WHERE EMAIL = "" AND PASSWORD = ? AND ROLE = 'ADMIN'
@@ -273,7 +293,7 @@ class Admin(User):
         """
         cursor.execute(query, (user_id,))
         connection.commit()
-    
+
     @classmethod
     def delete_product(cls, connection: sqlite3.Connection, product_id: int) -> None:
         cursor = connection.cursor()

@@ -1,13 +1,11 @@
 from flask import redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user, current_user
+from flask_login import current_user, login_required, login_user, logout_user
 
+from src.order import Order
+from src.product import Product
 from src.server import app, conn
 from src.server.forms import AdminForm
-from src.user import Admin
-from src.product import Product
-from src.user import User
-from src.order import Order
-
+from src.user import Admin, User
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -17,9 +15,7 @@ def admin_login():
     if form.validate_on_submit() and request.method == "POST":
         assert form.password.data
 
-        admin = Admin.from_email(
-            conn, password=form.password.data
-        )
+        admin = Admin.from_email(conn, password=form.password.data)
         login_user(admin)
         return redirect(url_for("admin_dashboard"))
 
@@ -42,4 +38,10 @@ def admin_dashboard():
     users = User.all(conn)
     orders = Order.all(conn)
 
-    return render_template("admin_dashboard.html", products=products, users=users, orders=orders, current_user=current_user)
+    return render_template(
+        "admin_dashboard.html",
+        products=products,
+        users=users,
+        orders=orders,
+        current_user=current_user,
+    )

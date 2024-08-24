@@ -2,7 +2,7 @@ from flask import redirect, url_for
 from werkzeug import Response
 
 from src.server import conn, login_manager
-from src.user import User, Admin
+from src.user import Admin, User
 
 
 @login_manager.user_loader

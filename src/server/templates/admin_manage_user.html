@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% set title = 'STEEZ™ - Admin' %}
+
+{% block body %}
+<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - User Management</p>
+
+<div class="container consolas">
+    <div class="row mt-3">
+        <div class="col">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.address }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>
+                            {% if user.role != 'ADMIN' %}
+                            <a href="{{ url_for('admin_delete_user', id=user.id) }}" class="btn btn-danger rounded rounded-0">Delete</a>
+                            {% else %}
+                            <button class="btn btn-secondary rounded rounded-0" disabled>Delete</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endblock %}
