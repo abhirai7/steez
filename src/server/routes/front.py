@@ -33,3 +33,10 @@ def search(query: str):
 @app.route("/refund-policy")
 def refund_policy():
     return render_template("refund_policy.html")
+
+
+@app.route("/order-history/")
+@app.route("/order-history")
+def order_history():
+    orders = current_user.orders
+    return render_template("order_history.html", orders=orders, current_user=current_user)

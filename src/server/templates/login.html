@@ -54,59 +54,47 @@
 {% endblock %}
 
 {% block body %}
-<div class="p-4 mt-5">
-    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - LOGIN</p>
-    <div class="container">
-        <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">
-            {{ form.csrf_token }}
-            <div class="input-group mb-2">
-                {{ form.email(class="form-control rounded rounded-0", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}
-            </div>
-            {% if form.email.errors %}
-                <div class="alert alert-danger mt-2" role="alert">
-                    {% for error in form.email.errors %}
-                        <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="container-sm card rounded rounded-0 p-5" style="max-width: 1000px;">
+        <div class="row">
+            <div class="col bg-transparent">
+                <div class="card-body bg-transparent">
+                    <h1 class="card-title horizon-font text-center" id="heading">STEEZ<sup>TM</sup> - LOGIN</h1>
+                    <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">
+                        {{ form.csrf_token }}
+                        <div class="input-group mb-2">
+                            {{ form.email(class="form-control rounded rounded-0", id="email", placeholder="Enter the Email", **{"aria-label": "Enter the Email", "aria-describedby": "email"}) }}
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {% for error in form.email.errors %}
+                                    <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
 
-            <div class="input-group mb-2">
-                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
-                <button class="btn btn-outline-secondary rounded rounded-0" type="button" id="show-password">Show Password</button>
-            </div>
-            {% if form.password.errors %}
-                <div class="alert alert-danger mt-2" role="alert">
-                    {% for error in form.password.errors %}
-                        <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {%endfor%}
-                </div>
-            {% endif %}
+                        <div class="input-group mb-2">
+                            {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {% for error in form.password.errors %}
+                                    <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                {%endfor%}
+                            </div>
+                        {% endif %}
 
-            <div class="text-center">
-                <p class="fs-5 mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="link-secondary">Register here</a></p>
-                {% if error %}
-                <p class="alert alert-danger" role="alert"><i class="bi bi-exclamation-circle"></i> {{ error }}</p>
-                {% endif %}
-                {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+                        <div class="text-center">
+                            <p class="fs-5 mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="link-secondary">Register here</a></p>
+                            {% if error %}
+                            <p class="alert alert-danger" role="alert"><i class="bi bi-exclamation-circle"></i> {{ error }}</p>
+                            {% endif %}
+                            {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
-{% endblock %}
-
-{% block script_bottom %}
-<script>
-    const password = document.getElementById('password');
-    const showPassword = document.getElementById('show-password');
-
-    showPassword.addEventListener('click', () => {
-        if (password.type === 'password') {
-            password.type = 'text';
-            showPassword.textContent = 'Hide Password';
-        } else {
-            password.type = 'password';
-            showPassword.textContent = 'Show Password';
-        }
-    });
-</script>
 {% endblock %}

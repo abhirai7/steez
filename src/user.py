@@ -50,7 +50,7 @@ class User:
 
         cursor = self.__conn.cursor()
         query = r"""
-            SELECT * FROM ORDERS WHERE USER_ID = ?
+            SELECT * FROM ORDERS WHERE USER_ID = ? ORDER BY CREATED_AT DESC
         """
         cursor.execute(query, (self.id,))
         return [Order(self.__conn, **row) for row in cursor.fetchall()]
