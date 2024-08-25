@@ -57,12 +57,6 @@ class Order:
         return cls(connection, **row)
 
     @classmethod
-    def delete(cls, connection: sqlite3.Connection, order_id: int) -> None:
-        cursor = connection.cursor()
-        cursor.execute("DELETE FROM ORDERS WHERE id = ?", (order_id,))
-        connection.commit()
-
-    @classmethod
     def from_id(cls, connection: sqlite3.Connection, order_id: int) -> Order:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM ORDERS WHERE id = ?", (order_id,))
@@ -118,3 +112,14 @@ class Order:
         self.connection.commit()
         self.status = status
         self.razorpay_order_id = razorpay_order_id
+
+    @classmethod
+    def delete(
+        cls, connection: sqlite3.Connection, *, order_id: int, user_id: int
+    ) -> None:
+        cursor = connection.cursor()
+        cursor.execute(
+            "DELETE FROM ORDERS WHERE ID = ? AND STATUS != 'PAID' AND USER_ID = ?",
+            (order_id, user_id),
+        )
+        connection.commit()

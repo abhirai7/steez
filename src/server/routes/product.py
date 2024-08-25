@@ -136,4 +136,12 @@ def payment_success():
 def payment_failure():
     return render_template("payment_status.html", status="error")
 
+
+@app.route("/delete-order/<int:order_id>")
+@login_required
+def delete_order(order_id: int):
+    Order.delete(conn, order_id=order_id, user_id=current_user.id)
+    return redirect(url_for("order_history"))
+
+
 csrf.exempt(razorpay_webhook)

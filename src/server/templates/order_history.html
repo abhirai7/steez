@@ -16,13 +16,15 @@
         <p class="text-center fs-1">Order History</p>
         {% for order in orders %}
             {% set product = order.product %}
-            <div class="card mt-3 rounded rounded-0">
-                <div class="card-body">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="{{ product.images[0] }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+            <div class="card mb-2 rounded rounded-0">
+                <div class="card-body m-3">
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <img src="{{ product.images[0] }}" class="img-thumbnail rounded rounded-0" alt="{{ product.name }}" style="width: 250px">
+                            </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-9">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-4">
@@ -35,7 +37,7 @@
                                     </div>
                                     <div class="col-4">
                                         <span class="text-muted">Order ID: {{ order.id }}</span>
-                                        <p class="fs-6">Status: {{ order.status }}</p>
+                                        <p class="fs-6">Status: {% if order.status == 'CONF' %}NOT PAID{% else %}{{ order.status }}{% endif %}</p>
                                     </div>
                                     <div class="col-4">
                                         <span class="text-muted">Order Date:</span>
@@ -48,6 +50,18 @@
                                     <div class="col-4">
                                         <span class="text-muted">Shipping Address:</span>
                                         <p class="fs-6">{{ current_user.address }}</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="text-muted">ETA</span>
+                                        <p class="fs-6 fst-italic">Can not be determined</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="text-muted">Delete Order</span>
+                                        {% if order.status == 'CONF' %}
+                                            <p><a href="{{ url_for('delete_order', order_id=order.id) }}" class="text-dark link-underline-dark">Click Here to Delete</a></p>
+                                        {% else %}
+                                            <p class="text-dark link-underline-dark">Can not delete this order</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

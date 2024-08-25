@@ -5,48 +5,6 @@
 
 {% set title = 'STEEZ™' %}
 
-{% block script %}
-<script>
-    function glitchText() {
-        let heading = document.getElementById('heading');
-
-        function generateRandomText() {
-            let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
-            let randomText = '';
-            randomText += Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
-            return `ST${randomText}Z<sup>TM</sup>`;
-        }
-
-        let iterations = 9;
-        let interval = 80;
-
-        let randomHtmls = [];
-
-        for (let i = 0; i < iterations; i++) {
-            randomHtmls.push(generateRandomText());
-        }
-
-        let reversedRandomHtmls = randomHtmls.slice().reverse();
-
-        var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
-        allRandomHtmls.push('STEEZ<sup>TM</sup>');
-        
-
-        allRandomHtmls.forEach((randomHtml, index) => {
-            setTimeout(() => {
-                heading.innerHTML = randomHtml;
-            }, index * interval);
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            glitchText();
-        }, 14000);
-    });
-</script>
-{% endblock %}
-
 {% block style %}
 <style>
     .fs {
@@ -65,21 +23,42 @@
 {% block body %}
 {{ navbar.navbar(current_user) }}
 
-<div>
-    <div class="mt-5">
-        <h2 class="text-center horizon-font fs-2 mb-4">Featured Products</h2>
-        <div class="row row-cols-lg-5">
-            {% for product in products %}
-                <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-                    <div class="card rounded rounded-0">
-                        <img src="{{ product.images[0] }}" class="card-img-top rounded rounded-0" alt="{{ product.name }}">
-                        <div class="card-body">
-                            <h5 class="card-title text-center horizon-font fs-5">{{ product.name }}</h5>
-                        </div>
-                        <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+{% if products %}
+<div class="mt-5">
+    <h2 class="text-center fs-1 mb-4">FEATURED PRODUCTS</h2>
+    <div class="row row-cols-lg-5">
+        {% for product in products %}
+            <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
+                <div class="card rounded rounded-0">
+                    <img src="{{ product.images[0] }}" class="card-img-top rounded rounded-0" alt="{{ product.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
+                        <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
                     </div>
+                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                 </div>
-            {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card rounded rounded-0 p-5">
+    <div class="row">
+        <div class="col-4 align-self-center">
+            <p class="fs-1 text-center">GIFT CARDS</p>
+        </div>
+        <div class="col-8">
+            <p class="fs-5 text-center">Gift cards are the perfect gift for any occasion. They are available in various denominations and can be used to purchase any product on our website.</p>
+            <form method="POST" action="#">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount</label>
+                    <input type="number" class="form-control rounded rounded-0" id="amount" name="amount" required>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary rounded rounded-0">Buy Gift Card</button>
+                <p class="fs-6 text-muted text-small mt-3">*Gift cards are non-refundable. For more information <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a></p>
+            </form>
         </div>
     </div>
 </div>

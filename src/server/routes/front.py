@@ -1,5 +1,5 @@
 from flask import render_template
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from src.product import Product
 from src.server import app, conn
@@ -37,6 +37,7 @@ def refund_policy():
 
 @app.route("/order-history/")
 @app.route("/order-history")
+@login_required
 def order_history():
     orders = current_user.orders
     return render_template("order_history.html", orders=orders, current_user=current_user)
