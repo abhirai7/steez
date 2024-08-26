@@ -1,0 +1,90 @@
+{% macro carousel() -%}
+<style>
+    .hero-section {
+        width: 100%;
+        height: 70vh;
+        background-image: url('/static/images/hero-background.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .card {
+        transition: transform .6s ease;
+        background-size: cover;
+        background-position: center;
+    }
+
+    #item-1:checked~.cards #card-3,
+    #item-2:checked~.cards #card-1,
+    #item-3:checked~.cards #card-2,
+    #item-4:checked~.cards #card-4 {
+        transform: translatex(-40%) scale(.8);
+        opacity: .4;
+        z-index: 0;
+    }
+
+    #item-1:checked~.cards #card-2,
+    #item-2:checked~.cards #card-3,
+    #item-3:checked~.cards #card-1,
+    #item-4:checked~.cards #card-4 {
+        transform: translatex(40%) scale(.8);
+        opacity: .4;
+        z-index: 0;
+    }
+
+    #item-1:checked~.cards #card-1,
+    #item-2:checked~.cards #card-2,
+    #item-3:checked~.cards #card-3,
+    #item-4:checked~.cards #card-4 {
+        transform: translatex(0) scale(1);
+        opacity: 1;
+        z-index: 1;
+    }
+</style>
+
+{% set placeholder = 'https://placehold.co/350x400' %}
+<!-- TODO: Fix Z-Axis -->
+
+<section class="hero-section d-flex justify-content-center align-items-center">
+    <div class="container card-container d-flex flex-wrap" style="transform-style: preserve-3d;">
+        <input type="radio" class="d-none" name="slider" id="item-1" checked>
+        <input type="radio" class="d-none" name="slider" id="item-2">
+        <input type="radio" class="d-none" name="slider" id="item-3">
+        <div class="cards d-flex h-100 w-100 position-relative justify-content-center align-items-center">
+            <label class="card rounded rounded-0 position-absolute" for="item-1" id="card-1">
+                <div class="row align-items-center p-5">
+                    <div class="col-lg-8 text-center">
+                        <h1>Lorem ipsum dolor sit amet.</h1>
+                        <p class="lead">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum, ducimus?</p>
+                    </div>
+                    <div class="col-lg-4 text-right d-flex justify-content-center align-items-center">
+                        <img src="{{ placeholder }}" alt="Image 1" class="img-fluid">
+                    </div>
+                </div>
+            </label>
+            <label class="card rounded rounded-0 position-absolute" for="item-2" id="card-2">
+                <div class="row align-items-center p-5">
+                    <div class="col-lg-8 text-center">
+                        <h1>Welcome to Our Website</h1>
+                        <p class="lead">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptates, aliquam.</p>
+                    </div>
+                    <div class="col-lg-4 text-right d-flex justify-content-center align-items-center">
+                        <img src="{{ placeholder }}" alt="Image 2" class="img-fluid">
+                    </div>
+                </div>
+            </label>
+            <label class="card rounded rounded-0 position-absolute" for="item-3" id="card-3">
+                <div class="row align-items-center p-5">
+                    <div class="col-lg-8 text-center">
+                        <h1>Lorem ipsum dolor sit amet.</h1>
+                        <p class="lead">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Consequatur, itaque.</p>
+                    </div>
+                    <div class="col-lg-4 text-right d-flex justify-content-center align-items-center">
+                        <img src="{{ placeholder }}" alt="Image 2" class="img-fluid">
+                    </div>
+                </div>
+            </label>
+        </div>
+    </div>
+</section>
+{%- endmacro %}

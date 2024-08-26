@@ -2,6 +2,7 @@
 
 {% import 'navbar.html' as navbar %}
 {% import 'footer.html' as footer %}
+{% import 'hero.html' as hero %}
 
 {% set title = 'STEEZ™' %}
 
@@ -22,6 +23,8 @@
 
 {% block body %}
 {{ navbar.navbar(current_user) }}
+
+{{ hero.carousel() }}
 
 {% if products %}
 <div class="mt-5">
