@@ -47,146 +47,200 @@
 
 {% block style %}
 <style>
-    .fs {
-        font-size: 7rem;
+    body {
+    background-color: #e9ecef; /* Light grey background for a softer look */
     }
+
+    .form-container {
+        margin: 0 auto; /* Center the form horizontally */
+        padding: 2rem; /* Increased padding for more spacious content */
+        background-color: #ffffff; /* White background for the form */
+        border-radius: .75rem; /* Slightly more rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    }
+
+.form-control {
+    border-radius: .5rem; /* Rounded corners for form controls */
+    border-color: #ced4da; /* Lighter border color for form controls */
+}
+
+.form-control:focus {
+    border-color: #80bdff; /* Highlight border color on focus */
+    box-shadow: 0 0 0 .2rem rgba(38, 143, 255, 0.25); /* Subtle focus shadow */
+}
+
+.alert {
+    border-radius: .5rem; /* Rounded corners for alerts */
+}
+
+.alert-info {
+    background-color: #d1ecf1; /* Light blue background for info alerts */
+    color: #0c5460; /* Darker blue text color for better readability */
+}
+
+.alert-danger {
+    background-color: #f8d7da; /* Light red background for error alerts */
+    color: #721c24; /* Darker red text color for better readability */
+}
+
+.btn-secondary {
+    background-color: #495057; /* Darker grey background for the button */
+    border-color: #6c757d; /* Matching border color */
+}
+
+.btn-secondary:hover {
+    background-color: #343a40; /* Darker grey on hover */
+    border-color: #23272b; /* Darker border color on hover */
+}
+
+
+
+
+.form-text {
+    color: #6c757d; /* Slightly darker text for help messages */
+}
+
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="p-4 mt-5">
-    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - REGISTER</p>
-    <div class="container">
-        <form action="{{ url_for('register') }}" method="POST">
-            {{ form.csrf_token }}
-            <p class="alert alert-info rounded rounded-0" role="alert" style="font-family: 'Courier New', Courier, monospace"><i class="bi bi-check-circle"></i> All fields marked with [*] are mandatory.</p>
-            {% if error %}
-                <p class="alert alert-danger" role="alert"><i class="bi bi-exclamation-circle"></i> {{ error }}</p>
-            {% endif %}
-    
-            <div class="mb-3">
-                {{ form.name.label(class="form-label fs-4") }}
-
-                {{ form.name(class="form-control rounded rounded-0", id="username", placeholder="[*] Enter your Name") }}
-                {% if form.name.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.Name.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
+<div class="container my-5">
+        <div class="form-container">
+            <p class="text-center horizon-font fs-1 mb-4" id="heading">STEEZ<sup>TM</sup> - REGISTER</p>
+            <form action="{{ url_for('register') }}" method="POST">
+                {{ form.csrf_token }}
+                <div class="alert alert-info rounded-0 mb-3" role="alert">
+                    <i class="bi bi-check-circle"></i> All fields marked with [*] are mandatory.
+                </div>
+                {% if error %}
+                    <div class="alert alert-danger rounded-0 mb-3" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ error }}
                     </div>
                 {% endif %}
-            </div>
     
-            <div class="mb-3">
-                {{ form.email(class="form-control rounded rounded-0", id="email", placeholder="[*] Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
-                {% if form.email.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.email.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-            </div>
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label fs-5") }}
+                    {{ form.name(class="form-control", id="username", placeholder="[*] Enter your Name") }}
+                    {% if form.name.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.name.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
     
-            <div class="mb-3">
-                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="[*] Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
-                {% if form.password.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.password.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                <div id="passwordHelp" class="form-text">Password must contain at least 8 characters.</div>
-            </div>
+                <div class="mb-3">
+                    {{ form.email(class="form-control", id="email", placeholder="[*] Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
+                    {% if form.email.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.email.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
     
-            <div class="mb-4">
-                {{ form.confirm_password(class="form-control rounded rounded-0", id="confirm_password", placeholder="[*] Confirm your Password") }}
+                <div class="mb-3">
+                    {{ form.password(class="form-control", id="password", placeholder="[*] Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
+                    {% if form.password.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.password.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div id="passwordHelp" class="form-text">Password must contain at least 8 characters.</div>
+                </div>
+    
+                <div class="mb-4">
+                    {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="[*] Confirm your Password") }}
                     {% if form.confirm_password.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.confirm_password.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.confirm_password.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-            <div class="mb-3">
-                {{ form.address_line1.label(class="form-label fs-4", id="address_line1") }}
-                {{ form.address_line1(class="form-control rounded rounded-0", id="address_line1", placeholder="[*] Enter your Address Line 1") }}
-                {% if form.address_line1.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.address_line1.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+                <div class="mb-3">
+                    {{ form.address_line1.label(class="form-label fs-5") }}
+                    {{ form.address_line1(class="form-control", id="address_line1", placeholder="[*] Enter your Address Line 1") }}
+                    {% if form.address_line1.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.address_line1.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-            <div class="mb-3">
-                {{ form.address_line2(class="form-control rounded rounded-0", id="address_line2", placeholder="Enter your Address Line 2") }}
-                {% if form.address_line2.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.address_line2.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="mb-3">
-                {{ form.pincode(class="form-control rounded rounded-0", id="pincode", placeholder="[*] Enter your Pincode") }}
-                {% if form.pincode.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.pincode.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+                <div class="mb-3">
+                    {{ form.address_line2(class="form-control", id="address_line2", placeholder="Enter your Address Line 2") }}
+                    {% if form.address_line2.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.address_line2.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.pincode(class="form-control", id="pincode", placeholder="[*] Enter your Pincode") }}
+                    {% if form.pincode.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.pincode.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-            <div class="mb-3">
-                {{ form.city(class="form-control rounded rounded-0 disable", id="city", placeholder="[*] Enter your City") }}
-                {% if form.city.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.city.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="mb-3">
-                {{ form.state(class="form-control rounded rounded-0 disable", id="state", placeholder="[*] Enter your State") }}
-                {% if form.state.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.state.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+                <div class="mb-3">
+                    {{ form.city(class="form-control", id="city", placeholder="[*] Enter your City") }}
+                    {% if form.city.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.city.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.state(class="form-control", id="state", placeholder="[*] Enter your State") }}
+                    {% if form.state.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.state.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-            <div class="mb-3">
-                {{ form.phone(class="form-control rounded rounded-0", id="phone", placeholder="[*] Enter your Phone Number") }}
-                {% if form.phone.errors %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        {% for error in form.phone.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+                <div class="mb-3">
+                    {{ form.phone(class="form-control", id="phone", placeholder="[*] Enter your Phone Number") }}
+                    {% if form.phone.errors %}
+                        <div class="alert alert-danger mt-2 rounded-0" role="alert">
+                            {% for error in form.phone.errors %}
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-            <div class="text-center mb-3">
-                <p class="fs-5">Already have an account? <a href="{{ url_for('login_route') }}" class="link-secondary">Login here</a></p>
-                {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
-            </div>
-        </form>
-        
+                <div class="text-center mb-3">
+                    <p class="fs-5">Already have an account? <a href="{{ url_for('login_route') }}" class="link-secondary">Login here</a></p>
+                    {{ form.submit(class="btn btn-secondary") }}
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% block script_bottom %}
