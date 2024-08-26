@@ -16,23 +16,23 @@
 <style>
     .zoom-on-hover:hover {
         transform: scale(1.05);
-        transition: transform 0.3s;
+        transition: transform 0.2s;
     }
 </style>
 {% endblock %}
 
 {% block body %}
 {{ navbar.navbar(current_user) }}
-
+<hr>
 {{ hero.carousel() }}
-
 {% if products %}
-<div class="mt-5">
-    <h2 class="text-center fs-1 mb-4">FEATURED PRODUCTS</h2>
+<hr>
+<div class="container-fluid mt-5">
+    <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
     <div class="row row-cols-lg-5">
         {% for product in products %}
             <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-                <div class="card rounded rounded-0">
+                <div class="card rounded rounded-0 shadow">
                     <img src="{{ product.images[0] }}" class="card-img-top rounded rounded-0" alt="{{ product.name }}">
                     <div class="card-body">
                         <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>

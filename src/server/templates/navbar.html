@@ -13,11 +13,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         loadSearchFunction();
     });
-
 </script>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary mt-2 mb-2">
-    <div class="container-fluid d-flex justify-content-between">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
         <div>
             <a class="nav-link active horizon-font fs-4" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
         </div>
@@ -25,15 +24,15 @@
             <input class="form-control me-2 rounded rounded-0 search-input" type="search" id="searchBar" placeholder="Search STEEZ™" aria-label="Search" style="height: 45px">
         </form>
         {% if current_user.is_authenticated %}
-            <div class="d-flex">
-                <p class="me-3"><a class="nav-link" href="{{ url_for('order_history') }}">Order History</a></p>
-                <a class="nav-link me-3" href="{{ url_for('checkout') }}">Checkout {% set total = current_user.cart.count %}{% if total %}<sup>{{ total }}</sup>{% endif %}</a>
-                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            <div class="d-flex align-items-center">
+                <a class="nav-link me-3 align-middle" href="{{ url_for('order_history') }}">Order History</a>
+                <a class="nav-link me-3 align-middle" href="{{ url_for('checkout') }}">Checkout {% set total = current_user.cart.count %}{% if total %}<sup>{{ total }}</sup>{% endif %}</a>
+                <a class="nav-link align-middle" href="{{ url_for('logout') }}">Logout</a>
             </div>
         {% else %}
-            <div class="d-flex">
-                <a class="nav-link me-3" href="{{ url_for('login_route') }}">Login</a>
-                <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+            <div class="d-flex align-items-center">
+                <a class="nav-link align-middle me-3" href="{{ url_for('login_route') }}">Login</a>
+                <a class="nav-link align-middle" href="{{ url_for('register') }}">Register</a>
             </div>
         {% endif %}
     </div>
