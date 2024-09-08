@@ -21,7 +21,7 @@ def generate_unique_identifier():
 @app.route("/admin/manage/product", methods=["GET", "POST"])
 @login_required
 def admin_manage_product():
-    products = Product.all(conn)
+    products = Product.all(conn, admin=True)
     return render_template("admin_manage_product.html", products=products)
 
 
@@ -75,9 +75,6 @@ def admin_edit_product(id):
 @login_required
 def admin_delete_product(id):
     current_user.delete_product(conn, id)
-
-    for file in os.listdir(f"{UPLOAD_FOLDER}/{id}/"):
-        os.remove(f"{UPLOAD_FOLDER}/{id}/{file}")
 
     return redirect(url_for("admin_manage_product"))
 

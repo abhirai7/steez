@@ -239,7 +239,7 @@ class Product:
         return ls
 
     @classmethod
-    def all(cls, connection: sqlite3.Connection) -> list[Product]:
+    def all(cls, connection: sqlite3.Connection, *, admin: bool = False) -> list[Product]:
         query = r"""
             SELECT *
             FROM PRODUCTS
@@ -249,6 +249,8 @@ class Product:
                 GROUP BY UNIQUE_ID
             )
         """
+        if admin:
+            query = "SELECT * FROM PRODUCTS"
 
         cursor = connection.cursor()
         cursor.execute(query)
