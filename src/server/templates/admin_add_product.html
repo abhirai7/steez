@@ -6,12 +6,12 @@
 <p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - Add Product</p>
 
 <div class="container">
-    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary rounded rounded-0 mb-3">Back</a>
+    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary mb-3">Back</a>
     <form action="{{ url_for('admin_add_product') }}" method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="input-group mb-2">
-            {{ form.name.label(class="input-group-text rounded rounded-0") }}
-            {{ form.name(class="form-control rounded rounded-0", placeholder="Enter the product name", id="name") }}
+            {{ form.name.label(class="input-group-text") }}
+            {{ form.name(class="form-control", placeholder="Enter the product name", id="name") }}
         </div>
 
         {% if form.name.errors %}
@@ -23,8 +23,8 @@
         {% endif %}
 
         <div class="input-group mb-2">
-            {{ form.price.label(class="input-group-text rounded rounded-0") }}
-            {{ form.price(class="form-control rounded rounded-0", placeholder="Enter the product price", id="price") }}
+            {{ form.price.label(class="input-group-text") }}
+            {{ form.price(class="form-control", placeholder="Enter the product price", id="price") }}
         </div>
 
         {% if form.price.errors %}
@@ -36,8 +36,8 @@
         {% endif %}
 
         <div class="input-group mb-2">
-            {{ form.description.label(class="input-group-text rounded rounded-0") }}
-            {{ form.description(class="form-control rounded rounded-0", placeholder="Enter the product description", id="description") }}
+            {{ form.description.label(class="input-group-text") }}
+            {{ form.description(class="form-control", placeholder="Enter the product description", id="description") }}
         </div>
 
         {% if form.description.errors %}
@@ -49,8 +49,8 @@
         {% endif %}
 
         <div class="input-group mb-2">
-            {{ form.images.label(class="input-group-text rounded rounded-0") }}
-            {{ form.images(class="form-control rounded rounded-0", placeholder="Enter the product image URL", id="image") }}
+            {{ form.images.label(class="input-group-text") }}
+            {{ form.images(class="form-control", placeholder="Enter the product image URL", id="image") }}
         </div>
 
         {% if form.images.errors %}
@@ -62,8 +62,8 @@
         {% endif %}
 
         <div class="input-group mb-2">
-            {{ form.stock.label(class="input-group-text rounded rounded-0") }}
-            {{ form.stock(class="form-control rounded rounded-0", placeholder="Enter the product stock", id="stock") }}
+            {{ form.stock.label(class="input-group-text") }}
+            {{ form.stock(class="form-control", placeholder="Enter the product stock", id="stock") }}
         </div>
 
         {% if form.stock.errors %}
@@ -75,11 +75,11 @@
         {% endif %}
 
         <div class="input-group mb-2">
-            {{ form.sizes.label(class="input-group-text rounded rounded-0") }}
-            {{ form.sizes(class="form-control rounded rounded-0") }}
+            {{ form.sizes.label(class="input-group-text") }}
+            {{ form.sizes(class="form-control") }}
         </div>
 
-        {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+        {{ form.submit(class="btn btn-secondary") }}
     </form>
 </div>
 {% endblock %}

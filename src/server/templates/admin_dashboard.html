@@ -6,24 +6,24 @@
 <p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - ADMIN DASHBORD</p>
 
 <div class="container">
-    <a href="{{ url_for('logout') }}" class="btn btn-danger rounded rounded-0 mb-3">Logout from Admin</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-danger mb-3">Logout from Admin</a>
     <div class="row p-3">
         <div class="col text-center consolas">
             <h3>Products</h3>
             <p class="text-muted fs-4">{{ products | length }}</p>
-            <a href="{{ url_for('admin_manage_product') }}" class="btn btn-primary rounded rounded-0">View</a>
+            <a href="{{ url_for('admin_manage_product') }}" class="btn btn-primary">View</a>
         </div>
 
         <div class="col text-center consolas">
             <h3>Orders</h3>
             <p class="text-muted fs-4">{{ orders | length }}</p>
-            <a href="{{ url_for('admin_manage_order') }}" class="btn btn-primary rounded rounded-0">View</a>
+            <a href="{{ url_for('admin_manage_order') }}" class="btn btn-primary">View</a>
         </div>
 
         <div class="col text-center consolas">
             <h3>Users</h3>
             <p class="text-muted fs-4">{{ users | length }}</p>
-            <a href="{{ url_for('admin_manage_user') }}" class="btn btn-primary rounded rounded-0">View</a>
+            <a href="{{ url_for('admin_manage_user') }}" class="btn btn-primary">View</a>
         </div>
     </div>
 </div>

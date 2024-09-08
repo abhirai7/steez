@@ -4,13 +4,13 @@
 
 {% block body %}
 {% if status == 'ok' %}
-    <div class="alert alert-success rounded rounded-0" role="alert">
-        Payment Successful! Redirecting in <span id="countdown">5</span> seconds...
-    </div>
+<div class="alert alert-success" role="alert">
+    Payment Successful! Redirecting in <span id="countdown">5</span> seconds...
+</div>
 {% else %}
-    <div class="alert alert-danger rounded rounded-0" role="alert">
-        Payment Failed! Redirecting in <span id="countdown">5</span> seconds...
-    </div>
+<div class="alert alert-danger" role="alert">
+    Payment Failed! Redirecting in <span id="countdown">5</span> seconds...
+</div>
 {% endif %}
 
 {% endblock %}

@@ -47,28 +47,28 @@
 
 {% block style %}
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-  }
-  
-  body {
-    justify-content: center;
-    align-items: center;
-  }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+    }
 
-  .container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 40px;
-    background-color: #fff;
-  }
-  
-  .login-section {
-    max-width: 800px;
-    background-image: url('{{ url_for("static", filename="images/login-background.jpg") }}');
-    border: 1px solid #ddd;
-  }
+    body {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .login-section {
+        max-width: 800px;
+        background-image: url('{{ url_for("static", filename="images/login-background.jpg") }}');
+        border: 1px solid #ddd;
+    }
 </style>
 
 {% endblock %}
@@ -80,25 +80,27 @@
         <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">
             {{ form.csrf_token }}
             <div class="input-group mb-3">
-                {{ form.email(class="form-control rounded rounded-0", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}
+                {{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email",
+                "aria-describedby": "email"}) }}
             </div>
             {% if form.email.errors %}
-                <div class="alert alert-danger mt-2" role="alert">
-                    {% for error in form.email.errors %}
-                        <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
+            <div class="alert alert-danger mt-2" role="alert">
+                {% for error in form.email.errors %}
+                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                {% endfor %}
+            </div>
             {% endif %}
 
             <div class="input-group mb-2">
-                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
+                {{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby":
+                "show-password"}) }}
             </div>
             {% if form.password.errors %}
-                <div class="alert alert-danger mt-2" role="alert">
-                    {% for error in form.password.errors %}
-                        <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {%endfor%}
-                </div>
+            <div class="alert alert-danger mt-2" role="alert">
+                {% for error in form.password.errors %}
+                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                {%endfor%}
+            </div>
             {% endif %}
 
             <div class="text-center">
@@ -106,7 +108,7 @@
                 {% if error %}
                 <p class="alert alert-danger" role="alert"><i class="bi bi-exclamation-circle"></i> {{ error }}</p>
                 {% endif %}
-                {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+                {{ form.submit(class="btn btn-secondary") }}
             </div>
         </form>
     </div>

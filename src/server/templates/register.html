@@ -57,7 +57,7 @@
 
 {% block body %}
 <div class="container my-5">
-    <div class="form-container p-5 rounded rounded-0">
+    <div class="form-container p-5">
         <p class="text-center horizon-font fs-1 mb-4" id="heading">STEEZ<sup>TM</sup> - REGISTER</p>
         <form action="{{ url_for('register') }}" method="POST">
             {{ form.csrf_token }}
@@ -72,7 +72,7 @@
 
             <div class="mb-3">
                 {{ form.name.label(class="form-label fs-5") }}
-                {{ form.name(class="form-control rounded rounded-0", id="username", placeholder="[*] Enter your Name") }}
+                {{ form.name(class="form-control", id="username", placeholder="[*] Enter your Name") }}
                 {% if form.name.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.name.errors %}
@@ -83,7 +83,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.email(class="form-control rounded rounded-0", id="email", placeholder="[*] Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
+                {{ form.email(class="form-control", id="email", placeholder="[*] Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
                 {% if form.email.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.email.errors %}
@@ -95,7 +95,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="[*] Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
+                {{ form.password(class="form-control", id="password", placeholder="[*] Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
                 {% if form.password.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.password.errors %}
@@ -107,7 +107,7 @@
             </div>
 
             <div class="mb-4">
-                {{ form.confirm_password(class="form-control rounded rounded-0", id="confirm_password", placeholder="[*] Confirm your Password") }}
+                {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="[*] Confirm your Password") }}
                 {% if form.confirm_password.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.confirm_password.errors %}
@@ -119,7 +119,7 @@
 
             <div class="mb-3">
                 {{ form.address_line1.label(class="form-label fs-5") }}
-                {{ form.address_line1(class="form-control rounded rounded-0", id="address_line1", placeholder="[*] Enter your Address Line 1") }}
+                {{ form.address_line1(class="form-control", id="address_line1", placeholder="[*] Enter your Address Line 1") }}
                 {% if form.address_line1.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.address_line1.errors %}
@@ -130,7 +130,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.address_line2(class="form-control rounded rounded-0", id="address_line2", placeholder="Enter your Address Line 2") }}
+                {{ form.address_line2(class="form-control", id="address_line2", placeholder="Enter your Address Line 2") }}
                 {% if form.address_line2.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.address_line2.errors %}
@@ -141,7 +141,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.pincode(class="form-control rounded rounded-0", id="pincode", placeholder="[*] Enter your Pincode") }}
+                {{ form.pincode(class="form-control", id="pincode", placeholder="[*] Enter your Pincode") }}
                 {% if form.pincode.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.pincode.errors %}
@@ -152,7 +152,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.city(class="form-control rounded rounded-0", id="city", placeholder="[*] Enter your City") }}
+                {{ form.city(class="form-control", id="city", placeholder="[*] Enter your City") }}
                 {% if form.city.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.city.errors %}
@@ -163,7 +163,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.state(class="form-control rounded rounded-0", id="state", placeholder="[*] Enter your State") }}
+                {{ form.state(class="form-control", id="state", placeholder="[*] Enter your State") }}
                 {% if form.state.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.state.errors %}
@@ -174,7 +174,7 @@
             </div>
 
             <div class="mb-3">
-                {{ form.phone(class="form-control rounded rounded-0", id="phone", placeholder="[*] Enter your Phone Number") }}
+                {{ form.phone(class="form-control", id="phone", placeholder="[*] Enter your Phone Number") }}
                 {% if form.phone.errors %}
                 <div class="alert alert-danger mt-2 rounded-0" role="alert">
                     {% for error in form.phone.errors %}

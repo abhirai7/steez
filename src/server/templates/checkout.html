@@ -30,7 +30,7 @@
             <h2 class="fs-5 text-muted fst-italic">No products in cart</h2>
             {% endif %}
             {% for product in products %}
-            <div class="card mb-2 p-3 rounded rounded-0" style="max-width: 540px;">
+            <div class="card mb-2 p-3" style="max-width: 540px;">
                 <div class="row">
                     <div class="col-4">
                         <img src="{{ product.images[0] }}" class="img-fluid rounded-start" alt="{{ product.name }}">
@@ -58,7 +58,7 @@
                         <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                     </div>
                 </div>
-                <a href="{{ url_for('remove_from_cart', product_id=product.id) }}" class="btn btn-outline-danger rounded rounded-0 z-1">Remove</a>
+                <a href="{{ url_for('remove_from_cart', product_id=product.id) }}" class="btn btn-outline-danger z-1">Remove</a>
             </div>
             {% endfor %}
         </div>
@@ -66,14 +66,14 @@
             <h2 class="fs-5">Apply Gift Card</h2>
         </div>
         <div class="col-10 mb-4">
-            <input type="text" class="form-control rounded rounded-0" placeholder="Gift Card Code (if any)" name="code" style="max-width: 540px;" id="gift-card-input">
+            <input type="text" class="form-control" placeholder="Gift Card Code (if any)" name="code" style="max-width: 540px;" id="gift-card-input">
             <p class="text-muted mt-1 fs-6">* Gift card will be used and applied automatically on checkout.</p>
         </div>
         <div class="col-2 d-flex justify-content-end mb-4">
             <h2 class="fs-5">Summary</h2>
         </div>
         <div class="col-10 mb-4">
-            <div class="card mb-2 p-3 rounded rounded-0" style="max-width: 540px;">
+            <div class="card mb-2 p-3" style="max-width: 540px;">
                 <div class="card-body">
                     <table>
                         <tbody>
@@ -94,10 +94,10 @@
                 </div>
             </div>
             {% if products | length > 0 %}
-            <button class="btn btn-danger rounded rounded-0 z-1" id="final-checkout">Final Checkout</a>
-            {% else %}
-            <a href="{{ url_for('home') }}" class="btn btn-danger rounded rounded-0 z-1 disabled">Final Checkout</a>
-            {% endif %}
+            <button class="btn btn-danger z-1" id="final-checkout">Final Checkout</a>
+                {% else %}
+                <a href="{{ url_for('home') }}" class="btn btn-danger z-1 disabled">Final Checkout</a>
+                {% endif %}
 
         </div>
         <p class="fs-6 text-muted mt-5 text-center">
@@ -115,7 +115,7 @@
     const giftCardInput = document.getElementById('gift-card-input');
 
     finalCheckoutButton.addEventListener('click', () => {
-       let uri = `{{ url_for('final_checkout') }}?gift-code=${giftCardInput.value}`; 
+        let uri = `{{ url_for('final_checkout') }}?gift-code=${giftCardInput.value}`;
         window.location.href = uri;
     });
 </script>

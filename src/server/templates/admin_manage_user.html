@@ -6,7 +6,7 @@
 <p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - User Management</p>
 
 <div class="container consolas">
-    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary rounded rounded-0 mb-3">Back</a>
+    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary mb-3">Back</a>
     <div class="row mt-3">
         <div class="col">
             <table class="table table-striped">
@@ -30,9 +30,9 @@
                         <td>{{ user.phone }}</td>
                         <td>
                             {% if user.role != 'ADMIN' %}
-                            <a href="{{ url_for('admin_delete_user', id=user.id) }}" class="btn btn-danger rounded rounded-0">Delete</a>
+                            <a href="{{ url_for('admin_delete_user', id=user.id) }}" class="btn btn-danger">Delete</a>
                             {% else %}
-                            <button class="btn btn-secondary rounded rounded-0" disabled>Delete</button>
+                            <button class="btn btn-secondary" disabled>Delete</button>
                             {% endif %}
                         </td>
                     </tr>

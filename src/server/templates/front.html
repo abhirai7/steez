@@ -21,7 +21,6 @@
 </style>
 
 <style>
-
     .image-transition img.image-1 {
         opacity: 1;
         transition: opacity 0.5s;
@@ -36,8 +35,6 @@
         opacity: 0;
         transition: opacity 0.5s;
     }
-
-    
 </style>
 {% endblock %}
 
@@ -52,47 +49,49 @@
     <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
     <div class="row row-cols-lg-5">
         {% for product in products %}
-            <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-                <div class="card rounded rounded-0 shadow image-transition">
-                    {% for image in product.images %}
-                        <img src="{{ image }}" class="card-img-top rounded rounded-0 image-{{ loop.index }}" alt="{{ product.name }}">
-                    {% endfor %}
-                    <div class="card-body">
-                        <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
-                        <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
-                    </div>
-                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+        <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
+            <div class="card shadow image-transition">
+                {% for image in product.images %}
+                <img src="{{ image }}" class="card-img-top image-{{ loop.index }}" alt="{{ product.name }}">
+                {% endfor %}
+                <div class="card-body">
+                    <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
+                    <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
                 </div>
+                <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>
 {% endif %}
 
-<div class="card rounded rounded-0 p-5">
+<div class="card p-5">
     <div class="row">
         <div class="col-4 align-self-center">
             <p class="fs-1 text-center">GIFT CARDS</p>
         </div>
         <div class="col-8">
-            <p class="fs-5 text-center">Gift cards are the perfect gift for any occasion. They are available in various denominations and can be used to purchase any product on our website.</p>
+            <p class="fs-5 text-center">Gift cards are the perfect gift for any occasion. They are available in various denominations and can be used to purchase any
+                product on our website.</p>
             <form method="POST" action="{{ url_for('buy_gift_card') }}">
                 {{ gift_form.csrf_token }}
                 <div class="mb-3">
                     {{ gift_form.amount.label(class="form-label") }}
-                    {{ gift_form.amount(class="form-control rounded rounded-0", id="amount") }}
+                    {{ gift_form.amount(class="form-control", id="amount") }}
                 </div>
                 {% if gift_form.errors %}
-                    <div class="alert alert-danger mt-3 rounded rounded-0" role="alert">
-                        {% for error in gift_form.errors %}
-                            <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger mt-3" role="alert">
+                    {% for error in gift_form.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
                 {% endif %}
 
-                {{ gift_form.submit(class="btn btn-outline-secondary rounded rounded-0") }}
+                {{ gift_form.submit(class="btn btn-outline-secondary") }}
 
-                <p class="fs-6 text-muted text-small mt-3">*Gift cards are non-refundable. For more information <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a></p>
+                <p class="fs-6 text-muted text-small mt-3">*Gift cards are non-refundable. For more information <a href="{{ url_for('refund_policy') }}"
+                        class="link-underlink-dark text-muted">Click Here</a></p>
             </form>
         </div>
     </div>

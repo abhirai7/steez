@@ -8,69 +8,69 @@
 {{ navbar(current_user) }}
 
 {% if orders | length == 0 %}
-    <div class="container mt-5">
-        <p class="text-center fs-1">No orders found!</p>
-    </div>
+<div class="container mt-5">
+    <p class="text-center fs-1">No orders found!</p>
+</div>
 {% else %}
-    <div class="container mt-5">
-        <p class="text-center fs-1">Order History</p>
-        {% for order in orders %}
-            {% set product = order.product %}
-            <div class="card mb-2 rounded rounded-0">
-                <div class="card-body m-3">
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <img src="{{ product.images[0] }}" class="img-thumbnail rounded rounded-0" alt="{{ product.name }}" style="width: 250px">
+<div class="container mt-5">
+    <p class="text-center fs-1">Order History</p>
+    {% for order in orders %}
+    {% set product = order.product %}
+    <div class="card mb-2">
+        <div class="card-body m-3">
+            <div class="row">
+                <div class="col-3">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <img src="{{ product.images[0] }}" class="img-thumbnail" alt="{{ product.name }}" style="width: 250px">
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4">
+                                <span class="text-muted">Product ID: {{ product.id }}</span>
+                                <a href="{{ url_for('product', product_id=product.id) }}" class="nav-link fs-5">{{ product.name }}</a>
                             </div>
-                        </div>
-                        <div class="col-9">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <span class="text-muted">Product ID: {{ product.id }}</span>
-                                        <a href="{{ url_for('product', product_id=product.id) }}" class="nav-link fs-5">{{ product.name }}</a>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">Quantity: {{ order.quantity }}</span>
-                                        <p class="fs-6">INR. {{ order.total_price }}</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">Order ID: {{ order.id }}</span>
-                                        <p class="fs-6">Status: {% if order.status == 'CONF' %}NOT PAID{% else %}{{ order.status }}{% endif %}</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">Order Date:</span>
-                                        <p class="fs-6">{{ order.created_at }}</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">Razorpay Order ID:</span>
-                                        <p class="fs-6">{{ order.razorpay_order_id }}</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">Shipping Address:</span>
-                                        <p class="fs-6">{{ current_user.address }}</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">ETA</span>
-                                        <p class="fs-6 fst-italic">Can not be determined</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted">Delete Order</span>
-                                        {% if order.status == 'CONF' %}
-                                            <p><a href="{{ url_for('delete_order', order_id=order.id) }}" class="text-dark link-underline-dark">Click Here to Delete</a></p>
-                                        {% else %}
-                                            <p class="text-dark link-underline-dark">Can not delete this order</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                            <div class="col-4">
+                                <span class="text-muted">Quantity: {{ order.quantity }}</span>
+                                <p class="fs-6">INR. {{ order.total_price }}</p>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted">Order ID: {{ order.id }}</span>
+                                <p class="fs-6">Status: {% if order.status == 'CONF' %}NOT PAID{% else %}{{ order.status }}{% endif %}</p>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted">Order Date:</span>
+                                <p class="fs-6">{{ order.created_at }}</p>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted">Razorpay Order ID:</span>
+                                <p class="fs-6">{{ order.razorpay_order_id }}</p>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted">Shipping Address:</span>
+                                <p class="fs-6">{{ current_user.address }}</p>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted">ETA</span>
+                                <p class="fs-6 fst-italic">Can not be determined</p>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted">Delete Order</span>
+                                {% if order.status == 'CONF' %}
+                                <p><a href="{{ url_for('delete_order', order_id=order.id) }}" class="text-dark link-underline-dark">Click Here to Delete</a></p>
+                                {% else %}
+                                <p class="text-dark link-underline-dark">Can not delete this order</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
+        </div>
     </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 {% endblock %}

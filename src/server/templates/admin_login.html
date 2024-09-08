@@ -61,18 +61,19 @@
             {{ form.csrf_token }}
 
             <div class="input-group mb-2">
-                {{ form.password(class="form-control rounded rounded-0", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
+                {{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby":
+                "show-password"}) }}
             </div>
             {% if form.password.errors %}
-                <div class="alert alert-danger mt-2" role="alert">
-                    {% for error in form.password.errors %}
-                        <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {%endfor%}
-                </div>
+            <div class="alert alert-danger mt-2" role="alert">
+                {% for error in form.password.errors %}
+                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                {%endfor%}
+            </div>
             {% endif %}
 
             <div class="text-center">
-                {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
+                {{ form.submit(class="btn btn-secondary") }}
             </div>
         </form>
     </div>

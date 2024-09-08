@@ -29,7 +29,7 @@
 <hr>
 <div class="container-xl mt-3">
     {% if error %}
-    <div class="alert alert-danger p-2 rounded rounded-0 text-center" role="alert">
+    <div class="alert alert-danger p-2 text-center" role="alert">
         <i class="bi bi-exclamation-diamond"></i> Item not found, Possible reason: product size not available.
     </div>
     {% endif %}
@@ -41,9 +41,9 @@
                     <img src="{{ product.images[0] }}" class="img-fluid large-image z-1 object-fit-cover shadow position-absolute overflow-visible" alt="{{ product.name }}">
                 </div>
             </div>
-            <div class="thumbnails d-flex justify-content-center mt-1 rounded rounded-0 z-2">
+            <div class="thumbnails d-flex justify-content-center mt-1 z-2">
                 {% for image in product.images %}
-                <img src="{{ image }}" class="img-thumbnail rounded rounded-0 border border-1 object-fir-cover" alt="{{ product.name }}">
+                <img src="{{ image }}" class="img-thumbnail border border-1 object-fir-cover" alt="{{ product.name }}">
                 {% endfor %}
             </div>
         </div>
@@ -52,7 +52,7 @@
             <p class="fs-1">{{ product.name }}</p>
             <p class="fs-6 text-muted">{{ product.average_rating }} ({{ product.total_reviews }} reviews)</p>
             <p class="fs-5">Price: INR. {{ product.price }}</p>
-            <p class="fs-6">{{ product.description }}</p>
+            <p class="fs-6">{{ product.description | safe }}</p>
             <hr>
             <div class="mt-2">
                 <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
@@ -62,24 +62,34 @@
                         <div class="col">
                             <div class="form-group mb-2">
                                 {{ form.quantity.label(class="form-label text-muted") }}
-                                {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6", placeholder="Quantity") }}
+                                {{ form.quantity(class="form-control form-control-lg fs-6", placeholder="Quantity") }}
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group mb-2">
                                 {{ form.size.label(class="form-label text-muted") }}
-                                {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6", placeholder="Select Size") }}
+                                {{ form.size(class="form-select form-select-lg fs-6", placeholder="Select Size") }}
                             </div>
                         </div>
                     </div>
 
-                    {% if current_user.is_authenticated %}
-                        {{ form.submit(class="btn btn-outline-secondary w-100 rounded rounded-0 mt-2", id="add-to-cart") }}
-                        <a href="{{ url_for('checkout') }}" class="btn btn-outline-danger w-100 rounded rounded-0 mt-2">Checkout</a>
-                    {% else %}
-                        <a href="{{ url_for('login_route') }}" class="btn btn-outline-secondary w-100 rounded rounded-0 mt-2">Login to Add to Cart</a>
-                        <a href="{{ url_for('login_route') }}" class="btn btn-outline-danger w-100 rounded rounded-0 mt-2">Login to Checkout</a>
-                    {% endif %}
+                    <div class="row">
+                        {% if current_user.is_authenticated %}
+                        <div class="col">
+                            {{ form.submit(class="btn btn-outline-secondary w-100 mt-2", id="add-to-cart") }}
+                        </div>
+                        <div class="col">
+                            <a href="{{ url_for('checkout') }}" class="btn btn-outline-danger w-100 mt-2">Checkout</a>
+                        </div>
+                        {% else %}
+                        <div class="col">
+                            <a href="{{ url_for('login_route') }}" class="btn btn-outline-secondary w-100 mt-2">Login to Add to Cart</a>
+                        </div>
+                        <div class="col">
+                            <a href="{{ url_for('login_route') }}" class="btn btn-outline-danger w-100 mt-2">Login to Checkout</a>
+                        </div>
+                        {% endif %}
+                    </div>
                 </form>
 
             </div>
@@ -112,20 +122,20 @@
             <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
                 {{ review_form.hidden_tag() }}
                 <div class="form-group mb-3">
-                    {{ review_form.review(class="form-control rounded rounded-0") }}
+                    {{ review_form.review(class="form-control") }}
                 </div>
                 <div class="form-group">
-                    {{ review_form.submit(class="btn btn-outline-secondary rounded rounded-0") }}
+                    {{ review_form.submit(class="btn btn-outline-secondary") }}
                 </div>
             </form>
             {% else %}
-            <a href="{{ url_for('login_route') }}" class="btn btn-outline-secondary rounded rounded-0">Login to Add Review</a>
+            <a href="{{ url_for('login_route') }}" class="btn btn-outline-secondary">Login to Add Review</a>
             {% endif %}
 
             <hr>
 
             {% for review in product.reviews %}
-            <div class="card mt-2 rounded rounded-0">
+            <div class="card mt-2">
                 <div class="card-body">
                     <h6 class="card-title text-muted">{{ review.user.name }} {% for i in range(review.stars) %}<i class="bi bi-star-fill"></i>{% endfor %}</h6>
                     <p class="card-text fs-6">{{ review.review }}</p>
