@@ -344,7 +344,6 @@ class Cart:
         cursor = self.__conn.cursor()
 
         try:
-            cursor.execute(r"BEGIN TRANSACTION")
             cursor.execute(
                 query,
                 (
@@ -353,10 +352,11 @@ class Cart:
                 ),
             )
             cursor.execute(r"DELETE FROM CARTS WHERE USER_ID = ?", (self.user_id,))
-            cursor.execute(r"COMMIT")
+            self.__conn.commit()
         except sqlite3.Error as e:
-            cursor.execute(r"ROLLBACK")
+            self.__conn.commit()
             raise e
+        
 
     def clear(self, *, product: Product | None = None) -> None:
         query = r"DELETE FROM CARTS WHERE USER_ID = ?"
