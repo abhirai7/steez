@@ -28,6 +28,11 @@
 
 <hr>
 <div class="container-xl mt-3">
+    {% if error %}
+    <div class="alert alert-danger p-2 rounded rounded-0 text-center" role="alert">
+        <i class="bi bi-exclamation-diamond"></i> Item not found, Possible reason: product size not available.
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col">
             <div class="position-relative">
@@ -48,9 +53,7 @@
             <p class="fs-6 text-muted">{{ product.average_rating }} ({{ product.total_reviews }} reviews)</p>
             <p class="fs-5">Price: INR. {{ product.price }}</p>
             <p class="fs-6">{{ product.description }}</p>
-            
             <hr>
-
             <div class="mt-2">
                 <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
                     {{ form.hidden_tag() }}
@@ -134,7 +137,7 @@
 {{ footer.footer() }}
 {% endblock %}
 
-{% block script %}
+{% block bottom_script %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const mainImage = document.querySelector('.main-image img');
@@ -168,6 +171,9 @@
             largeImage.style.transform = `scale(${zoomFactor})`;
         });
     });
-
+</script>
+<script>
+    const alertList = document.querySelectorAll('.alert')
+    const alerts = [...alertList].map(element => new bootstrap.Alert(element))
 </script>
 {% endblock %}

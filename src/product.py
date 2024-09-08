@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 
 from fuzzywuzzy import fuzz
 
-from .utils import generate_gift_card_code, get_product_pictures
+from .utils import generate_gift_card_code, get_product_pictures, size_names
 
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
@@ -112,6 +112,7 @@ class Product:
         self.images = get_product_pictures(unique_id)
         self.stock = stock
         self.size = size
+        self.size_name = size_names[size]
 
     @property
     def reviews(self) -> list[Review]:

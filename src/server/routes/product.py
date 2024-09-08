@@ -39,6 +39,7 @@ def product(product_id: int):
         current_user=current_user,
         form=cart_form,
         review_form=review_form,
+        error=request.args.get("error"),
     )
 
 
@@ -50,8 +51,11 @@ def add_to_cart(product_id: int):
 
     if form.validate_on_submit() and request.method == "POST" and form.quantity.data and form.size.data:
         try:
-            product = product.from_unique_id(conn, product.unique_id, size=form.size.data)
-            current_user.add_to_cart(product=product[0], quantity=form.quantity.data)
+            products = product.from_unique_id(conn, product.unique_id, size=form.size.data)
+            if not products:
+                return redirect(url_for("product", product_id=product_id, error="Item not available"))
+
+            current_user.add_to_cart(product=products[0], quantity=form.quantity.data)
         except ValueError as e:
             flash(str(e), "error")
 
