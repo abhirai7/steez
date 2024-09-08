@@ -7,6 +7,7 @@
 <p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - Product Management</p>
 
 <div class="container consolas">
+    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary rounded rounded-0 mb-3">Back</a>
     <div class="row">
         <div class="col text-center">
             <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary rounded rounded-0">Add Product</a>
@@ -36,7 +37,6 @@
                         <td>{{ product.stock }}</td>
                         <td>{{ product.size_name }}</td>
                         <td>
-                            <a href="{{ url_for('admin_edit_product', id=product.id) }}" class="btn btn-warning rounded rounded-0">Edit</a>
                             <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger rounded rounded-0">Delete</a>
                         </td>
                     </tr>

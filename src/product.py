@@ -327,7 +327,7 @@ class Cart:
 
     @property
     def count(self) -> int:
-        query = r"SELECT SUM(DISTINCT PRODUCT_ID) FROM CARTS WHERE USER_ID = ?"
+        query = r"SELECT SUM(QUANTITY) FROM CARTS WHERE USER_ID = ?"
         cursor = self.__conn.cursor()
         cursor.execute(query, (self.user_id,))
         count = cursor.fetchone()
