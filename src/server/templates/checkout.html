@@ -16,7 +16,8 @@
             <h2 class="fs-5">Address</h2>
         </div>
         <div class="col-10 mb-4">
-            <h2 class="fs-5">{{ current_user.name }} <span class="text-muted fs-6">{{ current_user.email }}</span></h2>
+            <p class="fs-4">{{ current_user.name }}</p>
+            <p class="text-muted fs-6">{{ current_user.email }}</p>
             <p class="fs-6">{{ current_user.address }}</p>
             <p class="fs-6"><span class="text-muted">+91</span> {{ current_user.phone }}</p>
         </div>
@@ -26,40 +27,47 @@
         <div class="col-10 mb-4">
             {% set products = current_user.cart.products() %}
             {% if products | length == 0 %}
-                <h2 class="fs-5 text-muted fst-italic">No products in cart</h2>
+            <h2 class="fs-5 text-muted fst-italic">No products in cart</h2>
             {% endif %}
             {% for product in products %}
-                <div class="card mb-2 p-3 rounded rounded-0" style="max-width: 540px;">
-                    <div class="row">
-                        <div class="col-4">
-                            <img src="{{ product.images[0] }}" class="img-fluid rounded-start" alt="{{ product.name }}">
-                        </div>
-                        <div class="col-8">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ product.name }}</h5>
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            <td class="d-flex justify-content-end text-muted me-2">Price: </td>
-                                            <td>INR. {{ product.price }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="d-flex justify-content-end text-muted me-2">Quantity: </td>
-                                            <td>{{ product.stock }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="d-flex justify-content-end text-muted me-2">Total: </td>
-                                            <td>INR. {{ product.price * product.stock }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
-                        </div>
+            <div class="card mb-2 p-3 rounded rounded-0" style="max-width: 540px;">
+                <div class="row">
+                    <div class="col-4">
+                        <img src="{{ product.images[0] }}" class="img-fluid rounded-start" alt="{{ product.name }}">
                     </div>
-                    <a href="{{ url_for('remove_from_cart', product_id=product.id) }}" class="btn btn-outline-danger rounded rounded-0 z-1">Remove</a>
+                    <div class="col-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }} <span class="text-muted fs-6">{{ product.size }}</span></h5>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td class="d-flex justify-content-end text-muted me-2">Price: </td>
+                                        <td>INR. {{ product.price }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="d-flex justify-content-end text-muted me-2">Quantity: </td>
+                                        <td>{{ product.stock }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="d-flex justify-content-end text-muted me-2">Total: </td>
+                                        <td>INR. {{ product.price * product.stock }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+                    </div>
                 </div>
+                <a href="{{ url_for('remove_from_cart', product_id=product.id) }}" class="btn btn-outline-danger rounded rounded-0 z-1">Remove</a>
+            </div>
             {% endfor %}
+        </div>
+        <div class="col-2 d-flex justify-content-end mb-4">
+            <h2 class="fs-5">Apply Gift Card</h2>
+        </div>
+        <div class="col-10 mb-4">
+            <input type="text" class="form-control rounded rounded-0" placeholder="Gift Card Code (if any)" name="code" style="max-width: 540px;" id="gift-card-input">
+            <p class="text-muted mt-1 fs-6">* Gift card will be used and applied automatically on checkout.</p>
         </div>
         <div class="col-2 d-flex justify-content-end mb-4">
             <h2 class="fs-5">Summary</h2>
@@ -86,9 +94,9 @@
                 </div>
             </div>
             {% if products | length > 0 %}
-                <a href="{{ url_for('final_checkout') }}" class="btn btn-danger rounded rounded-0 z-1">Final Checkout</a>
+            <button class="btn btn-danger rounded rounded-0 z-1" id="final-checkout">Final Checkout</a>
             {% else %}
-                <a href="{{ url_for('home') }}" class="btn btn-danger rounded rounded-0 z-1 disabled">Final Checkout</a>
+            <a href="{{ url_for('home') }}" class="btn btn-danger rounded rounded-0 z-1 disabled">Final Checkout</a>
             {% endif %}
 
         </div>
@@ -98,6 +106,17 @@
         </p>
     </div>
 </div>
-
 {{ footer.footer() }}
+{% endblock %}
+
+{% block script_bottom %}
+<script>
+    const finalCheckoutButton = document.getElementById('final-checkout');
+    const giftCardInput = document.getElementById('gift-card-input');
+
+    finalCheckoutButton.addEventListener('click', () => {
+       let uri = `{{ url_for('final_checkout') }}?gift-code=${giftCardInput.value}`; 
+        window.location.href = uri;
+    });
+</script>
 {% endblock %}

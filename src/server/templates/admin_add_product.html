@@ -73,6 +73,11 @@
         </div>
         {% endif %}
 
+        <div class="input-group mb-2">
+            {{ form.sizes.label(class="input-group-text rounded rounded-0") }}
+            {{ form.sizes(class="form-control rounded rounded-0") }}
+        </div>
+
         {{ form.submit(class="btn btn-secondary rounded rounded-0") }}
     </form>
 </div>

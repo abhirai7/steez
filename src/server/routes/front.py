@@ -1,20 +1,33 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from flask import render_template
 from flask_login import current_user, login_required
 
 from src.product import Product
 from src.server import app, conn
+from src.server.forms import GiftCardForm
 from src.utils import format_to_special
+
+if TYPE_CHECKING:
+    from src.user import User
+
+    assert isinstance(current_user, User)
 
 
 @app.route("/")
 @app.route("/home/")
 def home():
     products = Product.all(conn)
+    gift_form: GiftCardForm = GiftCardForm()
+
     return render_template(
         "front.html",
         format_to_special=format_to_special,
         products=products,
         current_user=current_user,
+        gift_form=gift_form,
     )
 
 
@@ -40,4 +53,6 @@ def refund_policy():
 @login_required
 def order_history():
     orders = current_user.orders
-    return render_template("order_history.html", orders=orders, current_user=current_user)
+    return render_template(
+        "order_history.html", orders=orders, current_user=current_user
+    )

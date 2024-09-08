@@ -1,15 +1,22 @@
+from __future__ import annotations
+
 import os
 
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from src.product import Product
 from src.order import Order
+from src.product import Product
 from src.server import app, conn
 from src.server.forms import ProductAddForm
+import string
+import random
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
 
+
+def generate_unique_identifier():
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=16))
 
 @app.route("/admin/manage/product", methods=["GET", "POST"])
 @login_required
@@ -29,22 +36,29 @@ def admin_add_product():
             and addform.price.data
             and addform.stock.data
             and addform.description.data
+            and addform.sizes.data
         )
 
-        product = Product.create(
-            conn,
-            name=addform.name.data,
-            price=float(addform.price.data),
-            stock=int(addform.stock.data),
-            description=addform.description.data,
-        )
+        _id = generate_unique_identifier()
+
+        for size in addform.sizes.data:
+            product = Product.create(
+                conn,
+                name=addform.name.data,
+                unique_id=_id,
+                price=float(addform.price.data),
+                stock=int(addform.stock.data),
+                description=addform.description.data,
+                size=size,
+            )
+
         images = addform.images.data
 
         for image in images:
-            if not os.path.exists(f"{UPLOAD_FOLDER}/{product.id}/"):
-                os.makedirs(f"{UPLOAD_FOLDER}/{product.id}/")
+            if not os.path.exists(f"{UPLOAD_FOLDER}/{product.unique_id}/"):
+                os.makedirs(f"{UPLOAD_FOLDER}/{product.unique_id}/")
 
-            with open(f"{UPLOAD_FOLDER}/{product.id}/{image.filename}", "wb+") as f:
+            with open(f"{UPLOAD_FOLDER}/{product.unique_id}/{image.filename}", "wb+") as f:
                 f.write(image.read())
 
         return redirect(url_for("admin_manage_product"))

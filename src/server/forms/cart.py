@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, SubmitField, TextAreaField
 
@@ -5,11 +7,12 @@ from src.utils import size_chart
 
 
 class AddToCartForm(FlaskForm):
-    quantity = IntegerField("Quantity")
     size = SelectField(
         "Size",
-        choices=[(size, size) for size, data in size_chart.items()],
+        choices=[(size_chart[size]["CODE"], size) for size in size_chart],
     )
+
+    quantity = IntegerField("Quantity")
 
     submit = SubmitField("Add to Cart")
 

@@ -284,7 +284,7 @@ def format_to_special(text: str, /) -> str:
     return "".join(result)
 
 
-def get_product_pictures(product_id: int) -> list[str]:
+def get_product_pictures(product_id: int | str) -> list[str]:
     this_path = pathlib.Path(__file__).parent
     path = this_path / "server" / "static" / "product_pictures" / str(product_id)
 
@@ -300,16 +300,35 @@ def get_product_pictures(product_id: int) -> list[str]:
 
 
 size_chart = {
-    "XX-SMALL": {"CHEST": "37''", "LENGTH": "26.5''"},
-    "X-SMALL": {"CHEST": "39''", "LENGTH": "27''"},
-    "SMALL": {"CHEST": "41''", "LENGTH": "27.5''"},
-    "MEDIUM": {"CHEST": "43''", "LENGTH": "28''"},
-    "LARGE": {"CHEST": "45''", "LENGTH": "29''"},
-    "X-LARGE": {"CHEST": "47''", "LENGTH": "30''"},
-    "XX-LARGE": {"CHEST": "51''", "LENGTH": "31''"},
-    "XXX-LARGE": {"CHEST": "53''", "LENGTH": "32''"},
+    "XX-SMALL": {"CHEST": "37''", "LENGTH": "26.5''", "CODE": "1"},
+    "X-SMALL": {"CHEST": "39''", "LENGTH": "27''", "CODE": "10"},
+    "SMALL": {"CHEST": "41''", "LENGTH": "27.5''", "CODE": "100"},
+    "MEDIUM": {"CHEST": "43''", "LENGTH": "28''", "CODE": "1000"},
+    "LARGE": {"CHEST": "45''", "LENGTH": "29''", "CODE": "10000"},
+    "X-LARGE": {"CHEST": "47''", "LENGTH": "30''", "CODE": "100000"},
+    "XX-LARGE": {"CHEST": "51''", "LENGTH": "31''", "CODE": "1000000"},
+    "XXX-LARGE": {"CHEST": "53''", "LENGTH": "32''", "CODE": "10000000"},
+}
+
+size_names = {
+    "1": "XX-SMALL",
+    "10": "X-SMALL",
+    "100": "SMALL",
+    "1000": "MEDIUM",
+    "10000": "LARGE",
+    "100000": "X-LARGE",
+    "1000000": "XX-LARGE",
+    "10000000": "XXX-LARGE"
 }
 
 
 def format_number(number: int, /) -> str:
     return locale.format_string("%d", number, grouping=True)
+
+
+def generate_gift_card_code() -> str:
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=16))
+
+
+def binary_adder(a: str, b: str) -> str:
+    return bin(int(a, 2) + int(b, 2))[2:]

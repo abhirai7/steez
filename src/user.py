@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .order import Order
-    from .product import VALID_STARS, Cart, Product
+    from .product import VALID_STARS, Cart, Product, GiftCard
     from .type_hints import Client as RazorpayClient
     from .type_hints import RazorPayOrderDict
 
@@ -150,7 +150,7 @@ class User:
     def add_to_cart(self, *, product: Product, quantity: int | None = 1) -> None:
         self.cart.add_product(product=product, quantity=quantity)
 
-    def remove_from_cart(self, *, product: Product, quantity: int = 1) -> None:
+    def remove_from_cart(self, *, product: Product, _: int = 1) -> None:
         self.cart.remove_product(product=product)
 
     def clear_cart(self, *, product: Product | None = None) -> None:
@@ -163,10 +163,10 @@ class User:
 
         self.__conn.commit()
 
-    def partial_checkout(self) -> list[Order]:
+    def partial_checkout(self, *, gift_card: GiftCard | None = None) -> list[Order]:
         from .order import Order
 
-        self.cart.update_to_database()
+        self.cart.update_to_database(gift_card=gift_card)
         self.clear_cart()
 
         orders: list[Order] = []
@@ -179,8 +179,10 @@ class User:
 
         return orders
 
-    def full_checkout(self, razorpay_client: RazorpayClient) -> RazorPayOrderDict:
-        orders: list[Order] = self.partial_checkout()
+    def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
+        from .product import GiftCard
+        gift_card = GiftCard.from_code(self.__conn, code=gift_code)
+        orders: list[Order] = self.partial_checkout(gift_card=gift_card)
 
         if not orders:
             error = "No orders found to checkout."
@@ -211,7 +213,7 @@ class User:
             },
         }
 
-        api_response: dict = razorpay_client.order.create(final_payload)
+        api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
         order_id = api_response["id"]
 
         query = r"""
@@ -234,7 +236,9 @@ class User:
 
         return api_response  # type: ignore
 
-    def __check_api_response(self, *, full_paylaod: dict, api_response: dict) -> bool:
+    def __check_api_response(
+        self, *, full_paylaod: dict, api_response: RazorPayOrderDict
+    ) -> bool:
         amount_correct = full_paylaod["amount"] == api_response["amount"]
         currency_correct = full_paylaod["currency"] == api_response["currency"]
         notes_correct = full_paylaod["notes"] == api_response["notes"]
@@ -259,6 +263,33 @@ class User:
         """
         cursor.execute(query)
         return [cls(connection, **row) for row in cursor.fetchall()]
+
+    def full_checkout_giftcard(
+        self, razorpay_client: RazorpayClient, amount: int
+    ) -> RazorPayOrderDict:
+        final_payload = {
+            "amount": int(amount * 100),
+            "currency": "INR",
+            "notes": {
+                "user_id": self.id,
+                "user_email": self.email,
+                "user_name": self.name,
+                "user_phone": self.phone,
+            },
+        }
+
+        api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
+
+        assert self.__check_api_response(
+            full_paylaod=final_payload, api_response=api_response
+        )
+
+        return api_response
+
+    def _buy_gift_card(self, amount: int) -> GiftCard:
+        from .product import GiftCard
+
+        return GiftCard.create(self.__conn, user=self, amount=amount)
 
 
 class Admin(User):

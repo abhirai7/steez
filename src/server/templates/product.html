@@ -11,7 +11,6 @@
         transition: transform 0.3s ease;
         transform: scale(0);
         transition: transform 0.3s ease;
-        pointer-events: none;
     }
 
     .thumbnail img {
@@ -19,8 +18,7 @@
     }
 
     .img-thumbnail {
-        width: 100px;
-        height: 100px;
+        max-width: 20%;
     }
 </style>
 {% endblock %}
@@ -28,38 +26,48 @@
 {% block body %}
 {{ navbar.navbar(current_user) }}
 
-<div class="container mt-4">
+<hr>
+<div class="container-xl mt-3">
     <div class="row">
-        <div class="col position-relative">
-            <div class="main-image">
-                <img src="{{ product.images[0] }}" class="img-fluid zoom-effect" alt="{{ product.name }}">
-                <img src="{{ product.images[0] }}" class="img-fluid large-image h-100 w-100 z-1 shadow object-fit-cover position-absolute overflow-visible" alt="{{ product.name }}">
+        <div class="col">
+            <div class="position-relative">
+                <div class="main-image">
+                    <img src="{{ product.images[0] }}" class="img-fluid zoom-effect border border-1" alt="{{ product.name }}">
+                    <img src="{{ product.images[0] }}" class="img-fluid large-image z-1 object-fit-cover shadow position-absolute overflow-visible" alt="{{ product.name }}">
+                </div>
             </div>
             <div class="thumbnails d-flex justify-content-center mt-1 rounded rounded-0 z-2">
                 {% for image in product.images %}
-                <img src="{{ image }}" class="img-thumbnail rounded rounded-0 h-20 object-fir-cover" alt="{{ product.name }}">
+                <img src="{{ image }}" class="img-thumbnail rounded rounded-0 border border-1 object-fir-cover" alt="{{ product.name }}">
                 {% endfor %}
             </div>
         </div>
+
         <div class="col">
-            <div class="card rounded rounded-0">
-                <div class="card-body">
-                    <h5 class="card-title consolas">{{ product.name }}</h5>
-                    <p class="card-text consolas">{{ product.description }}</p>
-                    <p class="card-text">Price: ₹{{ product.price }}</p>
-                </div>
-            </div>
+            <p class="fs-1">{{ product.name }}</p>
+            <p class="fs-6 text-muted">{{ product.average_rating }} ({{ product.total_reviews }} reviews)</p>
+            <p class="fs-5">Price: INR. {{ product.price }}</p>
+            <p class="fs-6">{{ product.description }}</p>
+            
+            <hr>
+
             <div class="mt-2">
                 <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
                     {{ form.hidden_tag() }}
-                    <div class="form-group mb-2">
-                        {{ form.quantity.label(class="form-label text-muted") }}
-                        {{ form.quantity(class="form-control form-control-lg rounded rounded-0", placeholder="Quantity") }}
-                    </div>
 
-                    <div class="form-group mb-2">
-                        {{ form.size.label(class="form-label text-muted") }}
-                        {{ form.size(class="form-select form-select-lg rounded rounded-0", placeholder="Select Size") }}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group mb-2">
+                                {{ form.quantity.label(class="form-label text-muted") }}
+                                {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6", placeholder="Quantity") }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group mb-2">
+                                {{ form.size.label(class="form-label text-muted") }}
+                                {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6", placeholder="Select Size") }}
+                            </div>
+                        </div>
                     </div>
 
                     {% if current_user.is_authenticated %}
@@ -72,28 +80,27 @@
                 </form>
 
             </div>
-            <hr>
-            <div class="mt-2">
-                <h5 class="d-flex justify-content-center">Reference Chart</h5>
-                <table class="table table-striped border border-1 mt-2">
-                    <thead>
-                        <th>SIZE</th>
-                        <th>CHEST</th>
-                        <th>LENGTH</th>
-                    </thead>
-                    <tbody>
-                        {% for size, chest, length in size_chart %}
-                        <tr>
-                            <td>{{ size }}</td>
-                            <td>{{ chest }}</td>
-                            <td>{{ length }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
+    <hr>
+    <p class="fs-6">Reference Chart</p>
+    <table class="table mt-2 mb-2">
+        <thead>
+            <th class="bg-transparent">SIZE</th>
+            <th class="bg-transparent">CHEST</th>
+            <th class="bg-transparent">LENGTH</th>
+        </thead>
+        <tbody>
+            {% for size, chest, length in size_chart %}
+            <tr>
+                <td class="bg-transparent">{{ size }}</td>
+                <td class="bg-transparent">{{ chest }}</td>
+                <td class="bg-transparent">{{ length }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
     <div class="reviews mt-4">
         <h2 class="mt-4">Reviews</h5>
 
@@ -144,7 +151,7 @@
         const imageContainer = document.querySelector('.main-image');
 
         imageContainer.addEventListener('mouseover', () => {
-            largeImage.style.transform = 'scale(1)'
+            largeImage.style.transform = 'scale(1.3)'
         });
 
         imageContainer.addEventListener('mouseout', () => {

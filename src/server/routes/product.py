@@ -8,7 +8,7 @@ from razorpay.errors import SignatureVerificationError
 
 from src.order import Order
 from src.product import Product
-from src.server import RAZORPAY_KEY, app, conn, csrf, razorpay_client
+from src.server import RAZORPAY_KEY, app, conn, razorpay_client
 from src.server.forms import AddReviewForm, AddToCartForm
 from src.user import User
 from src.utils import format_number, format_to_special, get_product_pictures, size_chart
@@ -21,7 +21,9 @@ if TYPE_CHECKING:
 @app.route("/products/<int:product_id>/", methods=["GET", "POST"])
 def product(product_id: int):
     product = Product.from_id(conn, product_id)
-    pictures = get_product_pictures(product_id)
+    pictures = get_product_pictures(product.unique_id)
+
+    _products = Product.from_unique_id(conn, product.unique_id)
 
     cart_form: AddToCartForm = AddToCartForm()
     review_form: AddReviewForm = AddReviewForm()
@@ -46,9 +48,10 @@ def add_to_cart(product_id: int):
     product = Product.from_id(conn, product_id)
     form: AddToCartForm = AddToCartForm()
 
-    if form.validate_on_submit() and request.method == "POST" and form.quantity.data:
+    if form.validate_on_submit() and request.method == "POST" and form.quantity.data and form.size.data:
         try:
-            current_user.add_to_cart(product=product, quantity=form.quantity.data)
+            product = product.from_unique_id(conn, product.unique_id, size=form.size.data)
+            current_user.add_to_cart(product=product[0], quantity=form.quantity.data)
         except ValueError as e:
             flash(str(e), "error")
 
@@ -103,12 +106,13 @@ def final_checkout():
         "razorpay_key": RAZORPAY_KEY,
         "amount": order["amount"],
         "order_id": order["id"],
+        "giftcard": False,
     }
     return render_template("payment.html", **variables)
 
 
-@app.route("/razorpay-webhook", methods=["POST"])
-@app.route("/razorpay-webhook/", methods=["POST"])
+@app.route("/razorpay-webhook-product", methods=["POST"])
+@app.route("/razorpay-webhook-product/", methods=["POST"])
 def razorpay_webhook():
     data = request.get_json()
 
@@ -142,6 +146,3 @@ def payment_failure():
 def delete_order(order_id: int):
     Order.delete(conn, order_id=order_id, user_id=current_user.id)
     return redirect(url_for("order_history"))
-
-
-csrf.exempt(razorpay_webhook)

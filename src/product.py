@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 
 from fuzzywuzzy import fuzz
 
-from .utils import get_product_pictures
+from .utils import generate_gift_card_code, get_product_pictures
 
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
@@ -96,22 +96,38 @@ class Product:
         connection: sqlite3.Connection,
         *,
         id: int,
+        unique_id: str,
         name: str,
         price: float,
         description: str,
         stock: int,
+        size: str,
     ):
         self.__conn = connection
         self.id = id
+        self.unique_id = unique_id
         self.name = name
         self.price = price
         self.description = description
-        self.images = get_product_pictures(id)
+        self.images = get_product_pictures(unique_id)
         self.stock = stock
+        self.size = size
 
     @property
     def reviews(self) -> list[Review]:
         return Review.from_product(self.__conn, product_id=self.id)
+
+    @property
+    def average_rating(self) -> float:
+        reviews = self.reviews
+        if not reviews:
+            return 0.0
+
+        return sum(review.stars for review in reviews) / self.total_reviews
+
+    @property
+    def total_reviews(self) -> int:
+        return len(self.reviews)
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
         return Review.create(
@@ -124,10 +140,13 @@ class Product:
         cursor.execute(query, (user_id, self.id))
         self.__conn.commit()
 
-    def is_available(self, count: QUANTITY = 1) -> bool:
-        query = r"SELECT STOCK FROM PRODUCTS WHERE ID = ? AND STOCK >= ?"
+    def is_available(self, count: QUANTITY = 1, *, size: str) -> bool:
+        if self.stock == -1:
+            return True
+
+        query = r"SELECT STOCK FROM PRODUCTS WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
         cursor = self.__conn.cursor()
-        cursor.execute(query, (self.id, count))
+        cursor.execute(query, (self.unique_id, count, size))
         stock = cursor.fetchone()
 
         if stock is None:
@@ -136,11 +155,14 @@ class Product:
         stock = stock[0]
         return stock >= count and stock > 0
 
-    def use(self, count: QUANTITY = 1) -> None:
-        query = r"UPDATE PRODUCTS SET STOCK = STOCK - ? WHERE ID = ? AND STOCK >= ?"
+    def use(self, count: QUANTITY = 1, *, size: str) -> None:
+        if self.stock == -1:
+            return
+
+        query = r"UPDATE PRODUCTS SET STOCK = STOCK - ? WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
         cursor = self.__conn.cursor()
 
-        cursor.execute(query, (count, self.id, count))
+        cursor.execute(query, (count, self.id, count, size))
         updated = cursor.rowcount
 
         if updated == 0:
@@ -149,10 +171,13 @@ class Product:
 
         self.__conn.commit()
 
-    def release(self, count: QUANTITY = 1) -> None:
-        query = r"UPDATE PRODUCTS SET STOCK = STOCK + ? WHERE ID = ?"
+    def release(self, count: QUANTITY = 1, *, size: str) -> None:
+        if self.stock == -1:
+            return
+
+        query = r"UPDATE PRODUCTS SET STOCK = STOCK + ? WHERE ID = ? AND SIZE = ?"
         cursor = self.__conn.cursor()
-        cursor.execute(query, (count, self.id))
+        cursor.execute(query, (count, self.id, size))
         self.__conn.commit()
 
     @classmethod
@@ -160,17 +185,22 @@ class Product:
         cls,
         connection: sqlite3.Connection,
         *,
+        unique_id: str,
         name: str,
         price: float,
         description: str,
         stock: int = 0,
+        size: str,
     ) -> Product:
         cursor = connection.cursor()
+
         query = r"""
-            INSERT INTO PRODUCTS (NAME, PRICE, DESCRIPTION, STOCK) VALUES (?, ?, ?, ?)
+            INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
             RETURNING *
         """
-        result = cursor.execute(query, (name, price, description, stock))
+        result = cursor.execute(
+            query, (unique_id, name, price, description, stock, size)
+        )
         data = result.fetchone()
         connection.commit()
 
@@ -188,8 +218,37 @@ class Product:
         return cls(connection, **row)
 
     @classmethod
+    def from_unique_id(
+        cls, connection: sqlite3.Connection, unique_id: str, *, size: str = ""
+    ) -> list[Product]:
+        cursor = connection.cursor()
+
+        query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = ?"
+        if size:
+            query += " AND SIZE = ?"
+            cursor.execute(query, (unique_id, size))
+        else:
+            cursor.execute(query, (unique_id,))
+
+        ls = []
+
+        while row := cursor.fetchone():
+            ls.append(cls(connection, **row))
+
+        return ls
+
+    @classmethod
     def all(cls, connection: sqlite3.Connection) -> list[Product]:
-        query = r"SELECT * FROM PRODUCTS"
+        query = r"""
+            SELECT *
+            FROM PRODUCTS
+            WHERE ROWID IN (
+                SELECT MIN(ROWID)
+                FROM PRODUCTS
+                GROUP BY UNIQUE_ID
+            )
+        """
+
         cursor = connection.cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -230,7 +289,7 @@ class Cart:
 
     def add_product(self, *, product: Product, quantity: QUANTITY | None = 1) -> None:
         quantity = quantity or 1
-        if not product.is_available(quantity):
+        if not product.is_available(quantity, size=product.size):
             error = "Product is not available."
             raise ValueError(error)
 
@@ -239,7 +298,7 @@ class Cart:
         cursor.execute(query, (self.user_id, product.id, quantity, quantity))
         self.__conn.commit()
 
-        product.use(quantity)
+        product.use(quantity, size=product.size)
 
     def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
         query = (
@@ -250,7 +309,7 @@ class Cart:
         row = cursor.fetchone()
         self.__conn.commit()
 
-        product.release(int(row[0]))
+        product.release(int(row[0]), size=product.size)
 
     def total(self) -> float:
         query = r"""
@@ -271,10 +330,10 @@ class Cart:
         count = cursor.fetchone()
         return int(count[0] or 0)
 
-    def update_to_database(self) -> None:
+    def update_to_database(self, *, gift_card: GiftCard | None = None) -> None:
         query = r"""
             INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE)
-                SELECT USER_ID, PRODUCT_ID, QUANTITY, QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)
+                SELECT USER_ID, PRODUCT_ID, QUANTITY, ((QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)) - ?)
                 FROM CARTS
                 WHERE USER_ID = ?
         """
@@ -283,7 +342,13 @@ class Cart:
 
         try:
             cursor.execute(r"BEGIN TRANSACTION")
-            cursor.execute(query, (self.user_id,))
+            cursor.execute(
+                query,
+                (
+                    gift_card.price if gift_card else 0,
+                    self.user_id,
+                ),
+            )
             cursor.execute(r"DELETE FROM CARTS WHERE USER_ID = ?", (self.user_id,))
             cursor.execute(r"COMMIT")
         except sqlite3.Error as e:
@@ -315,3 +380,84 @@ class Cart:
             products.append(product)
 
         return products
+
+
+class GiftCard:
+    def __init__(
+        self,
+        connection: sqlite3.Connection,
+        *,
+        id: int,
+        price: float,
+        user_id: int,
+        code: str,
+        used: int,
+        created_at: str | None,
+        used_at: str | None,
+    ):
+        self.conn = connection
+        self.id = id
+        self.price = int(price)
+        self.user_id = user_id
+        self.__code = code
+        self.used = bool(int(used))
+        self.created_at = created_at
+        self.used_at = used_at
+
+    @property
+    def code(self) -> str:
+        return self.__code
+
+    @property
+    def user(self) -> User:
+        from .user import User
+
+        return User.from_id(self.conn, self.user_id)
+
+    @classmethod
+    def create(cls, conn: sqlite3.Connection, *, user: User, amount: int) -> GiftCard:
+        cursor = conn.cursor()
+
+        query = r"""
+            INSERT INTO GIFT_CARDS (USER_ID, PRICE, CODE) VALUES (?, ?, ?) RETURNING *
+        """
+        cursor.execute(query, (user.id, amount, generate_gift_card_code()))
+        data = cursor.fetchone()
+        conn.commit()
+
+        return cls(conn, **data)
+
+    def use(self) -> None:
+        if not self.is_valid:
+            error = "Gift card is already used."
+            raise ValueError(error)
+
+        query = (
+            r"UPDATE GIFT_CARDS SET USED = 1, USED_AT = CURRENT_TIMESTAMP WHERE ID = ?"
+        )
+        cursor = self.conn.cursor()
+        cursor.execute(query, (self.id,))
+        self.conn.commit()
+
+    @property
+    def is_valid(self) -> bool:
+        return not self.used
+
+    @classmethod
+    def exists(cls, conn: sqlite3.Connection, *, code: str) -> GiftCard:
+        query = r"SELECT * FROM GIFT_CARDS WHERE CODE = ?"
+        cursor = conn.cursor()
+        cursor.execute(query, (code,))
+
+        if row := cursor.fetchone():
+            return cls(conn, **row)
+
+        error = "Gift card not found."
+        raise ValueError(error) from None
+
+    @classmethod
+    def from_code(cls, conn: sqlite3.Connection, code: str) -> GiftCard | None:
+        try:
+            return cls.exists(conn, code=code)
+        except ValueError:
+            return None

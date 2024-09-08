@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 

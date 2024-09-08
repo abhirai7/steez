@@ -9,7 +9,11 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     function razorPayCallback(response) {
+        {% if webhook %}
+        const url = `{{ url_for(webhook) }}`;
+        {% else %}
         const url = `{{ url_for('razorpay_webhook') }}`;
+        {% endif %}
 
         const data = {
             razorpay_payment_id: response.razorpay_payment_id,
@@ -21,6 +25,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': `{{ csrf_token() }}`,
             },
             body: JSON.stringify(data),
         })
@@ -28,7 +33,7 @@
             .then((data) => {
                 console.log(data);
                 if (data.status === 'ok') {
-                    window.location.href = `{{ url_for('payment_success') }}`;
+                    window.location.href = `{{ url_for('show_gift_card') }}?gift_card_code=${data.gift_card_code}`;
                 } else {
                     window.location.href = `{{ url_for('payment_failure') }}`;
                 }
@@ -43,7 +48,7 @@
         amount: `{{ amount }}`,
         currency: "INR",
         name: "STEEZ™",
-        description: "Payment",
+        description: "{% if description %}{{ description }}{% else %}Payment for Order ID: {{ order_id }}{% endif %}",
         order_id: `{{ order_id }}`,
         prefill: {
             name: `{{ current_user.name }}`,
@@ -70,15 +75,19 @@
 
 
 {% block body %}
-{{ navbar.navbar(current_user) }}
 
 <div class="container text-center mt-5">
     <hr>
     <div>
+        {% if giftcard %}
+        <h3>Your Gift Card has being recorded.</h3>
+        <h4>Thank you for shopping with us.</h4>
+        {% else %}
         <h3>Your Order has being recorded.</h3>
         <h4>Thank you for shopping with us.</h4>
+        {% endif %}
     </div>
-    <button type="button" class="btn btn-primary rounded rounded-0 mt-5" id="rzp-button">Pay with Razor</button>
+    <button type="button" class="btn btn-primary rounded rounded-0 mt-5" id="rzp-button">Pay with Razorpay</button>
 </div>
 
 {% endblock %}
