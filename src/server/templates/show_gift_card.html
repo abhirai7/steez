@@ -5,50 +5,12 @@
 {% import 'navbar.html' as navbar %}
 {% import 'footer.html' as footer %}
 
-{% block style %}
+{% block styles %}
 <style>
     .text-spacing {
         letter-spacing: 4px;
     }
 </style>
-{% endblock %}
-
-{% block script_bottom %}
-<script>
-    const copies = [
-        "Copied!",
-        "Double Copied!",
-        "Triple Copied!",
-        "Quadruple Copied!",
-        "More Copied!",
-        "Even More Copied!",
-        "So Much Copied!",
-        "Copied again!",
-        "STOP!!",
-        "SUPER COPIED!",
-        "MEGA COPIED!",
-        "ULTRA COPIED!",
-        "HYPER COPIED!",
-        "GOD LIKE",
-        "AAAAAAAAAAAAAAAA",
-        "...",
-        "I'm done!",
-    ];
-    const copier = document.getElementById('copier');
-    const giftCardCode = document.getElementById('gift-card-code');
-    var i = 0;
-    copier.addEventListener('click', () => {
-        navigator.clipboard.writeText(giftCardCode.innerText).then(() => {
-            copier.innerText = copies[i];
-            i++;
-            if (i === copies.length) {
-                copier.innerText = 'Copy Code to Clipboard';
-                i = 0;
-            }
-        });
-    });
-
-</script>
 {% endblock %}
 
 {% block body %}
@@ -101,4 +63,42 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block bottom_scripts %}
+<script>
+    const copies = [
+        "Copied!",
+        "Double Copied!",
+        "Triple Copied!",
+        "Quadruple Copied!",
+        "More Copied!",
+        "Even More Copied!",
+        "So Much Copied!",
+        "Copied again!",
+        "STOP!!",
+        "SUPER COPIED!",
+        "MEGA COPIED!",
+        "ULTRA COPIED!",
+        "HYPER COPIED!",
+        "GOD LIKE",
+        "AAAAAAAAAAAAAAAA",
+        "...",
+        "I'm done!",
+    ];
+    const copier = document.getElementById('copier');
+    const giftCardCode = document.getElementById('gift-card-code');
+    var i = 0;
+    copier.addEventListener('click', () => {
+        navigator.clipboard.writeText(giftCardCode.innerText).then(() => {
+            copier.innerText = copies[i];
+            i++;
+            if (i === copies.length) {
+                copier.innerText = 'Copy Code to Clipboard';
+                i = 0;
+            }
+        });
+    });
+
+</script>
 {% endblock %}
