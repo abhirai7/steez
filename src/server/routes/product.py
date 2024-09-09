@@ -116,7 +116,7 @@ def checkout():
 @login_required
 def final_checkout():
     args = request.args
-    gift_code = args.get("gift_code", "").replace(" ", "").upper()
+    gift_code = args.get("gift-code", "").replace(" ", "").upper()
 
     order = current_user.full_checkout(razorpay_client, gift_code=gift_code)
 

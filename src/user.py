@@ -192,22 +192,20 @@ class User:
             query = r"SELECT RAZORPAY_ORDER_ID FROM ORDERS WHERE USER_ID = ? AND STATUS != 'PAID' AND RAZORPAY_ORDER_ID IS NOT NULL"
             cursor = self.__conn.cursor()
             cursor.execute(query, (self.id,))
-            row = cursor.fetchone()
-            if row:
+            if row := cursor.fetchone():
                 order_id = row[0]
                 return razorpay_client.order.fetch(order_id)
 
             raise ValueError(error)
 
         total_price = sum(order.total_price for order in orders)
-        notes = {}
-
-        for order in orders:
-            notes[order.product.name] = {
+        notes = {
+            order.product.name: {
                 "quantity": order.quantity,
                 "price": order.product.price,
             }
-
+            for order in orders
+        }
         final_payload = {
             "amount": int(total_price * 100),
             "currency": "INR",

@@ -294,7 +294,7 @@ class Cart:
 
     def add_product(self, *, product: Product, quantity: QUANTITY | None = 1) -> None:
         quantity = quantity or 1
-        if not product.is_available(quantity, size=product.size):
+        if not product.is_available(quantity):
             error = "Product is not available."
             raise ValueError(error)
 
@@ -398,7 +398,7 @@ class GiftCard:
         price: float,
         user_id: int,
         code: str,
-        used: int,
+        used: int | str,
         created_at: str | None,
         used_at: str | None,
     ):

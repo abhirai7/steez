@@ -32,6 +32,12 @@ def home():
     )
 
 
+@app.route("/faq/")
+@app.route("/faq")
+def faq():
+    return render_template("faq.html", current_user=current_user)
+
+
 @app.route("/search/<string:query>")
 def search(query: str):
     products = Product.search(conn, query)
