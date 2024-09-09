@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arrow
+import contextlib
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from razorpay.errors import SignatureVerificationError
@@ -56,7 +57,7 @@ def razorpay_webhook_giftcard():
         )
         amount = int(order["amount"])
 
-        gift = current_user._buy_gift_card(amount=int(amount / 100))
+        gift = current_user._buy_gift_card(amount=amount // 100)
     except SignatureVerificationError:
         return {"status": "error"}, 400
 
@@ -73,12 +74,9 @@ def show_gift_card():
     if code is None:
         return redirect(url_for("home"))
 
-    try:
+    with contextlib.suppress(ValueError):
         if gift_card := GiftCard.exists(conn, code=code):
             return render_template(
                 "show_gift_card.html", gift_card=gift_card, arrow=arrow
             )
-    except ValueError:
-        pass
-
     return redirect(url_for("home"))

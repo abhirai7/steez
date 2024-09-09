@@ -115,7 +115,10 @@ def checkout():
 @app.route("/final-ckeckout")
 @login_required
 def final_checkout():
-    order = current_user.full_checkout(razorpay_client)
+    args = request.args
+    gift_code = args.get("gift_code", "").replace(" ", "").upper()
+
+    order = current_user.full_checkout(razorpay_client, gift_code=gift_code)
 
     variables = {
         "razorpay_key": RAZORPAY_KEY,

@@ -349,10 +349,13 @@ class Cart:
             cursor.execute(
                 query,
                 (
-                    gift_card.price if gift_card else 0,
+                    gift_card.price if (gift_card and gift_card.is_valid) else 0,
                     self.user_id,
                 ),
             )
+            if gift_card:
+                gift_card.use()
+
             cursor.execute(r"DELETE FROM CARTS WHERE USER_ID = ?", (self.user_id,))
             self.__conn.commit()
         except sqlite3.Error as e:
