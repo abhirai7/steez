@@ -318,7 +318,7 @@ size_names = {
     "10000": "LARGE",
     "100000": "X-LARGE",
     "1000000": "XX-LARGE",
-    "10000000": "XXX-LARGE"
+    "10000000": "XXX-LARGE",
 }
 
 

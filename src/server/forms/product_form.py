@@ -22,7 +22,7 @@ class ProductAddForm(FlaskForm):
     sizes = SelectMultipleField(
         "Size",
         validators=[DataRequired()],
-        choices=[(data['CODE'], size) for size, data in size_chart.items()],
+        choices=[(data["CODE"], size) for size, data in size_chart.items()],
     )
     submit = SubmitField("Add Product")
 

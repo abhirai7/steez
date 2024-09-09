@@ -5,4 +5,3 @@ from .front import *  # noqa
 from .gift_card import *  # noqa
 from .login import *  # noqa
 from .product import *  # noqa
-from .gift_card import *  # noqa

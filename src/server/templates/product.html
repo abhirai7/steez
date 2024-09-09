@@ -49,9 +49,9 @@
         </div>
 
         <div class="col">
-            <p class="fs-1">{{ product.name }}</p>
+            <p class="fs-1">{{ product.name.strip() }}</p>
             <p class="fs-6 text-muted">{{ product.average_rating }} ({{ product.total_reviews }} reviews)</p>
-            <p class="fs-5">Price: INR. {{ product.price }}</p>
+            <p class="fs-5 text-danger">Price: INR. {{ product.price }}</p>
             <p class="fs-6">{{ product.description | safe }}</p>
             <hr>
             <div class="mt-2">
@@ -135,10 +135,17 @@
             <hr>
 
             {% for review in product.reviews %}
-            <div class="card mt-2">
+            <div class="card mt-2 bg-transparent shadow-sm border border-1">
                 <div class="card-body">
-                    <h6 class="card-title text-muted">{{ review.user.name }} {% for i in range(review.stars) %}<i class="bi bi-star-fill"></i>{% endfor %}</h6>
-                    <p class="card-text fs-6">{{ review.review }}</p>
+                    <div class="row">
+                        <div class="col-1 m-auto">
+                            <img src="https://placehold.co/50x50?text={{ review.user.name[0].upper() }}" class="float-end rounded-circle image-fluid" alt="Circular Image"> 
+                        </div>
+                        <div class="col d-flex align-items-center p-0">
+                            <p class="card-title fs-6 text-dark">{{ review.user.name }} - <span class='text-muted'>{{ arrow.get(review.created_at).humanize() }}</span></p>
+                        </div>
+                    </div>
+                    <p class="ms-4 card-text fs-6 mt-2">{{ review.review }}</p>
                 </div>
             </div>
             {% endfor %}

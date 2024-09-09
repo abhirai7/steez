@@ -179,8 +179,11 @@ class User:
 
         return orders
 
-    def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
+    def full_checkout(
+        self, razorpay_client: RazorpayClient, *, gift_code: str = ""
+    ) -> RazorPayOrderDict:
         from .product import GiftCard
+
         gift_card = GiftCard.from_code(self.__conn, code=gift_code)
         orders: list[Order] = self.partial_checkout(gift_card=gift_card)
 

@@ -4,14 +4,13 @@ import os
 import random
 import string
 
+import markdown
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.order import Order
 from src.product import Product
 from src.server import app, conn
-import markdown
-
 from src.server.forms import ProductAddForm
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"

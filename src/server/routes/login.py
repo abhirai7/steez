@@ -9,14 +9,18 @@ from src.user import User
 @app.route("/login", methods=["GET", "POST"])
 @app.route("/login/", methods=["GET", "POST"])
 def login_route():
-    login: LoginForm = LoginForm(conn)
+    login: LoginForm = LoginForm()
 
     if login.validate_on_submit() and request.method == "POST":
         assert login.email.data and login.password.data
 
-        user = User.from_email(
-            conn, email=login.email.data, password=login.password.data
-        )
+        try:
+            user = User.from_email(
+                conn, email=login.email.data, password=login.password.data
+            )
+        except ValueError as e:
+            return render_template("login.html", error=str(e), form=login)
+
         login_user(user)
         return redirect(url_for("home"))
 
@@ -45,7 +49,7 @@ def register():
             and register.phone.data
         )
 
-        address = f"{register.address_line1.data} {register.address_line2.data}".strip()
+        address = f"{register.address_line1.data}".strip()
         address += (
             f", {register.city.data}, {register.state.data}, {register.pincode.data}"
         )

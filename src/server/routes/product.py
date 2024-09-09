@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import arrow
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from razorpay.errors import SignatureVerificationError
@@ -40,6 +41,7 @@ def product(product_id: int):
         form=cart_form,
         review_form=review_form,
         error=request.args.get("error"),
+        arrow=arrow,
     )
 
 
@@ -49,11 +51,22 @@ def add_to_cart(product_id: int):
     product = Product.from_id(conn, product_id)
     form: AddToCartForm = AddToCartForm()
 
-    if form.validate_on_submit() and request.method == "POST" and form.quantity.data and form.size.data:
+    if (
+        form.validate_on_submit()
+        and request.method == "POST"
+        and form.quantity.data
+        and form.size.data
+    ):
         try:
-            products = product.from_unique_id(conn, product.unique_id, size=form.size.data)
+            products = product.from_unique_id(
+                conn, product.unique_id, size=form.size.data
+            )
             if not products:
-                return redirect(url_for("product", product_id=product_id, error="Item not available"))
+                return redirect(
+                    url_for(
+                        "product", product_id=product_id, error="Item not available"
+                    )
+                )
 
             current_user.add_to_cart(product=products[0], quantity=form.quantity.data)
         except ValueError as e:

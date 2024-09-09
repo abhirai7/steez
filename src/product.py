@@ -239,7 +239,9 @@ class Product:
         return ls
 
     @classmethod
-    def all(cls, connection: sqlite3.Connection, *, admin: bool = False) -> list[Product]:
+    def all(
+        cls, connection: sqlite3.Connection, *, admin: bool = False
+    ) -> list[Product]:
         query = r"""
             SELECT *
             FROM PRODUCTS
@@ -356,7 +358,6 @@ class Cart:
         except sqlite3.Error as e:
             self.__conn.commit()
             raise e
-        
 
     def clear(self, *, product: Product | None = None) -> None:
         query = r"DELETE FROM CARTS WHERE USER_ID = ?"

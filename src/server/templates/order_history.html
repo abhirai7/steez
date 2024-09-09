@@ -41,7 +41,7 @@
                             </div>
                             <div class="col-4">
                                 <span class="text-muted">Order Date:</span>
-                                <p class="fs-6">{{ order.created_at }}</p>
+                                <p class="fs-6">{{ arrow.get(order.created_at).humanize() }}</p>
                             </div>
                             <div class="col-4">
                                 <span class="text-muted">Razorpay Order ID:</span>
@@ -60,7 +60,7 @@
                                 {% if order.status == 'CONF' %}
                                 <p><a href="{{ url_for('delete_order', order_id=order.id) }}" class="text-dark link-underline-dark">Click Here to Delete</a></p>
                                 {% else %}
-                                <p class="text-dark link-underline-dark">Can not delete this order</p>
+                                <p class="text-dark link-underline-dark fst-italic">Can not delete this order</p>
                                 {% endif %}
                             </div>
                         </div>

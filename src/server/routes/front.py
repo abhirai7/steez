@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import arrow
 from flask import render_template
 from flask_login import current_user, login_required
 
@@ -54,5 +55,5 @@ def refund_policy():
 def order_history():
     orders = current_user.orders
     return render_template(
-        "order_history.html", orders=orders, current_user=current_user
+        "order_history.html", orders=orders, current_user=current_user, arrow=arrow
     )
