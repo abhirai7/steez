@@ -24,8 +24,6 @@ def product(product_id: int):
     product = Product.from_id(conn, product_id)
     pictures = get_product_pictures(product.unique_id)
 
-    _products = Product.from_unique_id(conn, product.unique_id)
-
     cart_form: AddToCartForm = AddToCartForm()
     review_form: AddReviewForm = AddReviewForm()
 
@@ -61,7 +59,7 @@ def add_to_cart(product_id: int):
             products = product.from_unique_id(
                 conn, product.unique_id, size=form.size.data
             )
-            if not products:
+            if not products or len(products) > 1:
                 return redirect(
                     url_for(
                         "product", product_id=product_id, error="Item not available"
@@ -148,27 +146,6 @@ def razorpay_webhook():
     return {"status": "ok"}, 200
 
 
-# @app.route("/reference_chart")
-# def size_chart():
-#     product = Product.from_id(conn, product_id)
-#     pictures = get_product_pictures(product.unique_id)
-
-#     _products = Product.from_unique_id(conn, product.unique_id)
-
-#     cart_form: AddToCartForm = AddToCartForm()
-#     review_form: AddReviewForm = AddReviewForm()
-
-#     return render_template("reference_chart.html", product=product,
-#         pictures=pictures,
-#         format_to_special=format_to_special,
-#         size_chart=[
-#             (size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()
-#         ],
-#         current_user=current_user,
-#         form=cart_form,
-#         review_form=review_form,
-#         error=request.args.get("error"),
-#         arrow=arrow,)
 @app.route("/payment-success")
 def payment_success():
     return render_template("payment_status.html", status="ok")

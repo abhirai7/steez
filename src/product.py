@@ -141,13 +141,13 @@ class Product:
         cursor.execute(query, (user_id, self.id))
         self.__conn.commit()
 
-    def is_available(self, count: QUANTITY = 1, *, size: str) -> bool:
+    def is_available(self, count: QUANTITY = 1) -> bool:
         if self.stock == -1:
             return True
 
         query = r"SELECT STOCK FROM PRODUCTS WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
         cursor = self.__conn.cursor()
-        cursor.execute(query, (self.unique_id, count, size))
+        cursor.execute(query, (self.unique_id, count, self.size))
         stock = cursor.fetchone()
 
         if stock is None:
@@ -156,14 +156,14 @@ class Product:
         stock = stock[0]
         return stock >= count and stock > 0
 
-    def use(self, count: QUANTITY = 1, *, size: str) -> None:
+    def use(self, count: QUANTITY = 1) -> None:
         if self.stock == -1:
             return
 
         query = r"UPDATE PRODUCTS SET STOCK = STOCK - ? WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
         cursor = self.__conn.cursor()
 
-        cursor.execute(query, (count, self.id, count, size))
+        cursor.execute(query, (count, self.id, count, self.size))
         updated = cursor.rowcount
 
         if updated == 0:
@@ -172,13 +172,13 @@ class Product:
 
         self.__conn.commit()
 
-    def release(self, count: QUANTITY = 1, *, size: str) -> None:
+    def release(self, count: QUANTITY = 1) -> None:
         if self.stock == -1:
             return
 
         query = r"UPDATE PRODUCTS SET STOCK = STOCK + ? WHERE ID = ? AND SIZE = ?"
         cursor = self.__conn.cursor()
-        cursor.execute(query, (count, self.id, size))
+        cursor.execute(query, (count, self.id, self.size))
         self.__conn.commit()
 
     @classmethod
@@ -303,7 +303,7 @@ class Cart:
         cursor.execute(query, (self.user_id, product.id, quantity, quantity))
         self.__conn.commit()
 
-        product.use(quantity, size=product.size)
+        product.use(quantity)
 
     def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
         query = (
@@ -314,7 +314,7 @@ class Cart:
         row = cursor.fetchone()
         self.__conn.commit()
 
-        product.release(int(row[0]), size=product.size)
+        product.release(int(row[0]))
 
     def total(self) -> float:
         query = r"""
