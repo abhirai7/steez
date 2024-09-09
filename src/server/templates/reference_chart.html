@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block body %}
+<p class="fs-6">Reference Chart</p>
+<table class="table mt-2 mb-2">
+    <thead>
+        <th class="bg-transparent">SIZE</th>
+        <th class="bg-transparent">CHEST</th>
+        <th class="bg-transparent">LENGTH</th>
+    </thead>
+    <tbody>
+        {% for size, chest, length in size_chart %}
+        <tr>
+            <td class="bg-transparent">{{ size }}</td>
+            <td class="bg-transparent">{{ chest }}</td>
+            <td class="bg-transparent">{{ length }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr>
+{% endblock %}
