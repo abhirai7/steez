@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 
 from fuzzywuzzy import fuzz
 
-from .utils import generate_gift_card_code, get_product_pictures, size_names
+from .utils import generate_gift_card_code, get_product_pictures, size_names, SQLITE_OLD
 
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
@@ -55,10 +55,19 @@ class Review:
         review: str,
         stars: VALID_STARS,
     ) -> Review:
-        query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?) RETURNING *"
+        if SQLITE_OLD:
+            query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?)"
+        else:
+            query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?) RETURNING *"
         cursor = connection.cursor()
-        cursor.execute(query, (user_id, product_id, stars, review))
-        data = cursor.fetchone()
+        result = cursor.execute(query, (user_id, product_id, stars, review))
+
+        if SQLITE_OLD:
+            result = cursor.execute(
+                r"SELECT * FROM REVIEWS WHERE ROWID = ?", (cursor.lastrowid,)
+            )
+
+        data = result.fetchone()
         connection.commit()
 
         return cls(connection, **data)
@@ -195,13 +204,25 @@ class Product:
     ) -> Product:
         cursor = connection.cursor()
 
-        query = r"""
-            INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
-            RETURNING *
-        """
-        result = cursor.execute(
-            query, (unique_id, name, price, description, stock, size)
-        )
+        if SQLITE_OLD:
+            query = r"""
+                INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
+            """
+            cursor.execute(
+                query, (unique_id, name, price, description, stock, size)
+            )
+            result = cursor.execute(
+                r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,)
+            )
+        else:
+
+            query = r"""
+                INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
+                RETURNING *
+            """
+            result = cursor.execute(
+                query, (unique_id, name, price, description, stock, size)
+            )
         data = result.fetchone()
         connection.commit()
 

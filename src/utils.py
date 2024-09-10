@@ -7,7 +7,7 @@ import pathlib
 import random
 import secrets
 import string
-from sqlite3 import Cursor, Row
+from sqlite3 import Cursor, Row, sqlite_version_info
 from typing import Any, Generic, TypeVar
 
 from dotenv import load_dotenv
@@ -18,6 +18,11 @@ KT = TypeVar("KT")
 VT = TypeVar("VT")
 
 REGION = "en_IN"
+
+if sqlite_version_info >= (3, 35, 0):
+    SQLITE_OLD = False
+else:
+    SQLITE_OLD = True
 
 
 class IndexedDict(Generic[KT, VT]):
@@ -332,3 +337,4 @@ def generate_gift_card_code() -> str:
 
 def binary_adder(a: str, b: str) -> str:
     return bin(int(a, 2) + int(b, 2))[2:]
+

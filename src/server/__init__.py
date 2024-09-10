@@ -11,7 +11,7 @@ from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
 
 from src.user import User
-from src.utils import sqlite_row_factory
+from src.utils import sqlite_row_factory, SQLITE_OLD
 
 load_dotenv()
 
@@ -44,6 +44,9 @@ conn.row_factory = sqlite_row_factory
 
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})
+
+if SQLITE_OLD:
+    app.logger.warning("**SQLITE VERSION IS TOO OLD. PLEASE USE 3.35.0 OR NEWER. FEW FEATURES MAY NOT WORK.**")
 
 from .login_manager import *  # noqa
 from .routes import *  # noqa

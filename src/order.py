@@ -4,6 +4,8 @@ import datetime
 import sqlite3
 from typing import TYPE_CHECKING, Literal
 
+from .utils import SQLITE_OLD
+
 if TYPE_CHECKING:
     from .product import Product
     from .user import User
@@ -48,18 +50,26 @@ class Order:
         total_price: float,
     ) -> Order:
         cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO orders (user_id, product_id, quantity, total_price) VALUES (?, ?, ?, ?) RETURNING *",
-            (user_id, product_id, quantity, total_price),
-        )
-        row = cursor.fetchone()
+        if SQLITE_OLD:
+            cursor.execute(
+                "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?)",
+                (user_id, product_id, quantity, total_price),
+            )
+            result = cursor.execute("SELECT * FROM ORDERS WHERE ROWID = ?", (cursor.lastrowid,))
+        else:
+            result = cursor.execute(
+                "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?) RETURNING *",
+                (user_id, product_id, quantity, total_price),
+            )
+
+        row = result.fetchone()
         connection.commit()
         return cls(connection, **row)
 
     @classmethod
     def from_id(cls, connection: sqlite3.Connection, order_id: int) -> Order:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM ORDERS WHERE id = ?", (order_id,))
+        cursor.execute("SELECT * FROM ORDERS WHERE ID = ?", (order_id,))
         row = cursor.fetchone()
         if row is None:
             error = "Order not found."

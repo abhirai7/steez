@@ -38,7 +38,7 @@ def faq():
     return render_template("faq.html", current_user=current_user)
 
 
-@app.route("/search/<string:query>")
+@app.route("/search/<string:query>", methods=["GET"])
 def search(query: str):
     products = Product.search(conn, query)
     return render_template(
