@@ -41,12 +41,16 @@
 {% block body %}
 
 {{ navbar.navbar(current_user) }}
-{{ hero.carousel() }}
+{% if show_hero %}
+    {{ hero.carousel() }}
+{% endif %}
 
 {% if products %}
 <hr>
 <div class="container-fluid mt-5">
-    <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
+    {% if show_hero %}
+        <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
+    {% endif %}
     <div class="row row-cols-lg-5">
         {% for product in products %}
         <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
@@ -66,37 +70,40 @@
 </div>
 {% endif %}
 
-<div class="card p-5">
-    <div class="row">
-        <div class="col-4 align-self-center">
-            <p class="fs-1 text-center">GIFT CARDS</p>
-        </div>
-        <div class="col-8">
-            <p class="fs-5 text-center">Gift cards are the perfect gift for any occasion. They are available in various denominations and can be used to purchase any
-                product on our website.</p>
-            <form method="POST" action="{{ url_for('buy_gift_card') }}">
-                {{ gift_form.csrf_token }}
-                <div class="mb-3">
-                    {{ gift_form.amount.label(class="form-label") }}
-                    {{ gift_form.amount(class="form-control", id="amount") }}
-                </div>
-                {% if gift_form.errors %}
-                <div class="alert alert-danger mt-3" role="alert">
-                    {% for error in gift_form.errors %}
-                    <p>{{ error }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
+{% if show_hero %}
+    <div class="card p-5">
+        <div class="row">
+            <div class="col-4 align-self-center">
+                <p class="fs-1 text-center">GIFT CARDS</p>
+            </div>
+            <div class="col-8">
+                <p class="fs-5 text-center">Gift cards are the perfect gift for any occasion. They are available in various denominations and can be used to purchase any
+                    product on our website.</p>
+                <form method="POST" action="{{ url_for('buy_gift_card') }}">
+                    {{ gift_form.csrf_token }}
+                    <div class="mb-3">
+                        {{ gift_form.amount.label(class="form-label") }}
+                        {{ gift_form.amount(class="form-control", id="amount") }}
+                    </div>
+                    {% if gift_form.errors %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        {% for error in gift_form.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
-                {{ gift_form.submit(class="btn btn-outline-success") }}
+                    {{ gift_form.submit(class="btn btn-outline-success") }}
 
-                <p class="fs-6 text-muted text-small mt-3">*Gift cards are non-refundable. For more information <a href="{{ url_for('refund_policy') }}"
-                        class="link-underlink-dark text-muted">Click Here</a></p>
-            </form>
+                    <p class="fs-6 text-muted text-small mt-3">*Gift cards are non-refundable. For more information <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a></p>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+{% endif %}
 
-{{ footer.footer() }}
+{% if show_hero %}
+    {{ footer.footer() }}
+{% endif %}
 
 {% endblock %}

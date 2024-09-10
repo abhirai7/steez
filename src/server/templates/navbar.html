@@ -7,10 +7,9 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <form class="ms-auto" role="search">
-                <input class="form-control search-input" type="search" id="searchBar" placeholder="Search STEEZ™" aria-label="Search" style="height: 45px">
-            </form>
-
+            <div class="ms-auto">
+                <input class="form-control ms-auto search-input" type="search" id="searchBar" placeholder="Search STEEZ™" aria-label="Search" style="height: 45px">
+            </div>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex">
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">

@@ -29,6 +29,7 @@ def home():
         products=products,
         current_user=current_user,
         gift_form=gift_form,
+        show_hero=True,
     )
 
 
@@ -41,11 +42,14 @@ def faq():
 @app.route("/search/<string:query>", methods=["GET"])
 def search(query: str):
     products = Product.search(conn, query)
+    gift_form: GiftCardForm = GiftCardForm()
     return render_template(
         "front.html",
         format_to_special=format_to_special,
         products=products,
         current_user=current_user,
+        gift_form=gift_form,
+        show_hero=False,
     )
 
 
