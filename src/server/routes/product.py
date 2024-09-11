@@ -43,6 +43,16 @@ def product(product_id: int):
     )
 
 
+@app.route("/reference_chart", methods=["GET"])
+def reference_chart():
+    return render_template(
+        "reference_chart.html",
+        size_chart=[
+            (size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()
+        ],
+    )
+
+
 @app.route("/products/<int:product_id>/add-to-cart", methods=["POST"])
 @login_required
 def add_to_cart(product_id: int):

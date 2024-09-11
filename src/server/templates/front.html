@@ -1,109 +1,110 @@
-{% extends 'base.html' %}
-
-{% import 'navbar.html' as navbar %}
-{% import 'footer.html' as footer %}
-{% import 'hero.html' as hero %}
-
-{% set title = 'STEEZ™' %}
-
-{% block styles %}
+{% extends 'base.html' %} {% import 'navbar.html' as navbar %} {% import
+'footer.html' as footer %} {% import 'hero.html' as hero %} {% set title =
+'STEEZ™' %} {% block styles %}
 <style>
-    .fs {
-        font-size: 7rem;
-    }
+  .fs {
+    font-size: 7rem;
+  }
+
+  .product-card:hover {
+    transform: scale(1.05); /* Add magnifying effect on hover */
+    transition: transform 0.5s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .product-card img {
+    transition: opacity 0.5s ease-in-out;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+
+  .product-card .hover-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+  }
+
+  .product-card:hover .hover-image {
+    opacity: 1;
+  }
+
+  .product-card:hover .main-image {
+    opacity: 0;
+  }
 </style>
 
-<style>
-    .zoom-on-hover:hover {
-        transform: scale(1.05);
-        transition: transform 0.2s;
-    }
-</style>
-
-<style>
-    .image-transition img.image-1 {
-        opacity: 1;
-        transition: opacity 0.5s;
-    }
-
-    .image-transition img.image-2 {
-        opacity: 0;
-        transition: opacity 0.5s;
-    }
-
-    .image-transition img.image-3 {
-        opacity: 0;
-        transition: opacity 0.5s;
-    }
-</style>
-{% endblock %}
-
-{% block body %}
-
-{{ navbar.navbar(current_user) }}
-{% if show_hero %}
-    {{ hero.carousel() }}
-{% endif %}
-
-{% if products %}
-<hr>
+{% endblock %} {% block body %} {{ navbar.navbar(current_user) }} {% if
+show_hero %} {{ hero.carousel() }} {% endif %} {% if products %}
+<hr />
 <div class="container-fluid mt-5">
-    {% if show_hero %}
-        <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
-    {% endif %}
-    <div class="row row-cols-lg-5">
-        {% for product in products %}
-        <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-            <div class="card shadow image-transition">
-                {% for image in product.images %}
-                <img src="{{ image }}" class="card-img-top image-{{ loop.index }}" alt="{{ product.name }}">
-                {% endfor %}
-                <div class="card-body">
-                    <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
-                    <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
-                </div>
-                <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
-            </div>
+  {% if show_hero %}
+  <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
+  {% endif %}
+  <div class="row row-cols-lg-5">
+    {% for product in products %}
+    <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
+      <div class="card shadow image-transition product-card">
+        <img
+          src="{{ product.images[0] }}"
+          alt="{{ product.name }}"
+          class="img-fluid main-image"
+        />
+        <img
+          src="{{ product.images[1] }}"
+          alt="{{ product.name }}"
+          class="img-fluid hover-image"
+        />
+        <div class="card-body">
+          <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
+          <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
         </div>
-        {% endfor %}
+        <a
+          href="{{ url_for('product', product_id=product.id) }}"
+          class="stretched-link"
+        ></a>
+      </div>
     </div>
+    {% endfor %}
+  </div>
 </div>
-{% endif %}
-
-{% if show_hero %}
-    <div class="card p-5">
-        <div class="row">
-            <div class="col-4 align-self-center">
-                <p class="fs-1 text-center">GIFT CARDS</p>
-            </div>
-            <div class="col-8">
-                <p class="fs-5 text-center">Gift cards are the perfect gift for any occasion. They are available in various denominations and can be used to purchase any
-                    product on our website.</p>
-                <form method="POST" action="{{ url_for('buy_gift_card') }}">
-                    {{ gift_form.csrf_token }}
-                    <div class="mb-3">
-                        {{ gift_form.amount.label(class="form-label") }}
-                        {{ gift_form.amount(class="form-control", id="amount") }}
-                    </div>
-                    {% if gift_form.errors %}
-                    <div class="alert alert-danger mt-3" role="alert">
-                        {% for error in gift_form.errors %}
-                        <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
-                    {{ gift_form.submit(class="btn btn-outline-success") }}
-
-                    <p class="fs-6 text-muted text-small mt-3">*Gift cards are non-refundable. For more information <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a></p>
-                </form>
-            </div>
-        </div>
+{% endif %} {% if show_hero %}
+<div class="card p-5">
+  <div class="row">
+    <div class="col-4 align-self-center">
+      <p class="fs-1 text-center">GIFT CARDS</p>
     </div>
-{% endif %}
+    <div class="col-8">
+      <p class="fs-5 text-center">
+        Gift cards are the perfect gift for any occasion. They are available in
+        various denominations and can be used to purchase any product on our
+        website.
+      </p>
+      <form method="POST" action="{{ url_for('buy_gift_card') }}">
+        {{ gift_form.csrf_token }}
+        <div class="mb-3">
+          {{ gift_form.amount.label(class="form-label") }} {{
+          gift_form.amount(class="form-control", id="amount") }}
+        </div>
+        {% if gift_form.errors %}
+        <div class="alert alert-danger mt-3" role="alert">
+          {% for error in gift_form.errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %} {{ gift_form.submit(class="btn btn-outline-success") }}
 
-{% if show_hero %}
-    {{ footer.footer() }}
-{% endif %}
-
-{% endblock %}
+        <p class="fs-6 text-muted text-small mt-3">
+          *Gift cards are non-refundable. For more information
+          <a
+            href="{{ url_for('refund_policy') }}"
+            class="link-underlink-dark text-muted"
+            >Click Here</a
+          >
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %} {% if show_hero %} {{ footer.footer() }} {% endif %} {% endblock %}

@@ -1,21 +1,28 @@
 {% extends 'base.html' %}
 {% block body %}
-<p class="fs-6">Reference Chart</p>
-<table class="table mt-2 mb-2">
-    <thead>
-        <th class="bg-transparent">SIZE</th>
-        <th class="bg-transparent">CHEST</th>
-        <th class="bg-transparent">LENGTH</th>
-    </thead>
-    <tbody>
-        {% for size, chest, length in size_chart %}
-        <tr>
-            <td class="bg-transparent">{{ size }}</td>
-            <td class="bg-transparent">{{ chest }}</td>
-            <td class="bg-transparent">{{ length }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container my-4">
+    <p class="border border-dark p-3 w-50 mx-auto text-center bg-light font-weight-bold">
+        Reference Chart
+    </p>
+    <table class="table table-bordered table-hover text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>SIZE</th>
+                <th>CHEST</th>
+                <th>LENGTH</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for size, chest, length in size_chart %}
+            <tr>
+                <td>{{ size }}</td>
+                <td>{{ chest }}</td>
+                <td>{{ length }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <hr>
 {% endblock %}

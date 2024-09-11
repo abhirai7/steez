@@ -296,34 +296,12 @@
         margin-bottom: 10px;
     }
 
-
-    /* Related Products Section */
-
-    .related-products {
-        margin-bottom: 20px;
+    .main-image img {
+        height: 100%;
     }
-
-    .product-item {
-        margin-bottom: 20px;
+    .thumbnail img {
+        height: 100% ;
     }
-
-    .product-item img {
-        width: 60%;
-        height: 60%;
-        object-fit: cover;
-        border-radius: 10px;
-    }
-
-    .product-item h3 {
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-
-    .product-item p {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
     /* FAQ Section */
 
     .faq-list {
@@ -394,7 +372,7 @@
                         {{ form.hidden_tag() }}
 
                         <div class="row">
-                            <div class="col">
+                            <div class="col-">
                                 <div class="form-group mb-2">
                                     {{ form.quantity.label(class="form-label text-muted") }}
                                     {{ form.quantity(class="form-control form-control-lg fs-6", placeholder="Quantity") }}
@@ -404,6 +382,13 @@
                                 <div class="form-group mb-2">
                                     {{ form.size.label(class="form-label text-muted") }}
                                     {{ form.size(class="form-select form-select-lg fs-6", placeholder="Select Size") }}
+                                </div>
+                            </div>
+                            <div class="col"></div>
+                                <div class="form-group mb-2">
+                                    <a href = "{{ url_for('reference_chart') }}" class="ink-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                                        Size reference_chart
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -468,33 +453,9 @@
                 </div>
                 {% endfor %}
         </div>
-        <br>
-        <hr>
         <!-- Related Products Section -->
         <div class="row">
             <div class="col-md-12">
-                <h2>Related Products</h2>
-                <div class="related-products">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="product-item">
-                                <a href="#"><img class="product-card img-fluid main-image" src="products/product2.jpeg" alt="Related Product 1"></a>
-                                <h3>Related Product 1</h3>
-                                <p>Related Product Description</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product-item">
-                                <a href="#"><img class="product-card img-fluid main-image" src="products/product1.jpeg" alt="Related Product 2"></a>
-                                <h3>Related Product 2</h3>
-                                <p>Related Product Description</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <br>
-                <hr>
                 <!-- Product FAQs Section -->
                 <div class="row">
                     <div class="col-md-12">
