@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 from src.product import Product
 from src.server import app, conn
 from src.server.forms import GiftCardForm
-from src.utils import format_to_special
+from src.utils import format_to_special, FAQ_DATA
 
 if TYPE_CHECKING:
     from src.user import User
@@ -36,7 +36,7 @@ def home():
 @app.route("/faq/")
 @app.route("/faq")
 def faq():
-    return render_template("faq.html", current_user=current_user)
+    return render_template("faq.html", current_user=current_user, FAQ=FAQ_DATA)
 
 
 @app.route("/search/<string:query>", methods=["GET"])

@@ -338,3 +338,37 @@ def generate_gift_card_code() -> str:
 def binary_adder(a: str, b: str) -> str:
     return bin(int(a, 2) + int(b, 2))[2:]
 
+
+class FAQEntity:
+    def __init__(self, question: str, answer: str, /) -> None:
+        self.question = question
+        self.answer = answer
+
+
+class FAQ:
+    def __init__(self, /) -> None:
+        self.__faqs: list[FAQEntity] = []
+    
+    def add(self, question: str, answer: str, /) -> None:
+        self.__faqs.append(FAQEntity(question, answer))
+    
+    def get(self) -> list[FAQEntity]:
+        return self.__faqs
+    
+    def __iter__(self):
+        return iter(self.__faqs)
+    
+    def __len__(self):
+        return len(self.__faqs)
+
+
+with open("src/server/static/faq.json") as f:
+    import json
+
+    faq_data = json.load(f)
+
+faq = FAQ()
+for faq_entity in faq_data["faq"]:
+    faq.add(faq_entity["question"], faq_entity["answer"])
+
+FAQ_DATA = faq

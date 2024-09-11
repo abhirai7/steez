@@ -12,7 +12,7 @@ from src.product import Product
 from src.server import RAZORPAY_KEY, app, conn, razorpay_client
 from src.server.forms import AddReviewForm, AddToCartForm
 from src.user import User
-from src.utils import format_number, format_to_special, get_product_pictures, size_chart
+from src.utils import format_number, format_to_special, get_product_pictures, size_chart, FAQ_DATA
 
 if TYPE_CHECKING:
     assert isinstance(current_user, User)
@@ -40,6 +40,7 @@ def product(product_id: int):
         review_form=review_form,
         error=request.args.get("error"),
         arrow=arrow,
+        FAQ=FAQ_DATA,
     )
 
 

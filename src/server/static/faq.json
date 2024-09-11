@@ -1,0 +1,53 @@
+{
+    "faq": [
+        {
+            "question": "What is the time frame to return an item?",
+            "answer": "Items must be returned within 10 days of the delivery date."
+        },
+        {
+            "question": "What are the conditions for an item to be eligible for return?",
+            "answer": "Products must be unworn, unwashed, and in their original packaging with all tags attached."
+        },
+        {
+            "question": "Are sale items eligible for returns?",
+            "answer": "No, sale items and customized products are not eligible for returns or exchanges unless they are defective or damaged."
+        },
+        {
+            "question": "How do I initiate a return?",
+            "answer": "Contact customer support with your order number and reason for the return to initiate the process."
+        },
+        {
+            "question": "Who is responsible for return shipping costs?",
+            "answer": "Free return shipping is available for domestic orders. For international returns, the customer is responsible for shipping costs."
+        },
+        {
+            "question": "When should returns be shipped after receiving the return shipping label?",
+            "answer": "Returns should be shipped within 7 days of receiving the return shipping label."
+        },
+        {
+            "question": "How long does it take to receive a refund after a return?",
+            "answer": "If the return is approved, refunds are processed within 7-10 business days, and the credit is applied to the original method of payment."
+        },
+        {
+            "question": "Is the original shipping cost refundable?",
+            "answer": "No, the original shipping cost is non-refundable unless the return is due to an error by the company."
+        },
+        {
+            "question": "Can I exchange an item?",
+            "answer": "Yes, items can be exchanged for a different size or color within 10 days of the delivery date, as long as they meet the same conditions as returns."
+        },
+        {
+            "question": "How do I exchange an item?",
+            "answer": "Contact customer support to initiate the exchange, and the new item will be shipped after receiving the original one and confirming its condition."
+        },
+        {
+            "question": "What should I do if I receive a defective or damaged product?",
+            "answer": "Contact customer support immediately to arrange for a replacement or full refund, including shipping costs."
+        },
+        {
+            "question": "What items are non-returnable?",
+            "answer": "Non-returnable items include gift cards, final sale items, and customized or personalized products."
+        }
+    ]
+}
+  

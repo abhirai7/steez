@@ -9,175 +9,22 @@
 {{ navbar.navbar(current_user) }}
 <div class="container my-5">
     <h1 class="text-center mb-4">Return Policy Q&A</h1>
-
     <div class="accordion" id="returnPolicyAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true"
-                    aria-controls="collapseOne">
-                    What is the time frame to return an item?
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Items must be returned within 10 days of the delivery date.
+        {% for faq in FAQ %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                    <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
+                        aria-controls="collapse-{{ loop.index }}">
+                        {{ faq.question }}
+                    </button>
+                </h2>
+                <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#returnPolicyAccordion">
+                    <div class="accordion-body">
+                        {{ faq.answer }}
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false"
-                    aria-controls="collapseTwo">
-                    What are the conditions for an item to be eligible for return?
-                </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Products must be unworn, unwashed, and in their original packaging with all tags attached.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingThree">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false"
-                    aria-controls="collapseThree">
-                    Are sale items eligible for returns?
-                </button>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    No, sale items and customized products are not eligible for returns or exchanges unless they are defective or damaged.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingFour">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false"
-                    aria-controls="collapseFour">
-                    How do I initiate a return?
-                </button>
-            </h2>
-            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Contact customer support with your order number and reason for the return to initiate the process.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingFive">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false"
-                    aria-controls="collapseFive">
-                    Who is responsible for return shipping costs?
-                </button>
-            </h2>
-            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Free return shipping is available for domestic orders. For international returns, the customer is responsible for shipping costs.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingSix">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false"
-                    aria-controls="collapseSix">
-                    When should returns be shipped after receiving the return shipping label?
-                </button>
-            </h2>
-            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Returns should be shipped within 7 days of receiving the return shipping label.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingSeven">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false"
-                    aria-controls="collapseSeven">
-                    How long does it take to receive a refund after a return?
-                </button>
-            </h2>
-            <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    If the return is approved, refunds are processed within 7-10 business days, and the credit is applied to the original method of payment.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingEight">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false"
-                    aria-controls="collapseEight">
-                    Is the original shipping cost refundable?
-                </button>
-            </h2>
-            <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    No, the original shipping cost is non-refundable unless the return is due to an error by the company.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingNine">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false"
-                    aria-controls="collapseNine">
-                    Can I exchange an item?
-                </button>
-            </h2>
-            <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Yes, items can be exchanged for a different size or color within 10 days of the delivery date, as long as they meet the same conditions as returns.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTen">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false"
-                    aria-controls="collapseTen">
-                    How do I exchange an item?
-                </button>
-            </h2>
-            <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Contact customer support to initiate the exchange, and the new item will be shipped after receiving the original one and confirming its condition.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingEleven">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false"
-                    aria-controls="collapseEleven">
-                    What should I do if I receive a defective or damaged product?
-                </button>
-            </h2>
-            <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Contact customer support immediately to arrange for a replacement or full refund, including shipping costs.
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwelve">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwelve" aria-expanded="false"
-                    aria-controls="collapseTwelve">
-                    What items are non-returnable?
-                </button>
-            </h2>
-            <div id="collapseTwelve" class="accordion-collapse collapse" aria-labelledby="headingTwelve" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    Non-returnable items include gift cards, final sale items, and customized or personalized products.
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 
