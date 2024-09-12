@@ -6,17 +6,17 @@
 
 {% block body %}
 <div class="row">
-    <div class="col-2">
+    <div class="col-2"">
         {{ navbar.admin_navbar(current_user) }}
     </div>
-    <div class="col-10">
+    <div class="col-10 overflow-y-auto" style="height: 100vh;">
         <div class="border border-1 mt-3">
             <div class="card-header">
                 <p class="fs-1 m-0 text-center">Payments</p>
             </div>
         </div>
 
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped mt-3">
             <thead class="table-dark">
                 <tr>
                     <th>Payment ID</th>

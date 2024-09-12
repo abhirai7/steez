@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% import 'navbar.html' as navbar %}
+
+{% set title = 'STEEZ™ - Admin | Gift Cards' %}
+
+{% block body %}
+<div class="row">
+    <div class="col-2">
+        {{ navbar.admin_navbar(current_user) }}
+    </div>
+    <div class="col-10 overflow-y-auto" style="height: 100vh;">
+        <div class="border border-1 mt-3">
+            <div class="card-header">
+                <p class="fs-1 m-0 text-center">Gift Cards</p>
+                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Price</th>
+                    <th>User ID</th>
+                    <th>Code</th>
+                    <th>Used</th>
+                    <th>Created At</th>
+                    <th>Used At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if gift_cards %}
+                {% for card in gift_cards %}
+                <tr>
+                    <td>{{ card.id }}</td>
+                    <td>{{ card.price | int | format_currency }}</td>
+                    <td>USR_{{ card.user_id }}</td>
+                    <td>{{ card.code }}</td>
+                    <td>{{ 'Yes' if card.used else 'No' }}</td>
+                    <td>{{ card.created_at | datetimeformat }}</td>
+                    <td>{{ card.used_at | datetimeformat if card.used_at else 'Not Used' }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No gift cards available</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

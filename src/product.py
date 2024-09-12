@@ -487,3 +487,11 @@ class GiftCard:
             return cls.exists(conn, code=code)
         except ValueError:
             return None
+
+    @classmethod
+    def all(cls, conn: sqlite3.Connection) -> list[GiftCard]:
+        query = r"SELECT * FROM GIFT_CARDS"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        return [cls(conn, **row) for row in rows]

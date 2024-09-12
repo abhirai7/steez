@@ -10,7 +10,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.order import Order
-from src.product import Product
+from src.product import GiftCard, Product
 from src.server import app, conn, razorpay_client
 from src.server.forms import ProductAddForm
 from src.utils import size_names
@@ -115,9 +115,15 @@ def admin_manage_order():
 @login_required
 def admin_payments():
     response = razorpay_client.payment.all({"count": 100})
-    print(response)
 
     return render_template(
         "admin_payments.html",
         payments=response,
     )
+
+
+@app.route("/admin/giftcards")
+@login_required
+def admin_giftcards():
+    gift_cards = GiftCard.all(conn)
+    return render_template("admin_manage_giftcard.html", gift_cards=gift_cards)

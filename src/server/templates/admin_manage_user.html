@@ -1,44 +1,65 @@
 {% extends 'base.html' %}
 
-{% set title = 'STEEZ™ - Admin' %}
+{% import 'navbar.html' as navbar %}
+
+{% set title = 'STEEZ™ - Admin | Users' %}
 
 {% block body %}
-<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - User Management</p>
-
-<div class="container consolas">
-    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary mb-3">Back</a>
-    <div class="row mt-3">
-        <div class="col">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Address</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.address }}</td>
-                        <td>{{ user.phone }}</td>
-                        <td>
-                            {% if user.role != 'ADMIN' %}
-                            <a href="{{ url_for('admin_delete_user', id=user.id) }}" class="btn btn-danger">Delete</a>
-                            {% else %}
-                            <button class="btn btn-secondary" disabled>Delete</button>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="row">
+    <div class="col-2">
+        {{ navbar.admin_navbar(current_user) }}
     </div>
-    {% endblock %}
+    <div class="col-10 overflow-y-auto" style="height: 100vh;">
+        <div class="border border-1 mt-3">
+            <div class="card-header">
+                <p class="fs-1 m-0 text-center">Users</p>
+                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users %}
+                {% for user in users %}
+                <tr>
+                    <td>USR_{{ user['id'] }}</td>
+                    <td>{{ user['name'] }}</td>
+                    <td>{{ user['email'] }}</td>
+                    <td>{{ user['phone'] }}</td>
+                    <td>
+                        <p class="d-inline-flex gap-1">
+                            <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-address-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="collapse-address-{{ loop.index }}">
+                                View Address
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapse-address-{{ loop.index }}">
+                            <div class="card card-body">
+                                {{ user['address'] }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ user['role'] }}</td>
+                    <td>{{ user['created_at'] | datetimeformat }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No users found</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
