@@ -1,13 +1,26 @@
 from __future__ import annotations
 
+import arrow
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from src.order import Order
 from src.product import Product
-from src.server import app, conn
+from src.server import app, conn, razorpay_client
 from src.server.forms import AdminForm
 from src.user import Admin, User
+
+
+def todays_settlement(response: dict):
+    today = arrow.now().format("YYYY-MM-DD")
+
+    todays_settlements = [
+        item
+        for item in response["items"]
+        if arrow.get(item["created_at"]).format("YYYY-MM-DD") == today
+    ]
+
+    return sum(item["amount"] for item in todays_settlements)
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -36,9 +49,12 @@ def admin_logout():
 @login_required
 def admin_dashboard():
     assert current_user.is_admin
+
     products = Product.all(conn)
     users = User.all(conn)
     orders = Order.all(conn)
+
+    settlements = razorpay_client.settlement.all({"count": 100})
 
     return render_template(
         "admin_dashboard.html",
@@ -46,4 +62,6 @@ def admin_dashboard():
         users=users,
         orders=orders,
         current_user=current_user,
+        settlements=settlements,
+        todays_settlement=todays_settlement(settlements),
     )

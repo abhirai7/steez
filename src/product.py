@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 
 from fuzzywuzzy import fuzz
 
-from .utils import generate_gift_card_code, get_product_pictures, size_names, SQLITE_OLD
+from .utils import SQLITE_OLD, generate_gift_card_code, get_product_pictures, size_names
 
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
@@ -208,9 +208,7 @@ class Product:
             query = r"""
                 INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
             """
-            cursor.execute(
-                query, (unique_id, name, price, description, stock, size)
-            )
+            cursor.execute(query, (unique_id, name, price, description, stock, size))
             result = cursor.execute(
                 r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,)
             )

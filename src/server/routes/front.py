@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 from src.product import Product
 from src.server import app, conn
 from src.server.forms import GiftCardForm
-from src.utils import format_to_special, FAQ_DATA
+from src.utils import FAQ_DATA, format_to_special
 
 if TYPE_CHECKING:
     from src.user import User

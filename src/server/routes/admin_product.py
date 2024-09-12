@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import random
 import string
@@ -10,8 +11,9 @@ from flask_login import current_user, login_required
 
 from src.order import Order
 from src.product import Product
-from src.server import app, conn
+from src.server import app, conn, razorpay_client
 from src.server.forms import ProductAddForm
+from src.utils import size_names
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
 
@@ -24,7 +26,9 @@ def generate_unique_identifier():
 @login_required
 def admin_manage_product():
     products = Product.all(conn, admin=True)
-    return render_template("admin_manage_product.html", products=products)
+    return render_template(
+        "admin_manage_product.html", products=products, size_names=size_names
+    )
 
 
 @app.route("/admin/manage/product/add", methods=["GET", "POST"])
@@ -87,4 +91,33 @@ def admin_delete_product(id):
 @login_required
 def admin_manage_order():
     orders = Order.all(conn)
-    return render_template("admin_manage_order.html", orders=orders)
+
+    response = razorpay_client.order.all({"count": 100})
+
+    total_order_amount = sum(item["amount"] for item in response["items"])
+    total_paid = sum(
+        item["amount_paid"] for item in response["items"] if item["amount_paid"]
+    )
+    total_due = sum(item["amount_due"] for item in response["items"])
+
+    return render_template(
+        "admin_manage_order.html",
+        orders=orders,
+        total_order_amount=total_order_amount,
+        total_paid=total_paid,
+        total_due=total_due,
+        response=response,
+        json=json,
+    )
+
+
+@app.route("/admin/payouts", methods=["GET"])
+@login_required
+def admin_payments():
+    response = razorpay_client.payment.all({"count": 100})
+    print(response)
+
+    return render_template(
+        "admin_payments.html",
+        payments=response,
+    )

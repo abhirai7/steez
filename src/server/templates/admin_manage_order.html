@@ -1,54 +1,78 @@
 {% extends 'base.html' %}
 
+{% import 'navbar.html' as navbar %}
+
 {% set title = 'STEEZ™ - Admin' %}
 
 
 {% block body %}
-<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - Orders</p>
-
-<div class="container-fluid">
-    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary mb-3">Back</a>
-    <div class="row mt-3">
-        <div class="col">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>User ID</th>
-                        <th>User</th>
-                        <th>User Contact</th>
-                        <th>User Email</th>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Razorpay Order ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                    <tr>
-                        {% set product = order.product %}
-                        {% set user = order.user %}
-
-                        <td>{{ order.id }}</td>
-                        <td>{{ user.id }}</td>
-                        <td>
-                            {{ user.name }}
-                            <p class="text-muted fs-6">{{ user.address }}</p>
-                        </td>
-                        <td>+91 {{ user.phone }}</td>
-                        <td>{{ user.email }}</td>
-                        <td><a href="{{ url_for('product', product_id=product.id) }}">{{ product.name }}</a></td>
-                        <td>{{ order.quantity }}</td>
-                        <td>{{ order.total_price }}</td>
-                        <td>{{ order.status }}</td>
-                        <td>{{ order.razorpay_order_id }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="row">
+    <div class="col-2">
+        {{ navbar.admin_navbar(current_user) }}
+    </div>
+    <div class="col">
+        <div class="border border-1 mt-3">
+            <div class="card-header">
+                <p class="fs-1 m-0 text-center">Orders Created/Recorded</p>
+                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+            </div>
         </div>
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Amount</th>
+                    <th>Amount Paid</th>
+                    <th>Amount Due</th>
+                    <th>Status</th>
+                    <th>Attempts</th>
+                    <th>Created At</th>
+                    <th>Notes (Developer Use)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if response["items"] %}
+                {% for order in response["items"] %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.amount | format_currency }}</td>
+                    <td>{{ order.amount_paid | format_currency }}</td>
+                    <td>{{ order.amount_due | format_currency }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.attempts }}</td>
+                    <td>{{ order.created_at | datetimeformat }}</td>
+                    <td class="font-monospace pre">
+                        <p class="d-inline-flex gap-1">
+                            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"
+                                aria-controls="collapse-{{ loop.index }}">
+                                Show JSON Notes
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapse-{{ loop.index }}">
+                            <div class="card card-body">
+                                {{ order.notes | tojson | safe }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">No orders for today</td>
+                </tr>
+                {% endif %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th>Total</th>
+                    <th>{{ total_order_amount | format_currency }}</th>
+                    <th>{{ total_paid | format_currency }}</th>
+                    <th>{{ total_due | format_currency }}</th>
+                    <th colspan="3"></th>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>
 {% endblock %}

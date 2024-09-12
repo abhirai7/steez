@@ -12,7 +12,13 @@ from src.product import Product
 from src.server import RAZORPAY_KEY, app, conn, razorpay_client
 from src.server.forms import AddReviewForm, AddToCartForm
 from src.user import User
-from src.utils import format_number, format_to_special, get_product_pictures, size_chart, FAQ_DATA
+from src.utils import (
+    FAQ_DATA,
+    format_number,
+    format_to_special,
+    get_product_pictures,
+    size_chart,
+)
 
 if TYPE_CHECKING:
     assert isinstance(current_user, User)

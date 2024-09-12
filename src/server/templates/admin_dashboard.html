@@ -1,30 +1,78 @@
 {% extends 'base.html' %}
 
+{% import 'navbar.html' as navbar %}
+
 {% set title = 'STEEZ™ - Admin' %}
 
+{% block scripts %}
+<script>
+    function loadDateTime() {
+        const dateTime = document.getElementById('date-time');
+        const date = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const time = date.toLocaleTimeString('en-US');
+        dateTime.textContent = `${date.toLocaleDateString('en-US', options)} - ${time}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDateTime();
+    });
+
+    setInterval(() => {
+        loadDateTime();
+    }, 1000);
+</script>
+{% endblock %}
+
 {% block body %}
-<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - ADMIN DASHBORD</p>
-
-<div class="container">
-    <a href="{{ url_for('logout') }}" class="btn btn-danger mb-3">Logout from Admin</a>
-    <div class="row p-3">
-        <div class="col text-center consolas">
-            <h3>Products</h3>
-            <p class="text-muted fs-4">{{ products | length }}</p>
-            <a href="{{ url_for('admin_manage_product') }}" class="btn btn-primary">View</a>
+<div class="row" style="height: 100vh;">
+    <div class="col-2">
+        {{ navbar.admin_navbar(current_user) }}
+    </div>
+    <div class="col">
+        <div class="border border-1 mt-3">
+            <div class="card-header">
+                <p class="fs-1 m-0 text-center">Greetings! Admin</p>
+                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+            </div>
         </div>
 
-        <div class="col text-center consolas">
-            <h3>Orders</h3>
-            <p class="text-muted fs-4">{{ orders | length }}</p>
-            <a href="{{ url_for('admin_manage_order') }}" class="btn btn-primary">View</a>
+        <div class="card rounded rounded-0 mt-2">
+            <div class="card-body">
+                <p class="fs-4 text-center">Today's Settlement</p>
+                <p class="fs-1 text-center">{{ todays_settlement | int | format_currency }} <i class="bi bi-check-circle-fill"></i></p>
+            </div>
         </div>
 
-        <div class="col text-center consolas">
-            <h3>Users</h3>
-            <p class="text-muted fs-4">{{ users | length }}</p>
-            <a href="{{ url_for('admin_manage_user') }}" class="btn btn-primary">View</a>
-        </div>
+        <table class="table table-bordered table-striped mt-3">
+            <caption class="fs-6">Top 100 Settlements</caption>
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Entity</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Fees</th>
+                    <th>Tax</th>
+                    <th>UTR</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in settlements['items'] %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.entity }}</td>
+                    <td>{{ item.amount | int | format_currency }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.fees | int | format_currency }}</td>
+                    <td>{{ item.tax | int | format_currency }}</td>
+                    <td>{{ item.utr }}</td>
+                    <td>{{ item.created_at | datetimeformat }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

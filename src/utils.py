@@ -348,16 +348,16 @@ class FAQEntity:
 class FAQ:
     def __init__(self, /) -> None:
         self.__faqs: list[FAQEntity] = []
-    
+
     def add(self, question: str, answer: str, /) -> None:
         self.__faqs.append(FAQEntity(question, answer))
-    
+
     def get(self) -> list[FAQEntity]:
         return self.__faqs
-    
+
     def __iter__(self):
         return iter(self.__faqs)
-    
+
     def __len__(self):
         return len(self.__faqs)
 

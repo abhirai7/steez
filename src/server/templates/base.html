@@ -56,6 +56,11 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+    {% if current_user.is_admin %}
+    <div class="alert alert-warning m-0 p-2 text-center" role="alert">
+        You are logged in as an Admin - <a href="{{ url_for('logout') }}" class="alert-link">Logout</a>
+    </div>
+    {% endif %}
     {% block body %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>

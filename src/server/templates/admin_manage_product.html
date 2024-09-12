@@ -1,49 +1,65 @@
 {% extends 'base.html' %}
 
+{% import 'navbar.html' as navbar %}
+
 {% set title = 'STEEZ™ - Admin' %}
 
-
 {% block body %}
-<p class="text-center horizon-font fs-1 mt-5 mb-5" id="heading">STEEZ<sup>TM</sup> - Product Management</p>
-
-<div class="container consolas">
-    <a href='{{ url_for("admin_dashboard") }}' class="btn btn-secondary mb-3">Back</a>
-    <div class="row">
-        <div class="col text-center">
-            <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">Add Product</a>
-        </div>
+<div class="row max-vh-100">
+    <div class="col-2">
+        {{ navbar.admin_navbar(current_user) }}
     </div>
-    <div class="row mt-3">
-        <div class="col">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Unique ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Size</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in products %}
-                    <tr>
-                        <td>{{ product.id }}</td>
-                        <td>{{ product.unique_id }}</td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.stock }}</td>
-                        <td>{{ product.size_name }}</td>
-                        <td>
-                            <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger">Delete</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="col">
+        <div class="border border-1 mt-3">
+            <div class="card-header">
+                <p class="fs-1 m-0 text-center">Products</p>
+                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+            </div>
         </div>
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Unique ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Stock</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if products %}
+                {% for product in products %}
+                <tr>
+                    <td>PROD_{{ product['id'] }}</td>
+                    <td>{{ product['unique_id'] }}</td>
+                    <td>{{ product['name'] }}</td>
+                    <td>INR. {{ product['price'] }}</td>
+                    <td>
+                        <p class="d-inline-flex gap-1">
+                            <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"
+                                aria-controls="collapse-{{ loop.index }}">
+                                View Description
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapse-{{ loop.index }}">
+                            <div class="card card-body">
+                                {{ product['description'] | safe }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ product['stock'] }}</td>
+                    <td>{{ size_names[product['size']] }}</td> <!-- Using size mapping -->
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">No products available</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

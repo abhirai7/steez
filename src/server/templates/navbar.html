@@ -52,3 +52,36 @@
 </script>
 
 {%- endmacro %}
+
+{% macro admin_navbar(current_user) -%}
+<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark h-100">
+    <a href="{{ url_for('admin_dashboard') }}" class="d-flex align-items-center fs-4 text-white text-decoration-none text-center">
+        Admin Dashboard
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li>
+            <a href="{{ url_for('admin_manage_order') }}" class="nav-link text-white">
+                Orders
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('admin_manage_product') }}" class="nav-link text-white">
+                Products
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('admin_manage_user') }}" class="nav-link text-white">
+                Users
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('admin_payments') }}" class="nav-link text-white">
+                Payments
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <p class="text-center">{{ current_user.name }}</p>
+</div>
+{%- endmacro %}

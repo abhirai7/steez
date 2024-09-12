@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% import 'navbar.html' as navbar %}
+
+{% set title = 'STEEZ™ - Admin' %}
+
+{% block body %}
+<div class="row">
+    <div class="col-2">
+        {{ navbar.admin_navbar(current_user) }}
+    </div>
+    <div class="col-10">
+        <div class="border border-1 mt-3">
+            <div class="card-header">
+                <p class="fs-1 m-0 text-center">Payments</p>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Amount</th>
+                    <th>Currency</th>
+                    <th>Status</th>
+                    <th>Order ID</th>
+                    <th>Payment Method</th>
+                    <th>Bank</th>
+                    <th>Fee</th>
+                    <th>Tax</th>
+                    <th>Description</th>
+                    <th>Customer Email</th>
+                    <th>Customer Contact</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if payments %}
+                    {% for payment in payments['items'] %}
+                    <tr>
+                        <td>{{ payment['id'] }}</td>
+                        <td>{{ payment['amount'] | format_currency }}</td>
+                        <td>{{ payment['currency'] }}</td>
+                        <td>{{ payment['status'] }}</td>
+                        <td>{{ payment['order_id'] }}</td>
+                        <td>{{ payment['method'] }}</td>
+                        <td>{{ payment['bank'] }}</td>
+                        <td>{{ payment['fee'] | format_currency }}</td>
+                        <td>{{ payment['tax'] | format_currency }}</td>
+                        <td>{{ payment['description'] }}</td>
+                        <td>{{ payment['email'] }}</td>
+                        <td>{{ payment['contact'] }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center">No payments available</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+{% endblock %}

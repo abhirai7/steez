@@ -55,7 +55,9 @@ class Order:
                 "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?)",
                 (user_id, product_id, quantity, total_price),
             )
-            result = cursor.execute("SELECT * FROM ORDERS WHERE ROWID = ?", (cursor.lastrowid,))
+            result = cursor.execute(
+                "SELECT * FROM ORDERS WHERE ROWID = ?", (cursor.lastrowid,)
+            )
         else:
             result = cursor.execute(
                 "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?) RETURNING *",
