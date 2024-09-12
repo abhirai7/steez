@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .type_hints import Client as RazorpayClient
     from .type_hints import RazorPayOrderDict
 
-from .utils import Password, SQLITE_OLD
+from .utils import Password
 
 
 class User:
