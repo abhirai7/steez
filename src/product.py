@@ -259,24 +259,40 @@ class Product:
 
     @classmethod
     def all(
-        cls, connection: sqlite3.Connection, *, admin: bool = False
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        admin: bool = False,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> list[Product]:
-        query = r"""
-            SELECT *
-            FROM PRODUCTS
-            WHERE ROWID IN (
-                SELECT MIN(ROWID)
-                FROM PRODUCTS
-                GROUP BY UNIQUE_ID
-            )
-        """
+        params = (limit, offset) if limit is not None else ()
+        if limit is None:
+            query = r"""
+                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)
+            """
+        else:
+            query = r"""
+                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) LIMIT ? OFFSET ?
+            """
         if admin:
-            query = "SELECT * FROM PRODUCTS"
+            if limit is None:
+                query = r"SELECT * FROM PRODUCTS"
+            else:
+                query = r"SELECT * FROM PRODUCTS LIMIT ? OFFSET ?"
 
         cursor = connection.cursor()
-        cursor.execute(query)
+        cursor.execute(query, params)
         rows = cursor.fetchall()
         return [cls(connection, **row) for row in rows]
+
+    @staticmethod
+    def total_count(connection: sqlite3.Connection) -> int:
+        query = r"SELECT COUNT(*) FROM PRODUCTS"
+        cursor = connection.cursor()
+        cursor.execute(query)
+        count = cursor.fetchone()
+        return int(count[0])
 
     @classmethod
     def search(cls, connection: sqlite3.Connection, query: str) -> list[Product]:

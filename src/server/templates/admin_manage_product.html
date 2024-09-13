@@ -9,34 +9,43 @@
     <div class="col-2">
         {{ navbar.admin_navbar(current_user) }}
     </div>
-    <div class="col-10 overflow-y-auto" style="height: 100vh;">
+    <div class="col-10 ms-0 overflow-y-auto" style="height: 100vh;">
         <div class="border border-1 mt-3">
             <div class="card-header">
                 <p class="fs-1 m-0 text-center">Products</p>
-                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
             </div>
+            <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
         </div>
-        <table class="table table-bordered table-striped mt-3">
+
+        <button type="button" class="btn btn-success w-100 mt-3 rounded rounded-0" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            Add Product
+        </button>
+
+        <table class="table table-bordered table-striped mt-3 table-responsive">
             <thead class="table-dark">
                 <tr>
+                    <th>Sr. No.</th>
                     <th>ID</th>
                     <th>Unique ID</th>
                     <th>Name</th>
                     <th>Price</th>
                     <th>Description</th>
                     <th>Stock</th>
+                    <th>Preview</th>
                     <th>Size</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% if products %}
                 {% for product in products %}
                 <tr>
-                    <td>PROD_{{ product['id'] }}</td>
-                    <td>{{ product['unique_id'] }}</td>
-                    <td>{{ product['name'] }}</td>
-                    <td>INR. {{ product['price'] }}</td>
-                    <td>
+                    <td class="align-middle">{{ skip + loop.index }}</td>
+                    <td class="align-middle">PROD_{{ product['id'] }}</td>
+                    <td class="align-middle">{{ product['unique_id'] }}</td>
+                    <td class="align-middle">{{ product['name'] }}</td>
+                    <td class="align-middle">INR. {{ product['price'] }}</td>
+                    <td class="align-middle text-center">
                         <p class="d-inline-flex gap-1">
                             <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"
                                 aria-controls="collapse-{{ loop.index }}">
@@ -49,17 +58,96 @@
                             </div>
                         </div>
                     </td>
-                    <td>{{ product['stock'] }}</td>
-                    <td>{{ size_names[product['size']] }}</td> <!-- Using size mapping -->
+                    <td class="align-middle">{{ product['stock'] }}</td>
+                    <td class="align-middle">
+                        {% for image in product['images'] %}
+                        <img src="{{ image }}" alt="{{ product['name'] }}" class="img-thumbnail" style="width: 100px; height: 100px;">
+                        {% endfor %}
+                    </td>
+                    <td class="align-middle">{{ size_names[product['size']] }}</td>
+                    <td class="align-middle text-center">
+                        <p class="d-inline-flex gap-1">
+                            <a class="btn btn-danger" data-bs-toggle="collapse" href="#collapse-actions-{{ loop.index }}" role="button" aria-expanded="false"
+                                aria-controls="collapse-actions-{{ loop.index }}">
+                                Delete
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapse-actions-{{ loop.index }}">
+                            <div class="card card-body">
+                                <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger">Confirm Delete</a>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center">No products available</td>
+                    <td colspan="9" class="align-middle text-center">No products available</td>
                 </tr>
                 {% endif %}
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
+
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('admin_add_product') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.price.label(class="form-label") }}
+                        {{ form.price(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.images.label(class="form-label") }}
+                        {{ form.images(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.stock.label(class="form-label") }}
+                        {{ form.stock(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.sizes.label(class="form-label") }}
+                        {{ form.sizes(class="form-control") }}
+                    </div>
+                    <div class="modal-footer">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

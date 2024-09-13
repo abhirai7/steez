@@ -50,17 +50,17 @@ def admin_logout():
 def admin_dashboard():
     assert current_user.is_admin
 
-    products = Product.all(conn)
-    users = User.all(conn)
-    orders = Order.all(conn)
+    product_count = Product.total_count(conn)
+    user_count = User.total_count(conn)
+    order_count = Order.total_count(conn)
 
     settlements = razorpay_client.settlement.all({"count": 100})
 
     return render_template(
         "admin_dashboard.html",
-        products=products,
-        users=users,
-        orders=orders,
+        product_count=product_count,
+        user_count=user_count,
+        order_count=order_count,
         current_user=current_user,
         settlements=settlements,
         todays_settlement=todays_settlement(settlements),

@@ -21,6 +21,7 @@
         <table class="table table-bordered table-striped mt-3">
             <thead class="table-dark">
                 <tr>
+                    <th>Sr. No.</th>
                     <th>Order ID</th>
                     <th>Amount</th>
                     <th>Amount Paid</th>
@@ -35,6 +36,7 @@
                 {% if response["items"] %}
                 {% for order in response["items"] %}
                 <tr>
+                    <td>{{ skip + loop.index }}</td>
                     <td>{{ order.id }}</td>
                     <td>{{ order.amount | format_currency }}</td>
                     <td>{{ order.amount_paid | format_currency }}</td>
@@ -59,13 +61,13 @@
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td colspan="8" class="text-center">No orders for today</td>
+                    <td colspan="9" class="text-center">No orders for today</td>
                 </tr>
                 {% endif %}
             </tbody>
             <tfoot class="table-light">
                 <tr>
-                    <th>Total</th>
+                    <th colspan="2">Total</th>
                     <th>{{ total_order_amount | format_currency }}</th>
                     <th>{{ total_paid | format_currency }}</th>
                     <th>{{ total_due | format_currency }}</th>
@@ -73,6 +75,22 @@
                 </tr>
             </tfoot>
         </table>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}

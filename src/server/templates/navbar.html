@@ -61,11 +61,6 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li>
-            <a href="{{ url_for('admin_manage_order') }}" class="nav-link text-white">
-                Orders
-            </a>
-        </li>
-        <li>
             <a href="{{ url_for('admin_manage_product') }}" class="nav-link text-white">
                 Products
             </a>
@@ -76,13 +71,19 @@
             </a>
         </li>
         <li>
-            <a href="{{ url_for('admin_payments') }}" class="nav-link text-white">
-                Payments
+            <a href="{{ url_for('admin_giftcards') }}" class="nav-link text-white">
+                Gift Cards
+            </a>
+        </li>
+        <hr>
+        <li>
+            <a href="{{ url_for('admin_manage_order') }}" class="nav-link text-white">
+                Razorpay Orders
             </a>
         </li>
         <li>
-            <a href="{{ url_for('admin_giftcards') }}" class="nav-link text-white">
-                Gift Cards Issued
+            <a href="{{ url_for('admin_payments') }}" class="nav-link text-white">
+                Razorpay Payments
             </a>
         </li>
     </ul>

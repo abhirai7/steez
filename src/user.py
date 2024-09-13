@@ -257,13 +257,34 @@ class User:
         return cursor.fetchone() is not None
 
     @classmethod
-    def all(cls, connection: sqlite3.Connection) -> list[User]:
+    def all(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[User]:
+        cursor = connection.cursor()
+        if limit is None:
+            query = r"""
+                SELECT * FROM USERS WHERE ROLE = 'USER'
+            """
+            cursor.execute(query)
+        else:
+            query = r"""
+                SELECT * FROM USERS WHERE ROLE = 'USER' LIMIT ? OFFSET ?
+            """
+            cursor.execute(query, (limit, offset))
+        return [cls(connection, **row) for row in cursor.fetchall()]
+
+    @staticmethod
+    def total_count(connection: sqlite3.Connection) -> int:
         cursor = connection.cursor()
         query = r"""
-            SELECT * FROM USERS WHERE ROLE = 'USER'
+            SELECT COUNT(*) FROM USERS WHERE ROLE = 'USER'
         """
         cursor.execute(query)
-        return [cls(connection, **row) for row in cursor.fetchall()]
+        return cursor.fetchone()[0]
 
     def full_checkout_giftcard(
         self, razorpay_client: RazorpayClient, amount: int

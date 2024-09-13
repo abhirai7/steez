@@ -6,7 +6,7 @@
 
 {% block body %}
 <div class="row">
-    <div class="col-2"">
+    <div class="col-2">
         {{ navbar.admin_navbar(current_user) }}
     </div>
     <div class="col-10 overflow-y-auto" style="height: 100vh;">
@@ -19,6 +19,7 @@
         <table class="table table-bordered table-striped mt-3">
             <thead class="table-dark">
                 <tr>
+                    <th>Sr. No.</th>
                     <th>Payment ID</th>
                     <th>Amount</th>
                     <th>Currency</th>
@@ -34,9 +35,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% if payments %}
+                {% if payments['items'] %}
                     {% for payment in payments['items'] %}
                     <tr>
+                        <td>{{ skip + loop.index }}</td>
                         <td>{{ payment['id'] }}</td>
                         <td>{{ payment['amount'] | format_currency }}</td>
                         <td>{{ payment['currency'] }}</td>
@@ -59,6 +61,21 @@
             </tbody>
         </table>
 
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}

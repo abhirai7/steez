@@ -105,11 +105,30 @@ class Order:
         return Product.from_id(self.connection, self.product_id)
 
     @classmethod
-    def all(cls, connection: sqlite3.Connection) -> list[Order]:
+    def all(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[Order]:
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM ORDERS")
+
+        if limit is None:
+            query = r"SELECT * FROM ORDERS"
+            cursor.execute(query)
+        else:
+            query = r"SELECT * FROM ORDERS LIMIT ? OFFSET ?"
+            cursor.execute(query, (limit, offset))
+
         rows = cursor.fetchall()
         return [cls(connection, **row) for row in rows]
+
+    @classmethod
+    def total_count(cls, connection: sqlite3.Connection) -> int:
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM ORDERS")
+        return cursor.fetchone()[0]
 
     def update_order_status(
         self, *, status: VALID_STATUS, razorpay_order_id: str

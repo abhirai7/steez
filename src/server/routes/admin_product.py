@@ -25,9 +25,19 @@ def generate_unique_identifier():
 @app.route("/admin/manage/product", methods=["GET", "POST"])
 @login_required
 def admin_manage_product():
-    products = Product.all(conn, admin=True)
+    page = max(int(request.args.get("page", 1)), 1)
+    limit = int(request.args.get("limit", 15))
+    skip = (page - 1) * limit
+    products = Product.all(conn, admin=True, limit=limit, offset=skip)
+    addform: ProductAddForm = ProductAddForm()
     return render_template(
-        "admin_manage_product.html", products=products, size_names=size_names
+        "admin_manage_product.html",
+        products=products,
+        size_names=size_names,
+        form=addform,
+        page=page,
+        limit=limit,
+        skip=skip,
     )
 
 
@@ -90,9 +100,13 @@ def admin_delete_product(id):
 @app.route("/admin/manage/order", methods=["GET"])
 @login_required
 def admin_manage_order():
-    orders = Order.all(conn)
+    page = max(int(request.args.get("page", 1)), 1)
+    limit = int(request.args.get("limit", 15))
+    skip = (page - 1) * limit
 
-    response = razorpay_client.order.all({"count": 100})
+    orders = Order.all(conn, limit=limit, offset=skip)
+
+    response = razorpay_client.order.all({"count": limit, "skip": skip})
 
     total_order_amount = sum(item["amount"] for item in response["items"])
     total_paid = sum(
@@ -107,6 +121,9 @@ def admin_manage_order():
         total_paid=total_paid,
         total_due=total_due,
         response=response,
+        skip=skip,
+        page=page,
+        limit=limit,
         json=json,
     )
 
@@ -114,11 +131,14 @@ def admin_manage_order():
 @app.route("/admin/payouts", methods=["GET"])
 @login_required
 def admin_payments():
-    response = razorpay_client.payment.all({"count": 100})
+    page = max(int(request.args.get("page", 1)), 1)
+    limit = int(request.args.get("limit", 15))
+    skip = (page - 1) * limit
+
+    payments = razorpay_client.payment.all({"count": limit, "skip": skip})
 
     return render_template(
-        "admin_payments.html",
-        payments=response,
+        "admin_payments.html", payments=payments, page=page, skip=skip, limit=limit
     )
 
 
