@@ -114,66 +114,16 @@
         }
     }
 
-    /* Product Info Section */
-    .product-info {
-        margin-bottom: 20px;
-        padding: 20px;
-        background-color: #ffffff;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    /* Product Information Section */
+    .montserrat {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: bold;
     }
 
-    .product-info h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
 
-    .product-info p {
-        font-size: 16px;
-        margin-bottom: 20px;
-    }
-
-    .product-info ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .product-info li {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .product-info li span {
-        font-weight: bold;
-        margin-right: 10px;
-    }
-
-    /* Pricing and Availability Section */
-    .pricing-availability {
-        margin-bottom: 20px;
-        padding: 20px;
-        background-color: #ffffff;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .pricing-availability h2 {
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-
-    .pricing-availability p {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .pricing-availability span {
-        font-weight: bold;
-        margin-right: 10px;
-    }
 
     /* Call-to-Action Buttons */
     .cta-buttons {
@@ -355,15 +305,13 @@
             </div>
             <div class="col-md-6">
                 <!-- Product Information Section -->
-                <div class="product-info">
-                    <h1 class="fs-1">{{ product.name.strip() }}</h1>
+                    <h1 class="fs-1 montserrat"><strong>{{ product.name.strip() }}</h1></strong></h1>
                     <p>{{ product.description | safe }}</p>
-                </div>
+                
 
                 <!-- Pricing and Availability Section -->
                 <div class="pricing-availability">
-                    <h4>Price: <span>INR. {{ product.price }}</span></h4>
-                    <p>Availability: <span>In Stock</span></p>
+                    <h5><strong>INR. {{ product.price }}</strong></h5>
                 </div>
 
                 <!-- Call-to-Action Buttons -->

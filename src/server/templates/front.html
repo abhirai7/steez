@@ -7,15 +7,14 @@
   }
 
   .product-card:hover {
-    transform: scale(1.05); /* Add magnifying effect on hover */
-    transition: transform 0.5s ease;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02); /* Add magnifying effect on hove */
+    transition: transform 0.3s ease-in;
   }
 
   .product-card img {
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.2s ease-out;
     object-fit: cover;
-    border-radius: 10px;
+    /* border-radius: 10px; */
   }
 
 
@@ -23,15 +22,15 @@
     position: absolute;
     top: 0;
     left: 0;
-    opacity: 0;
-  }
-
-  .product-card:hover .hover-image {
     opacity: 1;
   }
 
-  .product-card:hover .main-image {
+  .product-card:hover .hover-image {
     opacity: 0;
+  }
+
+  .product-card:hover .main-image {
+    opacity: 1;
   }
 </style>
 
@@ -45,7 +44,7 @@ show_hero %} {{ hero.carousel() }} {% endif %} {% if products %}
   <div class="row row-cols-lg-5">
     {% for product in products %}
     <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-      <div class="card shadow image-transition product-card">
+      <div class="card image-transition product-card">
         <img
           src="{{ product.images[0] }}"
           alt="{{ product.name }}"
