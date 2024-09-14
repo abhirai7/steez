@@ -13,7 +13,6 @@
     /* Product Image section */
 
     .product-image {
-        margin-bottom: 20px;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -36,19 +35,11 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 150%;
-        height: 150%;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
         transform: scale(0);
         transition: transform 0.3s ease-in-out;
-    }
-
-    .main-image img {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
     .image-thumbnails {
@@ -110,24 +101,11 @@
         }
 
         .thumbnail img {
-            height: 50px;
+            height: 30px;
         }
     }
 
     /* Call-to-Action Buttons */
-    .cta-buttons {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .cta-buttons button {
-        margin-right: 10px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
 
     .btn-primary {
         background-color: #4CAF50;
@@ -264,85 +242,85 @@
         font-size: 16px;
         margin-bottom: 10px;
     }
+
+    .fs-max {
+        font-size: 4rem;
+    }
+
+    .fs-min {
+        font-size: 0.95rem;
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-{{ navbar.navbar(current_user) }}
 
-<hr>
-<div class="product-page m-3 p-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <!-- Product Image Section -->
+<div class="container-fluid mt-0 overflow-hidden">
+    {{ navbar.navbar(current_user) }}
+
+    <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
+        <div class="col border-end border-end-1 m-0 p-0">
+            <div>
+                <p class="d-block d-lg-none d-md-none fs-max fw-semibold text-uppercase">{{ product.name.strip() }}</p>
                 <div class="product-image">
                     <div class="main-image">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="small-image">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="large-image">
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="small-image border border-1">
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="large-image border border-1">
                     </div>
                     <div class="image-thumbnails">
                         {% for image in product.images %}
-
+        
                         <div class="thumbnail">
-                            <img src="{{ image }}" alt="{{ product.name }}">
+                            <img src="{{ image }}" alt="{{ product.name }}" class="rounded rounded-0">
                         </div>
                         {% endfor %}
-
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <!-- Product Information Section -->
-                    <h1 class="fs-1 montserrat"><strong>{{ product.name.strip() }}</h1></strong></h1>
-                    <p>{{ product.description | safe }}</p>
+        </div>
+        <div class="col border-start border-start-1 m-0 p-0">
+            <div class="p-5">
+                <p class="fs-max fw-semibold text-uppercase">{{ product.name.strip() }}</p>
+                <p class="text-muted fs-5">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae reiciendis ad, aspernatur optio eligendi doloremque perferendis architecto neque, magni nesciunt porro sit quas voluptates aperiam et explicabo. Tenetur aut ullam blanditiis earum!</p>
                 
-
-                <!-- Pricing and Availability Section -->
-                <div class="pricing-availability">
-                    <h5><strong>INR. {{ product.price }}</strong></h5>
+                <div class="mb-4 mt-4">
+                    <p class="fs-3 fw-bold">INR. {{ product.price }}</p>
                 </div>
-
-                <!-- Call-to-Action Buttons -->
+                <hr>
                 <div class="cta-buttons">
                     <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
                         {{ form.hidden_tag() }}
-
+        
                         <div class="row">
-                            <div class="col-">
-                                <div class="form-group mb-2">
-                                    {{ form.quantity.label(class="form-label text-muted") }}
-                                    {{ form.quantity(class="form-control form-control-lg fs-6", placeholder="Quantity") }}
-                                </div>
-                            </div>
                             <div class="col">
-                                <div class="form-group mb-2">
-                                    {{ form.size.label(class="form-label text-muted") }}
-                                    {{ form.size(class="form-select form-select-lg fs-6", placeholder="Select Size") }}
+                                <div class="form-group mb-4">
+                                    {{ form.quantity.label(class="form-label fw-semibold fs-5 text-muted mb-3") }}
+                                    {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6 w-100 border-dark-subtle focus-ring focus-ring-dark p-3 ", placeholder="1") }}
                                 </div>
-                            </div>
-                            <div class="col"></div>
                                 <div class="form-group mb-2">
+                                    {{ form.size.label(class="form-label fw-semibold fs-5 text-muted") }}
+                                    {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6 w-100 mb-3 border-dark-subtle focus-ring focus-ring-dark p-3", placeholder="Select Size") }}
                                     <a href = "{{ url_for('reference_chart') }}" class="ink-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
                                         Size Reference Chart
                                     </a>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+
+                        <div class="row mt-2">
                             {% if current_user.is_authenticated %}
                             <div class="col">
-                                {{ form.submit(class="btn btn-primary w-100", id="add-to-cart") }}
+                                {{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3", id="add-to-cart") }}
                             </div>
                             <div class="col">
-                                <a href="{{ url_for('checkout') }}" class="btn btn-secondary w-100 ">Buy Now</a>
+                                <a href="{{ url_for('checkout') }}" class="btn btn-success rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3">Checkout</a>
                             </div>
                             {% else %}
                             <div class="col">
-                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-secondary w-100 mt-2">Login to Add to Cart</a>
+                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-dark rounded rounded-5 w-100 fs-6 text-uppercase fw-semibold p-3">Login to Add to Cart</a>
                             </div>
                             <div class="col">
-                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-danger w-100 mt-2">Login to Checkout</a>
+                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-danger rounded rounded-5 w-100 fs-6 text-uppercase fw-semibold p-3">Login to Checkout</a>
                             </div>
                             {% endif %}
                         </div>
@@ -350,104 +328,65 @@
                 </div>
             </div>
         </div>
-
-        <!-- Product Reviews and Ratings Section -->
-        <div class="reviews mt-4">
-            <h2 class="mt-4">Reviews</h5>
-
-                {% if current_user.is_authenticated %}
-                <h5 class="mt-4">Add Review</h5>
-                <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
-                    {{ review_form.hidden_tag() }}
-                    <div class="form-group mb-3">
-                        {{ review_form.review(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ review_form.submit(class="btn btn-outline-secondary") }}
-                    </div>
-                </form>
-                {% else %}
-                <a href="{{ url_for('login_route') }}" class="btn btn-outline-secondary">Login to Add Review</a>
-                {% endif %}
-
-                <hr>
-
-                {% for review in product.reviews %}
-                <div class="card mt-2 bg-transparent shadow-sm border border-1">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-1 m-auto">
-                                <img src="https://placehold.co/50x50?text={{ review.user.name[0].upper() }}" class="float-end rounded-circle image-fluid"
-                                    alt="Circular Image">
-                            </div>
-                            <div class="col d-flex align-items-center p-0">
-                                <p class="card-title fs-6 text-dark">{{ review.user.name }} - <span class='text-muted'>{{ arrow.get(review.created_at).humanize()
-                                        }}</span></p>
-                            </div>
+    </div>
+    <hr class="mt-0">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Product FAQs Section -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Frequently Asked Questions</h2>
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <h3>Q: What is the warranty on this product?</h3>
+                            <p>A: Our product comes with a 1-year limited warranty.</p>
                         </div>
-                        <p class="ms-4 card-text fs-6 mt-2">{{ review.review }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-        </div>
-        <!-- Related Products Section -->
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Product FAQs Section -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2>Frequently Asked Questions</h2>
-                        <div class="faq-list">
-                            <div class="faq-item">
-                                <h3>Q: What is the warranty on this product?</h3>
-                                <p>A: Our product comes with a 1-year limited warranty.</p>
-                            </div>
-                            <div class="faq-item">
-                                <h3>Q: Can I return this product if I'm not satisfied?</h3>
-                                <p>A: Yes, you can return this product within 30 days of purchase for a full refund.</p>
-                            </div>
+                        <div class="faq-item">
+                            <h3>Q: Can I return this product if I'm not satisfied?</h3>
+                            <p>A: Yes, you can return this product within 30 days of purchase for a full refund.</p>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
-        {{ footer.footer() }}
-        {% endblock %}
+    </div>
+</div>
+{{ footer.footer() }}
+{% endblock %}
 
-        {% block bottom_scripts %}
-        <script>
-            const mainImage = document.querySelector('.main-image img');
-            const largeImage = document.querySelector('.large-image');
-            const thumbnails = document.querySelectorAll('.thumbnail img');
+{% block bottom_scripts %}
+<script>
+    const mainImage = document.querySelector('.main-image img');
+    const largeImage = document.querySelector('.large-image');
+    const thumbnails = document.querySelectorAll('.thumbnail img');
 
-            thumbnails.forEach((thumbnail) => {
-                thumbnail.addEventListener('mouseover', () => {
-                    mainImage.src = thumbnail.src;
-                    largeImage.src = thumbnail.src;
-                });
-            });
-            const imageContainer = document.querySelector('.main-image');
+    thumbnails.forEach((thumbnail) => {
+        thumbnail.addEventListener('mouseover', () => {
+            mainImage.src = thumbnail.src;
+            largeImage.src = thumbnail.src;
+        });
+    });
+    const imageContainer = document.querySelector('.main-image');
 
-            imageContainer.addEventListener('mouseover', () => {
-                const largeImage = imageContainer.querySelector('.large-image');
-                largeImage.style.transform = 'scale(1)';
-            });
+    imageContainer.addEventListener('mouseover', () => {
+        const largeImage = imageContainer.querySelector('.large-image');
+        largeImage.style.transform = 'scale(1)';
+    });
 
-            imageContainer.addEventListener('mouseout', () => {
-                const largeImage = imageContainer.querySelector('.large-image');
-                largeImage.style.transform = 'scale(0)';
-            });
+    imageContainer.addEventListener('mouseout', () => {
+        const largeImage = imageContainer.querySelector('.large-image');
+        largeImage.style.transform = 'scale(0)';
+    });
 
-            imageContainer.addEventListener('mousemove', (event) => {
-                const largeImage = imageContainer.querySelector('.large-image');
-                const containerRect = imageContainer.getBoundingClientRect();
-                const mouseX = event.clientX - containerRect.left;
-                const mouseY = event.clientY - containerRect.top;
-                const zoomFactor = 2;
+    imageContainer.addEventListener('mousemove', (event) => {
+        const largeImage = imageContainer.querySelector('.large-image');
+        const containerRect = imageContainer.getBoundingClientRect();
+        const mouseX = event.clientX - containerRect.left;
+        const mouseY = event.clientY - containerRect.top;
+        const zoomFactor = 2;
 
-                largeImage.style.transformOrigin = `${mouseX}px ${mouseY}px`;
-                largeImage.style.transform = `scale(${zoomFactor})`;
-            });
-        </script>
-        {% endblock %}
+        largeImage.style.transformOrigin = `${mouseX}px ${mouseY}px`;
+        largeImage.style.transform = `scale(${zoomFactor})`;
+    });
+</script>
+{% endblock %}

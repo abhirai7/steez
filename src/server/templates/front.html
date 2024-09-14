@@ -7,16 +7,13 @@
   }
 
   .product-card:hover {
-    transform: scale(1.02); /* Add magnifying effect on hove */
     transition: transform 0.3s ease-in;
   }
 
   .product-card img {
     transition: opacity 0.2s ease-out;
     object-fit: cover;
-    /* border-radius: 10px; */
   }
-
 
   .product-card .hover-image {
     position: absolute;
@@ -34,17 +31,21 @@
   }
 </style>
 
-{% endblock %} {% block body %} {{ navbar.navbar(current_user) }} {% if
-show_hero %} {{ hero.carousel() }} {% endif %} {% if products %}
+{% endblock %} 
+{% block body %} 
+{{ navbar.navbar(current_user) }} 
+{% if show_hero %} 
+  {{ hero.carousel() }} 
+{% endif %} {% if products %}
 <hr />
 <div class="container-fluid mt-5">
   {% if show_hero %}
   <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
   {% endif %}
-  <div class="row row-cols-lg-5">
+  <div class="row row-cols-lg-5 m-0 p-0">
     {% for product in products %}
-    <div class="col mb-4 zoom-on-hover" id="{{ product.id }}">
-      <div class="card image-transition product-card">
+    <div class="col zoom-on-hover m-0 border border-1" id="{{ product.id }}">
+      <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0 h-100 w-100">
         <img
           src="{{ product.images[0] }}"
           alt="{{ product.name }}"
@@ -69,7 +70,7 @@ show_hero %} {{ hero.carousel() }} {% endif %} {% if products %}
   </div>
 </div>
 {% endif %} {% if show_hero %}
-<div class="card p-5">
+<div class="card rounded rounded-0 p-5 mt-3">
   <div class="row">
     <div class="col-4 align-self-center">
       <p class="fs-1 text-center">GIFT CARDS</p>
@@ -92,7 +93,7 @@ show_hero %} {{ hero.carousel() }} {% endif %} {% if products %}
           <p>{{ error }}</p>
           {% endfor %}
         </div>
-        {% endif %} {{ gift_form.submit(class="btn btn-outline-success") }}
+        {% endif %} {{ gift_form.submit(class="btn btn-outline-success rounded rounded-0") }}
 
         <p class="fs-6 text-muted text-small mt-3">
           *Gift cards are non-refundable. For more information
