@@ -172,7 +172,7 @@ class Product:
         query = r"UPDATE PRODUCTS SET STOCK = STOCK - ? WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
         cursor = self.__conn.cursor()
 
-        cursor.execute(query, (count, self.id, count, self.size))
+        cursor.execute(query, (count, self.unique_id, count, self.size))
         updated = cursor.rowcount
 
         if updated == 0:
@@ -256,6 +256,19 @@ class Product:
             ls.append(cls(connection, **row))
 
         return ls
+    
+    @classmethod
+    def from_size(
+        cls, connection: sqlite3.Connection, *, id: int, size: str
+    ):
+        query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = (SELECT UNIQUE_ID FROM PRODUCTS WHERE ID = ?) AND SIZE = ?"
+        cursor = connection.cursor()
+        cursor.execute(query, (id, size))
+        row = cursor.fetchone()
+        if row is None:
+            error = "Product not found."
+            raise ValueError(error) from None
+        return cls(connection, **row)
 
     @classmethod
     def all(
@@ -312,6 +325,9 @@ class Product:
             "description": self.description,
             "stock": self.stock,
         }
+    
+    def __repr__(self) -> str:
+        return f"<Product name={self.name} price={self.price} stock={self.stock} unique_id={self.unique_id} size={self.size_name}>"
 
 
 class Cart:
@@ -339,6 +355,7 @@ class Cart:
         self.__conn.commit()
 
         product.use(quantity)
+        print("Used", product.name, quantity)
 
     def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
         query = (

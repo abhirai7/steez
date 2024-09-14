@@ -72,20 +72,11 @@ def add_to_cart(product_id: int):
         and form.quantity.data
         and form.size.data
     ):
-        try:
-            products = product.from_unique_id(
-                conn, product.unique_id, size=form.size.data
-            )
-            if not products or len(products) > 1:
-                return redirect(
-                    url_for(
-                        "product", product_id=product_id, error="Item not available"
-                    )
-                )
+        product = Product.from_size(
+            conn, id=product.id, size=form.size.data
+        )
 
-            current_user.add_to_cart(product=products[0], quantity=form.quantity.data)
-        except ValueError as e:
-            flash(str(e), "error")
+        current_user.add_to_cart(product=product, quantity=int(form.quantity.data))
 
         return redirect(url_for("product", product_id=product_id))
     return redirect(url_for("product", product_id=product_id))
