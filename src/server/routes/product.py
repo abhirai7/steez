@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arrow
-from flask import flash, redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from razorpay.errors import SignatureVerificationError
 
@@ -30,7 +30,7 @@ def product(product_id: int):
     product = Product.from_id(conn, product_id)
     pictures = get_product_pictures(product.unique_id)
 
-    cart_form: AddToCartForm = AddToCartForm()
+    cart_form: AddToCartForm = AddToCartForm(product.available_sizes)
     review_form: AddReviewForm = AddReviewForm()
 
     return render_template(
@@ -64,7 +64,7 @@ def reference_chart():
 @login_required
 def add_to_cart(product_id: int):
     product = Product.from_id(conn, product_id)
-    form: AddToCartForm = AddToCartForm()
+    form: AddToCartForm = AddToCartForm(product.available_sizes)
 
     if (
         form.validate_on_submit()
@@ -72,9 +72,7 @@ def add_to_cart(product_id: int):
         and form.quantity.data
         and form.size.data
     ):
-        product = Product.from_size(
-            conn, id=product.id, size=form.size.data
-        )
+        product = Product.from_size(conn, id=product.id, size=form.size.data)
 
         current_user.add_to_cart(product=product, quantity=int(form.quantity.data))
 

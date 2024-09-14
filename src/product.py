@@ -123,17 +123,34 @@ class Product:
         self.size = size
         self.size_name = size_names[size]
 
+        self._available_sizes = []
+
+    @property
+    def available_sizes(self) -> list[str]:
+        if self._available_sizes:
+            return self._available_sizes
+
+        query = "SELECT SIZE FROM PRODUCTS WHERE UNIQUE_ID = ?"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.unique_id,))
+        ls = []
+
+        while row := cursor.fetchone():
+            ls.append(row[0])
+
+        self._available_sizes = ls
+        return ls
+
     @property
     def reviews(self) -> list[Review]:
         return Review.from_product(self.__conn, product_id=self.id)
 
     @property
     def average_rating(self) -> float:
-        reviews = self.reviews
-        if not reviews:
-            return 0.0
+        if reviews := self.reviews:
+            return sum(review.stars for review in reviews) / self.total_reviews
 
-        return sum(review.stars for review in reviews) / self.total_reviews
+        return 0.0
 
     @property
     def total_reviews(self) -> int:
@@ -213,7 +230,6 @@ class Product:
                 r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,)
             )
         else:
-
             query = r"""
                 INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
                 RETURNING *
@@ -256,11 +272,9 @@ class Product:
             ls.append(cls(connection, **row))
 
         return ls
-    
+
     @classmethod
-    def from_size(
-        cls, connection: sqlite3.Connection, *, id: int, size: str
-    ):
+    def from_size(cls, connection: sqlite3.Connection, *, id: int, size: str):
         query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = (SELECT UNIQUE_ID FROM PRODUCTS WHERE ID = ?) AND SIZE = ?"
         cursor = connection.cursor()
         cursor.execute(query, (id, size))
@@ -310,12 +324,11 @@ class Product:
     @classmethod
     def search(cls, connection: sqlite3.Connection, query: str) -> list[Product]:
         all_products = cls.all(connection)
-        fuzz_sort = sorted(
+        return sorted(
             all_products,
             key=lambda product: fuzz.partial_ratio(query, product.name),
             reverse=True,
         )
-        return fuzz_sort
 
     def json(self) -> dict:
         return {
@@ -325,7 +338,7 @@ class Product:
             "description": self.description,
             "stock": self.stock,
         }
-    
+
     def __repr__(self) -> str:
         return f"<Product name={self.name} price={self.price} stock={self.stock} unique_id={self.unique_id} size={self.size_name}>"
 
