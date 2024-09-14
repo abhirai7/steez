@@ -1,7 +1,16 @@
+from __future__ import annotations
+
 import sqlite3
 
 from flask_wtf import FlaskForm
-from wtforms import EmailField, IntegerField, PasswordField, StringField, SubmitField
+from wtforms import (
+    EmailField,
+    Field,
+    IntegerField,
+    PasswordField,
+    StringField,
+    SubmitField,
+)
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from src.user import User
@@ -46,21 +55,17 @@ class RegisterForm(FlaskForm):
         return True
 
     def validate_phone(self, phone: IntegerField):
-        assert phone.data
-
-        phone_str = str(phone.data)
-        if len(phone_str) != 10:
-            raise ValidationError("Phone number must be 10 digits long")
-
-        return True
+        return self._validate_integer(phone, 10, "Phone number must be 10 digits long")
 
     def validate_pincode(self, pincode: IntegerField):
         assert pincode.data
 
-        pincode_str = str(pincode.data)
-        if len(pincode_str) != 6:
-            raise ValidationError("Pincode must be 6 digits long")
+        return self._validate_integer(pincode, 6, "Pincode must be 6 digits long")
 
+    def _validate_integer(self, field: Field, limit: int, error_message: str):
+        phone_str = str(field.data)
+        if len(phone_str) != limit:
+            raise ValidationError(error_message)
         return True
 
 
