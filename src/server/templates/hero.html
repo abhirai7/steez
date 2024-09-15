@@ -86,4 +86,19 @@
         </div>
     </div>
 </section>
+<script>
+    // cycle through the cards
+    setInterval(() => {
+        const radios = document.querySelectorAll('input[name="slider"]');
+        let index = 0;
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                index = i;
+                break;
+            }
+        }
+        radios[index].checked = false;
+        radios[index + 1] ? radios[index + 1].checked = true : radios[0].checked = true;
+    }, 5000);
+</script>
 {%- endmacro %}
