@@ -9,7 +9,7 @@ from razorpay.errors import SignatureVerificationError
 
 from src.order import Order
 from src.product import Product
-from src.server import RAZORPAY_KEY, app, conn, razorpay_client
+from src.server import RAZORPAY_KEY, app, conn, razorpay_client, sitemapper
 from src.server.forms import AddReviewForm, AddToCartForm
 from src.user import User
 from src.utils import (
@@ -24,6 +24,16 @@ if TYPE_CHECKING:
     assert isinstance(current_user, User)
 
 
+def product_ids():
+    return [product.id for product in Product.all(conn)]
+
+
+@sitemapper.include(
+    url_variables={"product_id": product_ids()},
+    lastmod=arrow.now().format("YYYY-MM-DD"),
+    changefreq="daily",
+    priority=0.8,
+)
 @app.route("/products/<int:product_id>", methods=["GET", "POST"])
 @app.route("/products/<int:product_id>/", methods=["GET", "POST"])
 def product(product_id: int):

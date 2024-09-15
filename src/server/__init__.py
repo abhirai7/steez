@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import pathlib
 import sqlite3
 from typing import TYPE_CHECKING
 
@@ -8,6 +9,7 @@ import razorpay
 from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager, current_user
+from flask_sitemapper import Sitemapper
 from flask_wtf import CSRFProtect
 
 from src.user import User
@@ -26,21 +28,22 @@ if TYPE_CHECKING:
 else:
     RazorpayClient = razorpay.Client
 
-
-login_manager = LoginManager()
-
-with open("schema.sql") as f:
-    schema = f.read()
+TODAY = "2024-09-15"
 
 app = Flask(__name__)
+app.secret_key = f"{SECRET_KEY}"
+
+schema = pathlib.Path("schema.sql").read_text()
 conn: sqlite3.Connection = sqlite3.connect("database.sqlite", check_same_thread=False)
 conn.executescript(schema)
-
-app.secret_key = f"{SECRET_KEY}"
-csrf = CSRFProtect(app)
-login_manager.init_app(app)
-
 conn.row_factory = sqlite_row_factory
+
+login_manager = LoginManager()
+csrf = CSRFProtect(app)
+sitemapper = Sitemapper()
+
+login_manager.init_app(app)
+sitemapper.init_app(app)
 
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})

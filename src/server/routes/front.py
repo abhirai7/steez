@@ -7,7 +7,7 @@ from flask import render_template
 from flask_login import current_user, login_required
 
 from src.product import Product
-from src.server import app, conn
+from src.server import TODAY, app, conn, sitemapper
 from src.server.forms import GiftCardForm
 from src.utils import FAQ_DATA, format_to_special
 
@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     assert isinstance(current_user, User)
 
 
+@sitemapper.include(lastmod=TODAY, changefreq="daily", priority=0.9)
 @app.route("/")
 @app.route("/home/")
 def home():
@@ -33,6 +34,7 @@ def home():
     )
 
 
+@sitemapper.include(lastmod=TODAY, changefreq="yearly", priority=0.5)
 @app.route("/faq/")
 @app.route("/faq")
 def faq():
@@ -53,6 +55,7 @@ def search(query: str):
     )
 
 
+@sitemapper.include(lastmod=TODAY, changefreq="monthly", priority=0.6)
 @app.route("/refund-policy/")
 @app.route("/refund-policy")
 def refund_policy():
@@ -67,3 +70,8 @@ def order_history():
     return render_template(
         "order_history.html", orders=orders, current_user=current_user, arrow=arrow
     )
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return sitemapper.generate(), 200, {"Content-Type": "application/xml"}

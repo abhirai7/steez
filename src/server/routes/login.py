@@ -1,11 +1,12 @@
 from flask import redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 
-from src.server import app, conn
+from src.server import app, conn, sitemapper
 from src.server.forms import LoginForm, RegisterForm
 from src.user import User
 
 
+@sitemapper.include()
 @app.route("/login", methods=["GET", "POST"])
 @app.route("/login/", methods=["GET", "POST"])
 def login_route():
@@ -36,6 +37,7 @@ def logout():
     return redirect(url_for("home"))
 
 
+@sitemapper.include()
 @app.route("/register", methods=["GET", "POST"])
 @app.route("/register/", methods=["GET", "POST"])
 def register():
