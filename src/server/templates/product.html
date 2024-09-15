@@ -256,7 +256,7 @@
     <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
         <div class="col border-end border-end-1 m-0 p-0">
             <div>
-                <div class="d-block d-lg-none d-md-none text-center">    
+                <div class="d-block d-lg-none d-md-none text-center">
                     <span class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</span>
                     <p class="text-muted">INR. {{ product.price }}</p>
                 </div>
@@ -343,20 +343,28 @@
 
                         <div class="row mt-2 row-cols-1 row-cols-md-2 row-cols-lg-2">
                             {% if current_user.is_authenticated %}
-                            <div class="col m-1">
-                                {{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3", id="add-to-cart") }}
+                            <div class="col">
+                                <div class="m-1">
+                                    {{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3", id="add-to-cart") }}
+                                </div>
                             </div>
-                            <div class="col m-1">
-                                <a href="{{ url_for('checkout') }}" class="btn btn-success rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3">Checkout</a>
+                            <div class="col">
+                                <div class="m-1">
+                                    <a href="{{ url_for('checkout') }}" class="btn btn-success rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3">Checkout</a>
+                                </div>
                             </div>
                             {% else %}
-                            <div class="col m-1">
-                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-dark rounded rounded-5 w-100 fs-6 text-uppercase fw-semibold p-3">Login to
-                                    Add to Cart</a>
+                            <div class="col">
+                                <div class="m-1">
+                                    <a href="{{ url_for('login_route') }}" class="btn btn-outline-dark rounded rounded-5 w-100 fs-6 text-uppercase fw-semibold p-3">Login
+                                        to Add to Cart</a>
+                                </div>
                             </div>
-                            <div class="col m-1">
-                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-danger rounded rounded-5 w-100 fs-6 text-uppercase fw-semibold p-3">Login to
-                                    Checkout</a>
+                            <div class="col">
+                                <div class="m-1">
+                                    <a href="{{ url_for('login_route') }}"
+                                        class="btn btn-outline-danger rounded rounded-5 w-100 fs-6 text-uppercase fw-semibold p-3">Login to Checkout</a>
+                                </div>
                             </div>
                             {% endif %}
                         </div>
