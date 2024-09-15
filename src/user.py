@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .order import Order
-    from .product import VALID_STARS, Cart, Product, GiftCard
+    from .product import VALID_STARS, Cart, GiftCard, Product
     from .type_hints import Client as RazorpayClient
     from .type_hints import RazorPayOrderDict
 
@@ -102,10 +102,7 @@ class User:
         query = r"""
             SELECT * FROM USERS WHERE ID = ?
         """
-        cursor.execute(
-            query,
-            (int(user_id),),
-        )
+        cursor.execute(query, (user_id,))
         row = cursor.fetchone()
         if row is None:
             error = "User not found."
@@ -200,11 +197,21 @@ class User:
 
         total_price = sum(order.total_price for order in orders)
         notes = {
-            order.product.name: {
-                "quantity": order.quantity,
-                "price": order.product.price,
-            }
-            for order in orders
+            "products": [
+                {
+                    "name": order.product.name,
+                    "quantity": order.quantity,
+                    "price": order.product.price,
+                }
+                for order in orders
+            ],
+            "user": {
+                "name": self.name,
+                "email": self.email,
+                "phone": self.phone,
+                "id": self.id,
+            },
+            "gift_card": False,
         }
         final_payload = {
             "amount": int(total_price * 100),
@@ -293,10 +300,13 @@ class User:
             "amount": int(amount * 100),
             "currency": "INR",
             "notes": {
-                "user_id": self.id,
-                "user_email": self.email,
-                "user_name": self.name,
-                "user_phone": self.phone,
+                "user": {
+                    "name": self.name,
+                    "email": self.email,
+                    "phone": self.phone,
+                    "id": self.id,
+                },
+                "gift_card": True,
             },
         }
 
