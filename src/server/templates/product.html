@@ -263,7 +263,7 @@
                 <div class="product-image">
                     <div class="main-image">
                         <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="small-image border border-1">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="large-image border border-1">
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="d-none d-lg-block d-md-block large-image border border-1">
                     </div>
                     <div class="image-thumbnails">
                         {% for image in product.images %}
@@ -341,7 +341,7 @@
                             </div>
                         </div>
 
-                        <div class="row mt-2">
+                        <div class="row mt-2 row-cols-1 row-cols-md-2 row-cols-lg-2">
                             {% if current_user.is_authenticated %}
                             <div class="col m-1">
                                 {{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-3", id="add-to-cart") }}

@@ -44,7 +44,7 @@
     {% endif %}
     <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
         {% for product in products %}
-        <div class="col zoom-on-hover m-0 p-0 border border-1" id="{{ product.id }}">
+        <div class="col zoom-on-hover text-center p-0 border border-1" id="{{ product.id }}">
             <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0 h-100 w-100">
                 <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
                 <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
@@ -61,11 +61,12 @@
 {% endif %} {% if show_hero %}
 <div class="card rounded rounded-0 p-5 mt-3">
     <div class="row">
-        <div class="col-4 align-self-center">
+        <div class="col-3 align-self-center d-none d-lg-block d-md-block">
             <p class="fs-1 text-center">GIFT CARDS</p>
         </div>
-        <div class="col-8">
-            <p class="fs-5 text-center">
+        <div class="col">
+            <p class="fs-1 text-center d-block d-lg-none d-md-none">GIFT CARDS</p>
+            <p class="fs-5 text-center text-muted">
                 Gift cards are the perfect gift for any occasion. They are available in
                 various denominations and can be used to purchase any product on our
                 website.
@@ -73,8 +74,8 @@
             <form method="POST" action="{{ url_for('buy_gift_card') }}">
                 {{ gift_form.csrf_token }}
                 <div class="mb-3">
-                    {{ gift_form.amount.label(class="form-label") }} {{
-                    gift_form.amount(class="form-control", id="amount") }}
+                    {{ gift_form.amount.label(class="form-label") }} 
+                    {{ gift_form.amount(class="form-control rounded rounded-0 p-2", id="amount") }}
                 </div>
                 {% if gift_form.errors %}
                 <div class="alert alert-danger mt-3" role="alert">
@@ -82,7 +83,14 @@
                     <p>{{ error }}</p>
                     {% endfor %}
                 </div>
-                {% endif %} {{ gift_form.submit(class="btn btn-outline-success rounded rounded-0") }}
+                {% endif %} 
+                <div class="mb-3">
+                    {% if current_user.is_authenticated %}
+                        {{ gift_form.submit(class="btn btn-outline-success rounded rounded-5 p-2 ps-3 pe-3") }}
+                    {% else %}
+                        <a href="{{ url_for('login_route') }}" class="btn btn-outline-success rounded rounded-5 p-2 ps-3 pe-3">Login to Buy</a>
+                    {% endif %}
+                </div>
 
                 <p class="fs-6 text-muted text-small mt-3">
                     *Gift cards are non-refundable. For more information
