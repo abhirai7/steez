@@ -44,7 +44,7 @@
                     <td class="align-middle">PROD_{{ product['id'] }}</td>
                     <td class="align-middle">{{ product['unique_id'] }}</td>
                     <td class="align-middle">{{ product['name'] }}</td>
-                    <td class="align-middle">INR. {{ product['price'] }}</td>
+                    <td class="align-middle">INR. {{ (product['price'] * 100) | format_currency }}</td>
                     <td class="align-middle text-center">
                         <p class="d-inline-flex gap-1">
                             <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"

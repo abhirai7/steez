@@ -34,7 +34,7 @@
                 {% for card in gift_cards %}
                 <tr>
                     <td>{{ card.id }}</td>
-                    <td>{{ card.price | int | format_currency }}</td>
+                    <td>{{ (card.price * 100) | int | format_currency }}</td>
                     <td>USR_{{ card.user_id }}</td>
                     <td>{{ card.code }}</td>
                     <td>{{ 'Yes' if card.used else 'No' }}</td>
