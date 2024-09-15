@@ -97,14 +97,12 @@ def admin_delete_product(id):
     return redirect(url_for("admin_manage_product"))
 
 
-@app.route("/admin/manage/order", methods=["GET"])
+@app.route("/admin/manage/razorpay-orders", methods=["GET"])
 @login_required
-def admin_manage_order():
+def admin_manage_razorpay_order():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
     skip = (page - 1) * limit
-
-    orders = Order.all(conn, limit=limit, offset=skip)
 
     response = razorpay_client.order.all({"count": limit, "skip": skip})
 
@@ -116,7 +114,6 @@ def admin_manage_order():
 
     return render_template(
         "admin_manage_order.html",
-        orders=orders,
         total_order_amount=total_order_amount,
         total_paid=total_paid,
         total_due=total_due,
@@ -125,6 +122,24 @@ def admin_manage_order():
         page=page,
         limit=limit,
         json=json,
+    )
+
+
+@app.route("/admin/manage/orders", methods=["GET"])
+@login_required
+def admin_manage_order():
+    page = max(int(request.args.get("page", 1)), 1)
+    limit = int(request.args.get("limit", 15))
+    skip = (page - 1) * limit
+
+    orders = Order.all(conn, limit=limit, offset=skip)
+
+    return render_template(
+        "admin_manage_partial_order.html",
+        orders=orders,
+        page=page,
+        skip=skip,
+        limit=limit,
     )
 
 

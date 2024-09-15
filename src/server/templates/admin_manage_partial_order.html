@@ -13,8 +13,7 @@
     <div class="col-10 overflow-y-auto" style="height: 100vh;">
         <div class="border border-1 mt-3">
             <div class="card-header">
-                <p class="fs-1 m-0 text-center">Razorpay Orders Created/Recorded</p>
-                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+                <p class="fs-1 m-0 text-center">Orders</p>
             </div>
         </div>
 
@@ -23,40 +22,28 @@
                 <tr>
                     <th>Sr. No.</th>
                     <th>Order ID</th>
-                    <th>Amount</th>
-                    <th>Amount Paid</th>
-                    <th>Amount Due</th>
+                    <th>User</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
                     <th>Status</th>
-                    <th>Attempts</th>
                     <th>Created At</th>
-                    <th>Notes (Developer Use)</th>
+                    <th>Razorpay Order ID</th>
                 </tr>
             </thead>
             <tbody>
-                {% if response["items"] %}
-                {% for order in response["items"] %}
+                {% if orders %}
+                {% for order in orders %}
                 <tr>
                     <td>{{ skip + loop.index }}</td>
                     <td>{{ order.id }}</td>
-                    <td>{{ order.amount | format_currency }}</td>
-                    <td>{{ order.amount_paid | format_currency }}</td>
-                    <td>{{ order.amount_due | format_currency }}</td>
+                    <td>(USR_{{ order.user.id }}) {{ order.user.name }}</td>
+                    <td>(PROD_{{ order.product.id }}) {{ product.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.total_price }}</td>
                     <td>{{ order.status }}</td>
-                    <td>{{ order.attempts }}</td>
                     <td>{{ order.created_at | datetimeformat }}</td>
-                    <td class="font-monospace pre">
-                        <p class="d-inline-flex gap-1">
-                            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"
-                                aria-controls="collapse-{{ loop.index }}">
-                                Show JSON Notes
-                            </a>
-                        </p>
-                        <div class="collapse" id="collapse-{{ loop.index }}">
-                            <div class="card card-body">
-                                {{ order.notes | tojson | safe }}
-                            </div>
-                        </div>
-                    </td>
+                    <td>{{ order.razorpay_order_id }}</td>
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -65,15 +52,6 @@
                 </tr>
                 {% endif %}
             </tbody>
-            <tfoot class="table-light">
-                <tr>
-                    <th colspan="2">Total</th>
-                    <th>{{ total_order_amount | format_currency }}</th>
-                    <th>{{ total_paid | format_currency }}</th>
-                    <th>{{ total_due | format_currency }}</th>
-                    <th colspan="4"></th>
-                </tr>
-            </tfoot>
         </table>
 
         <nav aria-label="Page navigation">
