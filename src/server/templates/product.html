@@ -237,6 +237,47 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h2 class="mb-4">Customer Reviews</h2>
+        
+        <!-- Review Form -->
+        <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST" class="mb-5">
+            {{ review_form.hidden_tag() }}
+            <div class="mb-3">
+                {{ review_form.review.label(class="form-label fw-bold") }}
+                {{ review_form.review(class="form-control form-control-lg", rows="5", placeholder="Write your review here...") }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Submit Review</button>
+        </form>
+
+        <!-- Reviews List -->
+        {% if product.reviews %}
+            <ul class="list-group">
+                {% for review in product.reviews %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="mb-1">{{ review.user.name }}</h5>
+                                <p class="mb-1">{{ review.review }}</p>
+                            </div>
+                            <small>{{ review.created_at }}</small>
+                        </div>
+                        <span class="text-warning">
+                            {% for star in range(review.stars) %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+        {% endif %}
+    </div>
+</div>
+
 {{ footer.footer() }}
 {% endblock %}
 

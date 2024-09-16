@@ -495,7 +495,8 @@ class Cart:
     def update_to_database(self, *, gift_card: GiftCard | None = None) -> None:
         query = r"""
             INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE)
-                SELECT USER_ID, PRODUCT_ID, QUANTITY, ((QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)) - ?)
+                SELECT 
+                    USER_ID, PRODUCT_ID, QUANTITY, MAX(((QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)) - ?), 1)
                 FROM CARTS
                 WHERE USER_ID = ?
         """
