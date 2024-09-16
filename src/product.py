@@ -99,6 +99,87 @@ class Review:
         self.__conn.commit()
 
 
+class Category:
+    def __init__(
+        self, connection: sqlite3.Connection, *, id: int, name: str, description: str
+    ):
+        self.__conn = connection
+        self.id = id
+        self.name = name
+        self.description = description
+
+    @classmethod
+    def create(
+        cls, connection: sqlite3.Connection, *, name: str, description: str
+    ) -> Category:
+        cursor = connection.cursor()
+
+        if SQLITE_OLD:
+            query = r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?)"
+            cursor.execute(query, (name, description))
+            result = cursor.execute(
+                r"SELECT * FROM CATEGORIES WHERE ROWID = ?", (cursor.lastrowid,)
+            )
+        else:
+            query = (
+                r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?) RETURNING *"
+            )
+            result = cursor.execute(query, (name, description))
+
+        data = result.fetchone()
+        connection.commit()
+
+        return cls(connection, **data)
+
+    @classmethod
+    def from_id(cls, connection: sqlite3.Connection, category_id: int) -> Category:
+        query = r"SELECT * FROM CATEGORIES WHERE ID = ?"
+        cursor = connection.cursor()
+        cursor.execute(query, (category_id,))
+        row = cursor.fetchone()
+        if row is None:
+            error = "Category not found."
+            raise ValueError(error) from None
+        return cls(connection, **row)
+
+    @classmethod
+    def from_name(cls, connection: sqlite3.Connection, name: str) -> Category:
+        query = r"SELECT * FROM CATEGORIES WHERE NAME = ?"
+        cursor = connection.cursor()
+        cursor.execute(query, (name,))
+        row = cursor.fetchone()
+        if row is None:
+            error = "Category not found."
+            raise ValueError(error) from None
+        return cls(connection, **row)
+
+    @classmethod
+    def all(cls, connection: sqlite3.Connection) -> list[Category]:
+        query = r"SELECT * FROM CATEGORIES"
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        return [cls(connection, **row) for row in rows]
+
+    @staticmethod
+    def total_count(connection: sqlite3.Connection) -> int:
+        query = r"SELECT COUNT(*) FROM CATEGORIES"
+        cursor = connection.cursor()
+        cursor.execute(query)
+        count = cursor.fetchone()
+        return int(count[0])
+
+    def json(self) -> dict:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Category name={self.name} description={self.description}>"
+
+
 class Product:
     def __init__(
         self,
@@ -108,20 +189,27 @@ class Product:
         unique_id: str,
         name: str,
         price: float,
+        display_price: float,
         description: str,
         stock: int,
         size: str,
+        category: int,
+        keywords: str = "",
+        created_at: str = ""
     ):
         self.__conn = connection
         self.id = id
         self.unique_id = unique_id
         self.name = name
         self.price = price
+        self.display_price = display_price
         self.description = description
         self.images = get_product_pictures(unique_id)
         self.stock = stock
         self.size = size
         self.size_name = size_names[size]
+        self.category = Category.from_id(connection, category)
+        self.keywords = [keyword.strip() for keyword in keywords.split(";")]
 
         self._available_sizes = []
 
@@ -215,27 +303,32 @@ class Product:
         unique_id: str,
         name: str,
         price: float,
+        display_price: float,
         description: str,
+        category: int,
         stock: int = 0,
         size: str,
+        keywords: str = "",
     ) -> Product:
         cursor = connection.cursor()
 
         if SQLITE_OLD:
             query = r"""
-                INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE, DISPLAY_PRICE, CATEGORY, KEYWORDS)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
-            cursor.execute(query, (unique_id, name, price, description, stock, size))
+            cursor.execute(query, (unique_id, name, price, description, stock, size, display_price, category, keywords))
             result = cursor.execute(
                 r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,)
             )
         else:
             query = r"""
-                INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE) VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE, DISPLAY_PRICE, CATEGORY, KEYWORDS)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 RETURNING *
             """
             result = cursor.execute(
-                query, (unique_id, name, price, description, stock, size)
+                query, (unique_id, name, price, description, stock, size, display_price, category, keywords)
             )
         data = result.fetchone()
         connection.commit()

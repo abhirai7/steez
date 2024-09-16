@@ -13,8 +13,6 @@
 
     .main-image {
         position: relative;
-        width: 60%;
-        margin: 20px;
     }
 
     .small-image {
@@ -34,187 +32,6 @@
         transform: scale(0);
         transition: transform 0.3s ease-in-out;
     }
-
-    .image-thumbnails {
-        width: 40%;
-        margin: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .thumbnail {
-        width: 30%;
-        margin: 10px;
-        cursor: pointer;
-    }
-
-    .thumbnail img {
-        width: 100%;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #ccc;
-    }
-
-    .thumbnail img:hover {
-        border: 2px solid #666;
-    }
-
-    @media (max-width: 968px) {
-        .main-image {
-            width: 100%;
-            margin: 10px;
-        }
-
-        .image-thumbnails {
-            width: 100%;
-            margin: 10px;
-        }
-
-        .thumbnail {
-            width: 45%;
-            margin: 5px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .main-image img {
-            height: 250px;
-        }
-
-        .thumbnail img {
-            height: 60px;
-        }
-    }
-
-    @media (max-width: 320px) {
-        .main-image img {
-            height: 200px;
-        }
-
-        .thumbnail img {
-            height: 30px;
-        }
-    }
-
-    /* Call-to-Action Buttons */
-
-    .btn-primary {
-        background-color: #4CAF50;
-        color: #fff;
-    }
-
-    .btn-primary:hover {
-        background-color: #3e8e41;
-    }
-
-    .btn-secondary {
-        background-color: #666;
-        color: #fff;
-    }
-
-    .btn-secondary:hover {
-        background-color: #555;
-    }
-
-    .btn-link {
-        background-color: transparent;
-        color: #337ab7;
-        border: none;
-    }
-
-    .btn-link:hover {
-        color: #23527c;
-    }
-
-
-
-    /* Related Products Section */
-    .related-products {
-        margin-bottom: 20px;
-    }
-
-    .related-product {
-        margin-bottom: 20px;
-    }
-
-    .related-product img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 10px;
-    }
-
-    .related-product h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .related-product p {
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
-
-    /* Product Availability Section */
-
-    .pricing-availability {
-        margin-bottom: 20px;
-    }
-
-    .pricing-availability h2 {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
-
-    .pricing-availability p {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-
-    /* Review Section */
-
-    .review-rating {
-        margin-bottom: 10px;
-    }
-
-    .review-rating span {
-        font-size: 16px;
-        margin-right: 10px;
-    }
-
-    .review-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .review-item {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .review-item h3 {
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-
-    .review-item p {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .main-image img {
-        height: 100%;
-    }
-
-    .thumbnail img {
-        height: 100%;
-    }
-
-    /* FAQ Section */
 
     .faq-list {
         list-style: none;
@@ -257,21 +74,37 @@
         <div class="col border-end border-end-1 m-0 p-0">
             <div>
                 <div class="d-block d-lg-none d-md-none text-center">
-                    <span class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</span>
-                    <p class="text-muted">INR. {{ product.price }}</p>
+                    <hr>
+                    <p class="fs-max fw-semibold text-uppercase">{{ product.name.strip() }}</p>
+                    {% set display_price = product.display_price %}
+                    {% set difference = display_price - product.price %}
+                    {% if difference > 0 %}
+                        {% set percent = ((difference / display_price) * 100) | int %}
+                        <span class="text-danger fs-4">-{{ percent }}% </span>
+                    {% endif %}
+                    <span class="fs-3 fw-bold">INR. {{ product.price }}</span>
+                    {% if difference > 0 %}
+                        <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
+                    {% endif %}
+                    <hr>
                 </div>
                 <div class="product-image">
-                    <div class="main-image">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="small-image border border-1">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="d-none d-lg-block d-md-block large-image border border-1">
-                    </div>
-                    <div class="image-thumbnails">
-                        {% for image in product.images %}
-
-                        <div class="thumbnail">
-                            <img src="{{ image }}" alt="{{ product.name }}" class="rounded rounded-0">
+                    <div class="row ms-5">
+                        <div class="col-12">
+                            <div class="main-image p-5">
+                                <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="small-image border border-1">
+                                <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="d-none d-lg-block d-md-block large-image border border-1">
+                            </div>
                         </div>
-                        {% endfor %}
+                        <div class="col-12 mt-0">
+                            <div class="d-flex justify-content-center">
+                                {% for image in product.images %}
+                                <div class="thumbnail m-2">
+                                    <img src="{{ image }}" alt="{{ product.name }}" class="img-thumbnail rounded rounded-0" style="width: 100px; height: 100px;">
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -282,7 +115,16 @@
                 <p class="text-muted fs-5">{{ product.description | safe }}</p>
 
                 <div class="mb-4 mt-4">
-                    <p class="fs-3 fw-bold">INR. {{ product.price }}</p>
+                    {% set display_price = product.display_price %}
+                    {% set difference = display_price - product.price %}
+                    {% if difference > 0 %}
+                        {% set percent = ((difference / display_price) * 100) | int %}
+                        <span class="text-danger fs-4">-{{ percent }}% </span>
+                    {% endif %}
+                    <span class="fs-3 fw-bold">INR. {{ product.price }}</span>
+                    {% if difference > 0 %}
+                        <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
+                    {% endif %}
                 </div>
                 <hr>
                 <div class="cta-buttons">
@@ -427,7 +269,7 @@
         const containerRect = imageContainer.getBoundingClientRect();
         const mouseX = event.clientX - containerRect.left;
         const mouseY = event.clientY - containerRect.top;
-        const zoomFactor = 2;
+        const zoomFactor = 1.5;
 
         largeImage.style.transformOrigin = `${mouseX}px ${mouseY}px`;
         largeImage.style.transform = `scale(${zoomFactor})`;

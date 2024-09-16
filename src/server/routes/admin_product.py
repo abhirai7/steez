@@ -10,9 +10,9 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.order import Order
-from src.product import GiftCard, Product
+from src.product import Category, GiftCard, Product
 from src.server import app, conn, razorpay_client
-from src.server.forms import ProductAddForm
+from src.server.forms import CategoryAddForm, ProductAddForm
 from src.utils import size_names
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
@@ -29,7 +29,7 @@ def admin_manage_product():
     limit = int(request.args.get("limit", 15))
     skip = (page - 1) * limit
     products = Product.all(conn, admin=True, limit=limit, offset=skip)
-    addform: ProductAddForm = ProductAddForm()
+    addform: ProductAddForm = ProductAddForm(conn)
     return render_template(
         "admin_manage_product.html",
         products=products,
@@ -44,7 +44,7 @@ def admin_manage_product():
 @app.route("/admin/manage/product/add", methods=["GET", "POST"])
 @login_required
 def admin_add_product():
-    addform: ProductAddForm = ProductAddForm()
+    addform: ProductAddForm = ProductAddForm(conn)
 
     if addform.validate_on_submit() and request.method == "POST":
         assert (
@@ -65,6 +65,9 @@ def admin_add_product():
                 price=float(addform.price.data),
                 stock=int(addform.stock.data),
                 description=markdown.markdown(addform.description.data),
+                category=addform.category.data,
+                display_price=addform.display_price.data or addform.price.data,
+                keywords=addform.keywords.data or "",
                 size=size,
             )
 
@@ -79,8 +82,33 @@ def admin_add_product():
             ) as f:
                 f.write(image.read())
 
-        return redirect(url_for("admin_manage_product"))
-    return render_template("admin_add_product.html", form=addform)
+    return redirect(url_for("admin_manage_product"))
+
+
+@app.route("/admin/manage/category", methods=["GET"])
+@login_required
+def admin_manage_category():
+    categories = Category.all(conn)
+    addform: CategoryAddForm = CategoryAddForm()
+    return render_template(
+        "admin_manage_category.html", categories=categories, form=addform
+    )
+
+
+@app.route("/admin/manage/category/add", methods=["GET", "POST"])
+@login_required
+def admin_add_category():
+    addform: CategoryAddForm = CategoryAddForm()
+
+    if addform.validate_on_submit() and request.method == "POST":
+        assert addform.name.data and addform.description.data
+
+        Category.create(
+            conn, name=addform.name.data, description=addform.description.data
+        )
+
+        return redirect(url_for("admin_manage_category"))
+    return render_template("admin_manage_category.html", form=addform)
 
 
 @app.route("/admin/manage/product/edit/<int:id>", methods=["GET", "POST"])

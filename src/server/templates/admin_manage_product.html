@@ -31,6 +31,7 @@
                     <th>Price</th>
                     <th>Description</th>
                     <th>Stock</th>
+                    <th>Category</th>
                     <th>Preview</th>
                     <th>Size</th>
                     <th>Actions</th>
@@ -59,6 +60,7 @@
                         </div>
                     </td>
                     <td class="align-middle">{{ product['stock'] }}</td>
+                    <td class="align-middle text-uppercase">{{ product['category'].name }}</td>
                     <td class="align-middle">
                         {% for image in product['images'] %}
                         <img src="{{ image }}" alt="{{ product['name'] }}" class="img-thumbnail" style="width: 100px; height: 100px;">
@@ -82,7 +84,7 @@
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td colspan="10" class="align-middle text-center">No products available</td>
+                    <td colspan="11" class="align-middle text-center">No products available</td>
                 </tr>
                 {% endif %}
             </tbody>
@@ -108,7 +110,7 @@
 
 <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content p-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -116,27 +118,51 @@
             <div class="modal-body">
                 <form method="POST" action="{{ url_for('admin_add_product') }}" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
-                    <div class="mb-3">
+                    <div class="mb-1">
                         {{ form.name.label(class="form-label") }}
                         {{ form.name(class="form-control") }}
                     </div>
-                    <div class="mb-3">
-                        {{ form.price.label(class="form-label") }}
-                        {{ form.price(class="form-control") }}
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-1">
+                                {{ form.price.label(class="form-label") }}
+                                {{ form.price(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-1">
+                                {{ form.display_price.label(class="form-label") }}
+                                {{ form.display_price(class="form-control") }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-1">
                         {{ form.description.label(class="form-label") }}
                         {{ form.description(class="form-control") }}
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-1">
                         {{ form.images.label(class="form-label") }}
                         {{ form.images(class="form-control") }}
                     </div>
-                    <div class="mb-3">
-                        {{ form.stock.label(class="form-label") }}
-                        {{ form.stock(class="form-control") }}
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-1">
+                                {{ form.stock.label(class="form-label") }}
+                                {{ form.stock(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-1">
+                                {{ form.category.label(class="form-label") }}
+                                {{ form.category(class="form-select") }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-1">
+                        {{ form.keywords.label(class="form-label") }}
+                        {{ form.keywords(class="form-control") }}
+                    </div>
+                    <div class="mb-1">
                         {{ form.sizes.label(class="form-label") }}
                         {{ form.sizes(class="form-control") }}
                     </div>
