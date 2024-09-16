@@ -37,6 +37,5 @@ def before_request():
         "%s [%s] %s", request.remote_addr, request.method, request.path
     )
     if "user_fingerprint_v2" not in request.cookies:
-        response = make_response("Cookie not found")
-        response.status_code = 401
-        return response
+        set_cookie()
+    return None
