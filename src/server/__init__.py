@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import pathlib
 import sqlite3
+import logging
 from typing import TYPE_CHECKING
 
 import razorpay
@@ -14,6 +15,8 @@ from flask_wtf import CSRFProtect
 
 from src.user import User
 from src.utils import SQLITE_OLD, sqlite_row_factory
+
+from .logger import SQLiteHandler
 
 load_dotenv()
 
@@ -52,6 +55,11 @@ if SQLITE_OLD:
     app.logger.warning(
         "**SQLITE VERSION IS TOO OLD. PLEASE USE 3.35.0 OR NEWER. FEW FEATURES MAY NOT WORK.**"
     )
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(SQLiteHandler(conn))
 
 from .filters import *  # noqa
 from .login_manager import *  # noqa

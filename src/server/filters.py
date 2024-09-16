@@ -2,12 +2,11 @@ import locale
 
 import arrow
 
+import contextlib
 from src.server import app
 
-try:
+with contextlib.suppress(locale.Error):
     locale.setlocale(locale.LC_ALL, "en_IN")
-except locale.Error:
-    pass
 
 
 @app.template_filter("datetimeformat")
@@ -21,4 +20,4 @@ def format_currency(value):
     try:
         return locale.currency((value or 0) / 100, grouping=True)
     except ValueError:
-        return value
+        return f"INR. {(value or 0) / 100}"

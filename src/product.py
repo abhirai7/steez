@@ -368,7 +368,6 @@ class Cart:
         self.__conn.commit()
 
         product.use(quantity)
-        print("Used", product.name, quantity)
 
     def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
         query = (

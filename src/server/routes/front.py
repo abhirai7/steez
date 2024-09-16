@@ -70,8 +70,3 @@ def order_history():
     return render_template(
         "order_history.html", orders=orders, current_user=current_user, arrow=arrow
     )
-
-
-@app.route("/sitemap.xml")
-def sitemap():
-    return sitemapper.generate(), 200, {"Content-Type": "application/xml"}
