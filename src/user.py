@@ -216,9 +216,7 @@ class User:
         final_payload = {
             "amount": int(total_price * 100),
             "currency": "INR",
-            "notes": {
-                "products": notes,
-            },
+            "notes": notes,
         }
 
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
