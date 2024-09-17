@@ -12,7 +12,7 @@ from flask_login import current_user, login_required
 from src.order import Order
 from src.product import Category, GiftCard, Product
 from src.server import app, conn, razorpay_client
-from src.server.forms import CategoryAddForm, ProductAddForm
+from src.server.forms import CategoryAddForm, ProductAddForm, CarouselForm
 from src.utils import size_names
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
@@ -190,3 +190,4 @@ def admin_payments():
 def admin_giftcards():
     gift_cards = GiftCard.all(conn)
     return render_template("admin_manage_giftcard.html", gift_cards=gift_cards)
+
