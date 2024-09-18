@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from flask import make_response, request
 
-from src.server import app, sitemapper, logger
+from src.server import app, logger, sitemapper
 
 
 @app.route("/sitemap.xml")
@@ -30,12 +30,11 @@ def set_cookie():
 
     return response
 
+
 @app.before_request
 def before_request():
     # IP address, HTTP method, and path, status code
-    logger.debug(
-        "%s [%s] %s", request.remote_addr, request.method, request.path
-    )
+    logger.debug("%s [%s] %s", request.remote_addr, request.method, request.path)
     if "user_fingerprint_v2" not in request.cookies:
         set_cookie()
     return None

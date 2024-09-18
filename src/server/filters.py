@@ -1,8 +1,8 @@
+import contextlib
 import locale
 
 import arrow
 
-import contextlib
 from src.server import app
 
 with contextlib.suppress(locale.Error):

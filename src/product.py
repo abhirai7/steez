@@ -108,6 +108,12 @@ class Category:
         self.name = name
         self.description = description
 
+    def delete(self) -> None:
+        query = r"DELETE FROM CATEGORIES WHERE ID = ?"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.id,))
+        self.__conn.commit()
+
     @classmethod
     def create(
         cls, connection: sqlite3.Connection, *, name: str, description: str
@@ -195,7 +201,7 @@ class Product:
         size: str,
         category: int,
         keywords: str = "",
-        created_at: str = ""
+        created_at: str = "",
     ):
         self.__conn = connection
         self.id = id
@@ -317,7 +323,20 @@ class Product:
                 INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE, DISPLAY_PRICE, CATEGORY, KEYWORDS)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
-            cursor.execute(query, (unique_id, name, price, description, stock, size, display_price, category, keywords))
+            cursor.execute(
+                query,
+                (
+                    unique_id,
+                    name,
+                    price,
+                    description,
+                    stock,
+                    size,
+                    display_price,
+                    category,
+                    keywords,
+                ),
+            )
             result = cursor.execute(
                 r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,)
             )
@@ -328,7 +347,18 @@ class Product:
                 RETURNING *
             """
             result = cursor.execute(
-                query, (unique_id, name, price, description, stock, size, display_price, category, keywords)
+                query,
+                (
+                    unique_id,
+                    name,
+                    price,
+                    description,
+                    stock,
+                    size,
+                    display_price,
+                    category,
+                    keywords,
+                ),
             )
         data = result.fetchone()
         connection.commit()

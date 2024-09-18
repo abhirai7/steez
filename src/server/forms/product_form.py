@@ -58,4 +58,4 @@ class GiftCardForm(FlaskForm):
     amount = IntegerField("Amount", validators=[DataRequired(), NumberRange(min=50, max=2000)])
     submit = SubmitField("Buy Gift Card")
 
-# fmt: off
+# fmt: on

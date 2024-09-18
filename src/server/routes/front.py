@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 
 from src.product import Product
 from src.server import TODAY, app, conn, sitemapper
-from src.server.forms import GiftCardForm, CarouselForm
+from src.server.forms import GiftCardForm
 from src.utils import FAQ_DATA, format_to_special
 
 if TYPE_CHECKING:
@@ -70,4 +70,3 @@ def order_history():
     return render_template(
         "order_history.html", orders=orders, current_user=current_user, arrow=arrow
     )
-

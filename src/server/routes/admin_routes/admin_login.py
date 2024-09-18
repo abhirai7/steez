@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user
 
 from src.order import Order
 from src.product import Product
-from src.server import app, conn, razorpay_client, admin_login_required
+from src.server import admin_login_required, app, conn, razorpay_client
 from src.server.forms import AdminForm
 from src.user import Admin, User
 

@@ -1,6 +1,6 @@
 from flask import render_template
 
-from src.server import app, conn, admin_login_required
+from src.server import admin_login_required, app, conn
 from src.user import User
 
 

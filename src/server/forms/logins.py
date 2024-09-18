@@ -16,11 +16,12 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 from src.user import User
 
 
+# fmt: off
 class LoginForm(FlaskForm):
-    email = EmailField("Email address", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    email       = EmailField("Email address", validators=[DataRequired(), Email()])
+    password    = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
 
-    submit = SubmitField("Login")
+    submit      = SubmitField("Login")
 
 
 class RegisterForm(FlaskForm):
@@ -28,21 +29,19 @@ class RegisterForm(FlaskForm):
         super().__init__(*args, **kwargs)
         self.conn = connection
 
-    name: StringField = StringField("Person Details", validators=[DataRequired()])
-    email = EmailField("", validators=[DataRequired(), Email()])
-    password = PasswordField("", validators=[DataRequired(), Length(min=8)])
-    confirm_password = PasswordField(
-        "", validators=[DataRequired(), EqualTo("password")]
-    )
+    name         = StringField("Person Details", validators=[DataRequired()])
+    email        = EmailField("", validators=[DataRequired(), Email()])
+    password     = PasswordField("", validators=[DataRequired(), Length(min=8)])
+    confirm_password = PasswordField("", validators=[DataRequired(), EqualTo("password")])
 
     address_line1 = StringField("Address Details", validators=[DataRequired()])
 
-    city = StringField("", validators=[DataRequired()])
-    state = StringField("", validators=[DataRequired()])
-    pincode = IntegerField("", validators=[DataRequired()])
-    phone = IntegerField("", validators=[DataRequired()])
+    city         = StringField("", validators=[DataRequired()])
+    state        = StringField("", validators=[DataRequired()])
+    pincode      = IntegerField("", validators=[DataRequired()])
+    phone        = IntegerField("", validators=[DataRequired()])
 
-    submit = SubmitField("Register")
+    submit       = SubmitField("Register")
 
     def validate_email(self, email: EmailField):
         assert email.data
@@ -74,5 +73,7 @@ class AdminForm(FlaskForm):
         super().__init__(*args, **kwargs)
         self.conn = connection
 
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
-    submit = SubmitField("Login")
+    password    = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    submit      = SubmitField("Login")
+
+# fmt: on
