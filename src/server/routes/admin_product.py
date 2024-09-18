@@ -7,12 +7,13 @@ import string
 
 import markdown
 from flask import redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 
+from src.carousel import Carousel
 from src.order import Order
 from src.product import Category, GiftCard, Product
-from src.server import app, conn, razorpay_client
-from src.server.forms import CategoryAddForm, ProductAddForm, CarouselForm
+from src.server import app, conn, razorpay_client, admin_login_required
+from src.server.forms import CarouselForm, CategoryAddForm, ProductAddForm
 from src.utils import size_names
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
@@ -23,7 +24,7 @@ def generate_unique_identifier():
 
 
 @app.route("/admin/manage/product", methods=["GET", "POST"])
-@login_required
+@admin_login_required
 def admin_manage_product():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -42,7 +43,7 @@ def admin_manage_product():
 
 
 @app.route("/admin/manage/product/add", methods=["GET", "POST"])
-@login_required
+@admin_login_required
 def admin_add_product():
     addform: ProductAddForm = ProductAddForm(conn)
 
@@ -86,7 +87,7 @@ def admin_add_product():
 
 
 @app.route("/admin/manage/category", methods=["GET"])
-@login_required
+@admin_login_required
 def admin_manage_category():
     categories = Category.all(conn)
     addform: CategoryAddForm = CategoryAddForm()
@@ -96,7 +97,7 @@ def admin_manage_category():
 
 
 @app.route("/admin/manage/category/add", methods=["GET", "POST"])
-@login_required
+@admin_login_required
 def admin_add_category():
     addform: CategoryAddForm = CategoryAddForm()
 
@@ -112,13 +113,13 @@ def admin_add_category():
 
 
 @app.route("/admin/manage/product/edit/<int:id>", methods=["GET", "POST"])
-@login_required
+@admin_login_required
 def admin_edit_product(id):
     return redirect(url_for("admin_manage_product"))
 
 
 @app.route("/admin/manage/product/delete/<int:id>", methods=["GET", "POST"])
-@login_required
+@admin_login_required
 def admin_delete_product(id):
     current_user.delete_product(conn, id)
 
@@ -126,7 +127,7 @@ def admin_delete_product(id):
 
 
 @app.route("/admin/manage/razorpay-orders", methods=["GET"])
-@login_required
+@admin_login_required
 def admin_manage_razorpay_order():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -154,7 +155,7 @@ def admin_manage_razorpay_order():
 
 
 @app.route("/admin/manage/orders", methods=["GET"])
-@login_required
+@admin_login_required
 def admin_manage_order():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -172,7 +173,7 @@ def admin_manage_order():
 
 
 @app.route("/admin/payouts", methods=["GET"])
-@login_required
+@admin_login_required
 def admin_payments():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -186,8 +187,51 @@ def admin_payments():
 
 
 @app.route("/admin/giftcards")
-@login_required
+@admin_login_required
 def admin_giftcards():
     gift_cards = GiftCard.all(conn)
     return render_template("admin_manage_giftcard.html", gift_cards=gift_cards)
 
+
+@app.route("/admin/manage/carousel")
+@admin_login_required
+def admin_manage_carousel():
+    form = CarouselForm()
+    carousels = Carousel.all(conn)
+    return render_template("admin_manage_carousel.html", form=form, carousels=carousels)
+
+
+@app.route("/admin/delete/carousel/<int:id>")
+@admin_login_required
+def admin_delete_carousel(id):
+    carousel = Carousel.get(conn, id)
+    carousel.delete()
+    return redirect(url_for("admin_manage_carousel"))
+
+
+@app.route("/admin/manage/carousel/add", methods=["POST"])
+@admin_login_required
+def admin_add_carousel():
+    form: CarouselForm = CarouselForm()
+
+    if form.validate_on_submit():
+        assert form.image.data and form.heading.data and form.description.data
+
+        image = form.image.data
+        filename = image.filename
+        _id = generate_unique_identifier()
+
+        if not os.path.exists(f"{UPLOAD_FOLDER}/{_id}/"):
+            os.makedirs(f"{UPLOAD_FOLDER}/{_id}/")
+
+        with open(f"{UPLOAD_FOLDER}/{_id}/{filename}", "wb+") as f:
+            f.write(image.read())
+
+        Carousel.create(
+            conn,
+            image=_id,
+            heading=form.heading.data,
+            description=form.description.data,
+        )
+
+    return redirect(url_for("admin_manage_carousel"))

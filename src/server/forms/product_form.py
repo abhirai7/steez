@@ -47,16 +47,11 @@ class CategoryAddForm(FlaskForm):
 
 
 class CarouselForm(FlaskForm):
-    slide1 = StringField("Slide 1")
-    image1 = FileField("Image 1")
+    heading     = StringField("Heading", validators=[DataRequired()])
+    description = TextAreaField("Description", validators=[DataRequired()])
+    image       = FileField("Image", validators=[DataRequired()])
 
-    slide2 = StringField("Slide 2")
-    image2 = FileField("Image 2")
-
-    slide3 = StringField("Slide 3")
-    image3 = FileField("Image 3")
-
-    submit = SubmitField("Update Carousel")
+    submit      = SubmitField("Update Carousel")
 
 
 class GiftCardForm(FlaskForm):

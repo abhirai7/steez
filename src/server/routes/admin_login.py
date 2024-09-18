@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import arrow
 from flask import redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask_login import current_user, login_user, logout_user
 
 from src.order import Order
 from src.product import Product
-from src.server import app, conn, razorpay_client
+from src.server import app, conn, razorpay_client, admin_login_required
 from src.server.forms import AdminForm
 from src.user import Admin, User
 
@@ -38,7 +38,7 @@ def admin_login():
 
 
 @app.route("/admin/logout")
-@login_required
+@admin_login_required
 def admin_logout():
     logout_user()
     return redirect(url_for("home"))
@@ -46,7 +46,7 @@ def admin_logout():
 
 @app.route("/admin/dashboard")
 @app.route("/admin/dashboard/")
-@login_required
+@admin_login_required
 def admin_dashboard():
     assert current_user.is_admin
 

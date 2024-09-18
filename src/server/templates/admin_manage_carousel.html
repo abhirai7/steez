@@ -12,14 +12,55 @@
     <div class="col-10 overflow-y-auto" style="height: 100vh;">
         <div class="border border-1 mt-3">
             <div class="card-header">
-                <p class="fs-1 m-0 text-center"></p>
+                <p class="fs-1 m-0 text-center">Carousel </p>
             </div>
         </div>
         <button type="button" class="btn btn-success w-100 mt-3 rounded rounded-0" data-bs-toggle="modal" data-bs-target="#add-carousel">
-            <!--  -->
+            Add Carousel
         </button>
 
-        <!--  -->
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Heading</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if carousels %}
+                {% for carousel in carousels %}
+                <tr>
+                    <td class="align-middle text-center">{{ loop.index }}</td>
+                    <td class="align-middle text-center">CAR_{{ carousel.id }}</td>
+                    <td class="align-middle text-center"><img src="{{ carousel.image }}" class="img-thumbnail" class="img-thumbnail" style="width: 100px; height: 100px;"></td>
+                    <td class="align-middle text-center">{{ carousel.heading }}</td>
+                    <td class="align-middle text-center">{{ carousel.description }}</td>
+                    <td class="align-middle text-center">
+                        <p class="d-inline-flex gap-1">
+                            <a class="btn btn-danger" data-bs-toggle="collapse" href="#collapse-actions-{{ loop.index }}" role="button" aria-expanded="false"
+                                aria-controls="collapse-actions-{{ loop.index }}">
+                                Delete
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapse-actions-{{ loop.index }}">
+                            <div class="card card-body">
+                                <a href="{{ url_for('admin_delete_carousel', id=carousel.id) }}" class="btn btn-danger">Confirm Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">No carousel available</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -27,11 +68,29 @@
     <div class="modal-dialog">
         <div class="modal-content p-3">
             <div class="modal-header">
-                <h5 class="modal-title" id="add-carousel-label"></h5>
+                <h5 class="modal-title" id="add-carousel-label">Carousel Add</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!--  -->
+                <form action="{{ url_for('admin_add_carousel') }}" method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.image.label(class="form-label") }}
+                        {{ form.image(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.heading.label(class="form-label") }}
+                        {{ form.heading(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control") }}
+                    </div>
+                    <div class="modal-footer">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

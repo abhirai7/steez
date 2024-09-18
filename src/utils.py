@@ -299,7 +299,7 @@ def get_product_pictures(product_id: int | str) -> list[str]:
     files = []
     for file in path.iterdir():
         path_from_static = file.relative_to(this_path / "server")
-        files.append("/" + str(path_from_static))
+        files.append(f"/{str(path_from_static)}")
 
     return files
 

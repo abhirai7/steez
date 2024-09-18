@@ -33,10 +33,10 @@
                 {% if categories %}
                 {% for category in categories %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>CAT_{{ category.id }}</td>
-                    <td>{{ category.name }}</td>
-                    <td>{{ category.description }}</td>
+                    <td class="align-middle">{{ loop.index }}</td>
+                    <td class="align-middle">CAT_{{ category.id }}</td>
+                    <td class="align-middle">{{ category.name }}</td>
+                    <td class="align-middle">{{ category.description }}</td>
                 </tr>
                 {% endfor %}
                 {% else %}
