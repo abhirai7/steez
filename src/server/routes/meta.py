@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import make_response, request
+from flask import make_response, render_template, request
 
 from src.server import app, logger, sitemapper
 
@@ -38,3 +38,13 @@ def before_request():
     if "user_fingerprint_v2" not in request.cookies:
         set_cookie()
     return None
+
+
+@app.route("/payment-success")
+def payment_success():
+    return render_template("payment_status.html", status="ok")
+
+
+@app.route("/payment-failure")
+def payment_failure():
+    return render_template("payment_status.html", status="error")

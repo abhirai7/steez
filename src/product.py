@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlite3
 from typing import TYPE_CHECKING, Literal
 
-from fuzzywuzzy import fuzz
+from fuzzywuzzy.fuzz import partial_ratio
 
 from .utils import SQLITE_OLD, generate_gift_card_code, get_product_pictures, size_names
 
@@ -107,6 +107,9 @@ class Category:
         self.id = id
         self.name = name
         self.description = description
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     def delete(self) -> None:
         query = r"DELETE FROM CATEGORIES WHERE ID = ?"
@@ -246,7 +249,7 @@ class Product:
         if self._available_sizes:
             return self._available_sizes
 
-        query = "SELECT SIZE FROM PRODUCTS WHERE UNIQUE_ID = ?"
+        query = r"SELECT SIZE FROM PRODUCTS WHERE UNIQUE_ID = ?"
         cursor = self.__conn.cursor()
         cursor.execute(query, (self.unique_id,))
         ls = []
@@ -277,7 +280,7 @@ class Product:
             self.__conn, user_id=user_id, product_id=self.id, stars=stars, review=review
         )
 
-    def del_review(self, *, user_id: int) -> None:
+    def delete_review(self, *, user_id: int) -> None:
         query = r"DELETE FROM REVIEWS WHERE `USER_ID` = ? AND `PRODUCT_ID` = ?"
         cursor = self.__conn.cursor()
         cursor.execute(query, (user_id, self.id))
@@ -469,9 +472,13 @@ class Product:
     @classmethod
     def search(cls, connection: sqlite3.Connection, query: str) -> list[Product]:
         all_products = cls.all(connection)
+
         return sorted(
             all_products,
-            key=lambda product: fuzz.partial_ratio(query, product.name),
+            key=lambda product: partial_ratio(
+                query,
+                f"{product.name} {product.description} {' '.join(product.keywords)}",
+            ),
             reverse=True,
         )
 
@@ -486,6 +493,17 @@ class Product:
 
     def __repr__(self) -> str:
         return f"<Product name={self.name} price={self.price} stock={self.stock} unique_id={self.unique_id} size={self.size_name}>"
+
+    @staticmethod
+    def categorise_products(products: list[Product]) -> dict[Category, list[Product]]:
+        categories: dict[Category, list[Product]] = {}
+        for product in products:
+            if product.category not in categories:
+                categories[product.category] = []
+
+            categories[product.category].append(product)
+
+        return categories
 
 
 class Cart:
@@ -507,7 +525,7 @@ class Cart:
             error = "Product is not available."
             raise ValueError(error)
 
-        query = "INSERT INTO CARTS (USER_ID, PRODUCT_ID, QUANTITY) VALUES (?, ?, ?) ON CONFLICT(USER_ID, PRODUCT_ID) DO UPDATE SET QUANTITY = QUANTITY + ?"
+        query = r"INSERT INTO CARTS (USER_ID, PRODUCT_ID, QUANTITY) VALUES (?, ?, ?) ON CONFLICT(USER_ID, PRODUCT_ID) DO UPDATE SET QUANTITY = QUANTITY + ?"
         cursor = self.__conn.cursor()
         cursor.execute(query, (self.user_id, product.id, quantity, quantity))
         self.__conn.commit()

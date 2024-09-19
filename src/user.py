@@ -142,7 +142,7 @@ class User:
         product.add_review(user_id=self.id, stars=stars, review=review)
 
     def del_review(self, *, product: Product) -> None:
-        product.del_review(user_id=self.id)
+        product.delete_review(user_id=self.id)
 
     def add_to_cart(self, *, product: Product, quantity: int | None = 1) -> None:
         self.cart.add_product(product=product, quantity=quantity)

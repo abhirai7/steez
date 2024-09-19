@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 @app.route("/home/")
 def home():
     products = Product.all(conn)
+    categories = Product.categorise_products(products)
     gift_form: GiftCardForm = GiftCardForm()
 
     return render_template(
@@ -31,6 +32,7 @@ def home():
         current_user=current_user,
         gift_form=gift_form,
         show_hero=True,
+        categories=categories,
     )
 
 

@@ -154,17 +154,6 @@ def razorpay_webhook():
 
     return {"status": "ok"}, 200
 
-
-@app.route("/payment-success")
-def payment_success():
-    return render_template("payment_status.html", status="ok")
-
-
-@app.route("/payment-failure")
-def payment_failure():
-    return render_template("payment_status.html", status="error")
-
-
 @app.route("/delete-order/<int:order_id>")
 @login_required
 def delete_order(order_id: int):
