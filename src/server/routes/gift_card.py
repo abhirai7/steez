@@ -19,8 +19,8 @@ if TYPE_CHECKING:
     assert isinstance(current_user, User)
 
 
-@app.route("/buy-gift-card/", methods=["POST"])
-@app.route("/buy-gift-card", methods=["POST"])
+@app.route("/giftcard/buy/", methods=["POST"])
+@app.route("/giftcard/buy", methods=["POST"])
 @login_required
 def buy_gift_card():
     gift_form: GiftCardForm = GiftCardForm()
@@ -42,11 +42,12 @@ def buy_gift_card():
             "giftcard": True,
         }
         return render_template("payment.html", **variables)
+
     return render_template("buy_gift_card.html", form=gift_form)
 
 
-@app.route("/razorpay-webhook-giftcard", methods=["POST"])
-@app.route("/razorpay-webhook-giftcard/", methods=["POST"])
+@app.route("/razorpay-webhook/giftcard/", methods=["POST"])
+@app.route("/razorpay-webhook/giftcard", methods=["POST"])
 def razorpay_webhook_giftcard():
     data = request.get_json()
 
@@ -64,8 +65,8 @@ def razorpay_webhook_giftcard():
     return {"status": "ok", "gift_card_code": gift.code}, 200
 
 
-@app.route("/show-gift-card/")
-@app.route("/show-gift-card")
+@app.route("/giftcard/show/")
+@app.route("/giftcard/show")
 @login_required
 def show_gift_card():
     args = request.args

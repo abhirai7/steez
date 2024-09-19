@@ -19,10 +19,7 @@ VT = TypeVar("VT")
 
 REGION = "en_IN"
 
-if sqlite_version_info >= (3, 35, 0):
-    SQLITE_OLD = False
-else:
-    SQLITE_OLD = True
+SQLITE_OLD = sqlite_version_info < (3, 35, 0)
 
 
 class IndexedDict(Generic[KT, VT]):
@@ -45,10 +42,7 @@ class IndexedDict(Generic[KT, VT]):
         if self.__case_sensitive:
             return key
 
-        if isinstance(key, str):
-            return key.casefold()
-
-        return key
+        return key.casefold() if isinstance(key, str) else key
 
     def __setitem__(self, key: KT, value: VT) -> None:
         """Set the value for the key.
@@ -101,13 +95,12 @@ class IndexedDict(Generic[KT, VT]):
         key = self._parse_key(key)
         if key in self.__actual_dict:
             index = self.__index_cache[key]
+        elif isinstance(key, int):
+            index = int(key)
+            key = self.__keys[index]
         else:
-            if isinstance(key, int):
-                index = int(key)
-                key = self.__keys[index]
-            else:
-                error = f"KeyError: {key}"
-                raise KeyError(error)
+            error = f"KeyError: {key}"
+            raise KeyError(error)
 
         del self.__keys[index]
         del self.__values[index]
@@ -231,11 +224,12 @@ class Password:
 
     @staticmethod
     def is_strong(password: str, /) -> bool:
-        valids: list[bool] = []
-        valids.append(any(char.islower() for char in password))
-        valids.append(any(char.isupper() for char in password))
-        valids.append(any(char.isdigit() for char in password))
-        valids.append(any(char in string.punctuation for char in password))
+        valids: list[bool] = [
+            (any(char.islower() for char in password)),
+            (any(char.isupper() for char in password)),
+            (any(char.isdigit() for char in password)),
+            (any(char in string.punctuation for char in password)),
+        ]
         return all(valids) and len(password) >= 8
 
 
@@ -331,8 +325,8 @@ def format_number(number: int, /) -> str:
     return locale.format_string("%d", number, grouping=True)
 
 
-def generate_gift_card_code() -> str:
-    return "".join(random.choices(string.ascii_uppercase + string.digits, k=16))
+def generate_gift_card_code(k: int = 16) -> str:
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=k))
 
 
 def binary_adder(a: str, b: str) -> str:

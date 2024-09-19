@@ -648,6 +648,21 @@ class GiftCard:
         from .user import User
 
         return User.from_id(self.conn, self.user_id)
+    
+    @staticmethod
+    def admin_create(conn: sqlite3.Connection, *, user: User, amount: int) -> GiftCard:
+        assert user.is_admin, "Only admins can create gift cards."
+
+        cursor = conn.cursor()
+
+        query = r"""
+            INSERT INTO GIFT_CARDS (USER_ID, PRICE, CODE) VALUES (?, ?, ?) RETURNING *
+        """
+        cursor.execute(query, (user.id, amount, generate_gift_card_code()))
+        data = cursor.fetchone()
+        conn.commit()
+
+        return GiftCard(conn, **data)
 
     @classmethod
     def create(cls, conn: sqlite3.Connection, *, user: User, amount: int) -> GiftCard:
