@@ -8,9 +8,9 @@ import markdown
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user
 
-from src.product import Product
+from src.product import Product, Category
 from src.server import admin_login_required, app, conn
-from src.server.forms import ProductAddForm
+from src.server.forms import ProductAddForm, ProductUpdateForm
 from src.utils import size_names
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
@@ -27,6 +27,8 @@ def admin_manage_product():
     limit = int(request.args.get("limit", 15))
     skip = (page - 1) * limit
     products = Product.all(conn, admin=True, limit=limit, offset=skip)
+
+    product_edit_forms: list[ProductUpdateForm] = [ProductUpdateForm(conn, product=product) for product in products]
     addform: ProductAddForm = ProductAddForm(conn)
     return render_template(
         "admin_manage_product.html",
@@ -36,6 +38,7 @@ def admin_manage_product():
         page=page,
         limit=limit,
         skip=skip,
+        editforms=product_edit_forms
     )
 
 
@@ -83,15 +86,32 @@ def admin_add_product():
     return redirect(url_for("admin_manage_product"))
 
 
-@app.route("/admin/manage/product/edit/<int:id>", methods=["GET", "POST"])
+@app.route("/admin/manage/product/edit/<int:id>", methods=["POST"])
 @admin_login_required
-def admin_edit_product(id):
+def admin_edit_product(id: int):
+    product = Product.from_id(conn, id)
+    product_update_form: ProductUpdateForm = ProductUpdateForm(conn, product=product)
+
+    if product_update_form.validate_on_submit():
+        product.name = product_update_form.name.data or product.name
+        product.price = product_update_form.price.data or product.price
+        product.stock = product_update_form.stock.data or product.stock
+        product.description = (
+            markdown.markdown(product_update_form.description.data) if product_update_form.description.data else product.description
+        )
+        product.category = Category.from_id(conn, int(product_update_form.category.data)) if product_update_form.category.data else product.category 
+        product.display_price = product_update_form.display_price.data or product.display_price
+        product.keywords = product_update_form.keywords.data.split(";") if product_update_form.keywords.data else product.keywords
+        product.size = product.size
+
+        product.update()
+
     return redirect(url_for("admin_manage_product"))
 
 
-@app.route("/admin/manage/product/delete/<int:id>", methods=["GET", "POST"])
+@app.route("/admin/manage/product/delete/<int:id>")
 @admin_login_required
-def admin_delete_product(id):
+def admin_delete_product(id: int):
     current_user.delete_product(conn, id)
 
     return redirect(url_for("admin_manage_product"))

@@ -219,6 +219,28 @@ class Product:
 
         self._available_sizes = []
 
+    def update(self) -> None:
+        query = r"""
+            UPDATE PRODUCTS
+            SET NAME = ?, PRICE = ?, DISPLAY_PRICE = ?, DESCRIPTION = ?, STOCK = ?, SIZE = ?, CATEGORY = ?, KEYWORDS = ?
+            WHERE ID = ?
+        """
+        cursor = self.__conn.cursor()
+        cursor.execute(
+            query,
+            (
+                self.name,
+                self.price,
+                self.display_price,
+                self.description,
+                self.stock,
+                self.size,
+                self.category.id,
+                ";".join(self.keywords),
+                self.id,
+            ),
+        )
+
     @property
     def available_sizes(self) -> list[str]:
         if self._available_sizes:

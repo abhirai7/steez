@@ -19,6 +19,11 @@ from wtforms.validators import DataRequired, NumberRange
 from src.product import Category
 from src.utils import size_chart
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.product import Product
+
 # fmt: off
 
 class ProductAddForm(FlaskForm):
@@ -38,6 +43,29 @@ class ProductAddForm(FlaskForm):
 
         self.conn = connection
         self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
+
+
+class ProductUpdateForm(FlaskForm):
+    name          = StringField("Product Name")
+    display_price = FloatField("Display Price")
+    price         = FloatField("Price")
+    description   = TextAreaField("Description")
+    stock         = IntegerField("Stock")
+    sizes         = SelectField("Size", choices=[(data["CODE"], size) for size, data in size_chart.items()])
+    category      = SelectField("Category", choices=[])
+    keywords      = StringField("Keywords")
+
+    submit        = SubmitField("Update Product")
+
+    def validate_on_submit(self, extra_validators=None):
+        return True
+
+    def __init__(self, connection: sqlite3.Connection, *args, product: Product, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.conn = connection
+        self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
+        self.product = product
 
 
 class CategoryAddForm(FlaskForm):

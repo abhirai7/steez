@@ -79,6 +79,72 @@
                                 <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger">Confirm Delete</a>
                             </div>
                         </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal-{{ product.id }}">
+                            Edit
+                        </button>
+                        <div class="modal fade" id="editProductModal-{{ product.id }}" tabindex="-1" aria-labelledby="editProductModalLabel-{{ product.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content p-3">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editProductModalLabel-{{ product.id }}">Edit Product</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('admin_edit_product', id=product.id) }}" method="POST">
+                                            {{ editforms[loop.index0].hidden_tag() }}
+                                            <div class="mb-1">
+                                                {{ editforms[loop.index0].name.label(class="form-label") }}
+                                                {{ editforms[loop.index0].name(class="form-control") }}
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="mb-1">
+                                                        {{ editforms[loop.index0].price.label(class="form-label") }}
+                                                        {{ editforms[loop.index0].price(class="form-control") }}
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="mb-1">
+                                                        {{ editforms[loop.index0].display_price.label(class="form-label") }}
+                                                        {{ editforms[loop.index0].display_price(class="form-control") }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-1">
+                                                {{ editforms[loop.index0].description.label(class="form-label") }}
+                                                {{ editforms[loop.index0].description(class="form-control") }}
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="mb-1">
+                                                        {{ editforms[loop.index0].stock.label(class="form-label") }}
+                                                        {{ editforms[loop.index0].stock(class="form-control") }}
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="mb-1">
+                                                        {{ editforms[loop.index0].category.label(class="form-label") }}
+                                                        {{ editforms[loop.index0].category(class="form-select") }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-1">
+                                                {{ editforms[loop.index0].keywords.label(class="form-label") }}
+                                                {{ editforms[loop.index0].keywords(class="form-control") }}
+                                            </div>
+                                            <div class="mb-1">
+                                                {{ editforms[loop.index0].sizes.label(class="form-label") }}
+                                                {{ editforms[loop.index0].sizes(class="form-control") }}
+                                            </div>
+                                            <div class="modal-footer">
+                                                {{ editforms[loop.index0].submit(class="btn btn-primary") }}
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
