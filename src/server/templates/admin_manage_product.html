@@ -94,31 +94,31 @@
                                             {{ editforms[loop.index0].hidden_tag() }}
                                             <div class="mb-1">
                                                 {{ editforms[loop.index0].name.label(class="form-label") }}
-                                                {{ editforms[loop.index0].name(class="form-control") }}
+                                                {{ editforms[loop.index0].name(class="form-control", placeholder=product.name) }}
                                             </div>
                                             <div class="row">
                                                 <div class="col">
                                                     <div class="mb-1">
                                                         {{ editforms[loop.index0].price.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].price(class="form-control") }}
+                                                        {{ editforms[loop.index0].price(class="form-control", placeholder=product.price) }}
                                                     </div>
                                                 </div>
                                                 <div class="col">
                                                     <div class="mb-1">
                                                         {{ editforms[loop.index0].display_price.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].display_price(class="form-control") }}
+                                                        {{ editforms[loop.index0].display_price(class="form-control", placeholder=product.display_price) }}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="mb-1">
                                                 {{ editforms[loop.index0].description.label(class="form-label") }}
-                                                {{ editforms[loop.index0].description(class="form-control") }}
+                                                {{ editforms[loop.index0].description(class="form-control", placeholder=product.description) }}
                                             </div>
                                             <div class="row">
                                                 <div class="col">
                                                     <div class="mb-1">
                                                         {{ editforms[loop.index0].stock.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].stock(class="form-control") }}
+                                                        {{ editforms[loop.index0].stock(class="form-control", placeholder=product.stock) }}
                                                     </div>
                                                 </div>
                                                 <div class="col">
@@ -130,11 +130,7 @@
                                             </div>
                                             <div class="mb-1">
                                                 {{ editforms[loop.index0].keywords.label(class="form-label") }}
-                                                {{ editforms[loop.index0].keywords(class="form-control") }}
-                                            </div>
-                                            <div class="mb-1">
-                                                {{ editforms[loop.index0].sizes.label(class="form-label") }}
-                                                {{ editforms[loop.index0].sizes(class="form-control") }}
+                                                {{ editforms[loop.index0].keywords(class="form-control", placeholder=";".join(product.keywords)) }}
                                             </div>
                                             <div class="modal-footer">
                                                 {{ editforms[loop.index0].submit(class="btn btn-primary") }}
