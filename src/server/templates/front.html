@@ -36,29 +36,36 @@
 {{ navbar.navbar(current_user) }}
 {% if show_hero %}
 {{ hero.carousel() }}
-{% endif %} {% if products %}
+{% endif %} 
+
+{% if products %}
 <hr />
 <div class="container-fluid mt-5">
-    {% if show_hero %}
-    <p class="text-center fs-1 mb-4">FEATURED PRODUCTS</p>
-    {% endif %}
-    <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
-        {% for product in products %}
-        <div class="col zoom-on-hover text-center p-0 border border-1" id="{{ product.id }}">
-            <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0 h-100 w-100">
-                <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
-                <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
-                <div class="card-body">
-                    <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
-                    <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
+    {% for category, products in categories.items() %}
+    <div>
+        <p class="text-center fs-1 mb-4 fw-uppercase">{{ category.name }}</p>
+        <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
+            {% for product in products %}
+            <div class="col zoom-on-hover" id="{{ product.id }}">
+                <div class="text-center p-0 border border-1">
+                    <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0 h-100 w-100">
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
+                        <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
+                        <div class="card-body">
+                            <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
+                            <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
+                        </div>
+                        <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+                    </div>
                 </div>
-                <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
+    {% endfor %}
 </div>
-{% endif %} {% if show_hero %}
+{% endif %}
+
 <div class="card rounded rounded-0 p-5 mt-3">
     <div class="row">
         <div class="col-3 align-self-center d-none d-lg-block d-md-block">
@@ -100,4 +107,5 @@
         </div>
     </div>
 </div>
-{% endif %} {% if show_hero %} {{ footer.footer() }} {% endif %} {% endblock %}
+{{ footer.footer() }}
+{% endblock %}

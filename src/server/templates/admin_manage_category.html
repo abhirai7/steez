@@ -57,7 +57,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{{ url_for('admin_add_category') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ url_for('admin_add_category') }}">
                     {{ form.hidden_tag() }}
                     <div class="mb-1">
                         {{ form.name.label(class="form-label") }}

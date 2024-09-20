@@ -52,7 +52,7 @@ class ProductUpdateForm(FlaskForm):
     description   = TextAreaField("Description")
     stock         = IntegerField("Stock")
     sizes         = SelectField("Size", choices=[(data["CODE"], size) for size, data in size_chart.items()])
-    category      = SelectField("Category", choices=[])
+    category      = SelectField("Category", choices=[], validators=[DataRequired()])
     keywords      = StringField("Keywords")
 
     submit        = SubmitField("Update Product")
@@ -66,6 +66,9 @@ class ProductUpdateForm(FlaskForm):
         self.conn = connection
         self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
         self.product = product
+
+        self.category.data = product.category.id
+        self.category.default = product.category.id
 
 
 class CategoryAddForm(FlaskForm):
