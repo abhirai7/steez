@@ -2,48 +2,48 @@
 <div class="container-fluid">
     <div class="container-xl">
         <footer class="p-3 mt-5">
-        <div class="row">
-            <div class="col-6 col-md-2 mb-3">
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">FAQs</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">About</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Contact Us</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Refund Policy</a></li>
-            </ul>
-            </div>
-    
-            <div class="col-6 col-md-2 mb-3">
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Instagram</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Twitter</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Facebook</a></li>
-            </ul>
-            </div>
-    
-            <div class="col-6 col-md-2 mb-3">
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Partners</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Custom Orders</a></li>
-            </ul>
-            </div>
-    
-            <div class="col-md-5 offset-md-1 mb-3">
-            <form action="{{ url_for('home') }}" method="POST">
-                {{ newsletter_form.csrf_token }}
-                <h5>Subscribe to our newsletter</h5>
-                <p>Monthly digest of what's new and exciting from us.</p>
-                <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-                    {{ newsletter_form.email(class="form-control rounded rounded-0") }}
-                    {{ newsletter_form.subscribe(class="btn btn-primary rounded rounded-0") }}
+            <div class="row">
+                <div class="col-6 col-md-2 mb-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">FAQs</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">About</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Contact Us</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Refund Policy</a></li>
+                    </ul>
                 </div>
-            </form>
+
+                <div class="col-6 col-md-2 mb-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Instagram</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Twitter</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Facebook</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-2 mb-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Partners</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Custom Orders</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-5 offset-md-1 mb-3">
+                    <form action="{{ url_for('home') }}" method="POST">
+                        {{ newsletter_form.csrf_token }}
+                        <h5>Subscribe to our newsletter</h5>
+                        <p>Monthly digest of what's new and exciting from us.</p>
+                        <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+                            {{ newsletter_form.email(class="form-control rounded rounded-0") }}
+                            {{ newsletter_form.subscribe(class="btn btn-primary rounded rounded-0") }}
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-    
-        <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
-            <p>© 2024 STEEZ, All rights reserved.</p>
-        </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
+                <p>© 2024 STEEZ, All rights reserved.</p>
+            </div>
         </footer>
     </div>
-  </div>
+</div>
 {%- endmacro %}
