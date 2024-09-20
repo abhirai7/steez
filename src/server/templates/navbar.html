@@ -1,12 +1,14 @@
-{% macro navbar(current_user) -%}
+{% macro navbar(current_user, search_form) -%}
 <style>
     #search-input-bar {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 50px; /* adjust height to match navbar height */
-        background-color: rgb(248, 249, 250);;
+        height: 50px;
+        /* adjust height to match navbar height */
+        background-color: rgb(248, 249, 250);
+        ;
         padding: 10px;
         display: none;
     }
@@ -20,20 +22,20 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto text-center "></ul>
-                <li class="nav-item mx-4 fs-5" style="list-style-type: none">
-                    <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">OVERSIZED</button>
-                </li>
-                <li class="nav-item mx-4 fs-5" style="list-style-type: none">
-                    <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">HOODIES</button>
-                </li>
-                <li class="nav-item mx-4 fs-5" style="list-style-type: none">
-                    <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">BOTTOMS</button>
+            <li class="nav-item mx-4 fs-5" style="list-style-type: none">
+                <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">OVERSIZED</button>
+            </li>
+            <li class="nav-item mx-4 fs-5" style="list-style-type: none">
+                <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">HOODIES</button>
+            </li>
+            <li class="nav-item mx-4 fs-5" style="list-style-type: none">
+                <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">BOTTOMS</button>
 
-                </li>
+            </li>
             </ul>
             <ul class="navbar-nav ms-auto mx-3 mb-2 mb-lg-0 d-flex ">
                 <li class="nav-item mx-3 fs-5">
-                    <button class="nav-link" id = "search-btn"><i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i></button>
+                    <button class="nav-link" id="search-btn"><i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i></button>
                 </li>
                 {% if current_user.is_authenticated %}
                 <li class="nav-item mx-1 fs-5">
@@ -57,18 +59,20 @@
             </ul>
         </div>
     </div>
-    <div class="mb-0"  id="search-input-bar" style="display: none;">
+    <div class="mb-0" id="search-input-bar" style="display: none;">
         <label for="basic-url" class="form-label fw-semibold fs-4">SEARCH</label>
-        <div class="input-group input-group-lg mx-4">
-            <input type="text" id = "search-input"class="form-control" aria-describedby="button-addon2">
+        <form action="{{ url_for('search') }}" method="POST" class="input-group input-group-lg mx-4">
+            {{ search_form.hidden_tag() }}
+            {{ search_form.query(class="form-control", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby": "button-addon2"}) }}
+            {{ search_form.submit(class="d-none") }}
             <button class="btn btn-outline-secondary border" type="button" id="close-btn"><i class="fa-solid fa-xmark" style="color: #575b60;"></i></button>
-        </div>
+        </form>        
     </div>
-      
+
 </nav>
 
 <script>
-    
+
     const searchBtn = document.getElementById("search-btn");
     const searchInputBar = document.getElementById("search-input-bar");
     const closeBtn = document.getElementById("close-btn");
@@ -91,7 +95,7 @@
             }
         }
     });
-    
+
 </script>
 
 {%- endmacro %}
