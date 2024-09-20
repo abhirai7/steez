@@ -7,6 +7,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.product import Product
+from src.carousel import Carousel
 from src.server import TODAY, app, conn, sitemapper
 from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm
 from src.utils import FAQ_DATA
@@ -33,6 +34,7 @@ def home():
         categories=categories,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
+        carousels=Carousel.all(conn),
     )
 
 
@@ -62,6 +64,7 @@ def search():
             products=products,
             current_user=current_user,
             search_form=form,
+            newsletter_form=SubscribeNewsLetterForm(),
         )
 
     return redirect(url_for("home"))

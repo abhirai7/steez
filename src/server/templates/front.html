@@ -35,7 +35,7 @@
 {% block body %}
 {{ navbar.navbar(current_user, search_form) }}
 {% if show_hero %}
-{{ hero.carousel() }}
+{{ hero.carousel(carousels) }}
 {% endif %}
 
 {% if products %}

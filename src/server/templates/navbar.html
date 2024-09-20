@@ -22,15 +22,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto text-center "></ul>
-            <li class="nav-item mx-4 fs-5" style="list-style-type: none">
-                <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">OVERSIZED</button>
+            <li class="nav-link mx-4 fs-5">
+                <button class="border border-0 bg-transparent">OVERSIZED</button>
             </li>
-            <li class="nav-item mx-4 fs-5" style="list-style-type: none">
-                <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">HOODIES</button>
+            <li class="nav-link mx-4 fs-5">
+                <button class="border border-0 bg-transparent">HOODIES</button>
             </li>
-            <li class="nav-item mx-4 fs-5" style="list-style-type: none">
-                <button class="border border-0 " style="background-color: rgb(248, 249, 250);;">BOTTOMS</button>
-
+            <li class="nav-link mx-4 fs-5">
+                <button class="border border-0 bg-transparent">BOTTOMS</button>
             </li>
             </ul>
             <ul class="navbar-nav ms-auto mx-3 mb-2 mb-lg-0 d-flex ">
@@ -63,10 +62,11 @@
         <label for="basic-url" class="form-label fw-semibold fs-4">SEARCH</label>
         <form action="{{ url_for('search') }}" method="POST" class="input-group input-group-lg mx-4">
             {{ search_form.hidden_tag() }}
-            {{ search_form.query(class="form-control", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby": "button-addon2"}) }}
+            {{ search_form.query(class="form-control", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby":
+            "button-addon2"}) }}
             {{ search_form.submit(class="d-none") }}
             <button class="btn btn-outline-secondary border" type="button" id="close-btn"><i class="fa-solid fa-xmark" style="color: #575b60;"></i></button>
-        </form>        
+        </form>
     </div>
 
 </nav>
