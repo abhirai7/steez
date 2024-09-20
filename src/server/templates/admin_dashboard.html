@@ -36,14 +36,14 @@
                 <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
             </div>
         </div>
-        <canvas id="settlementsChart" class="mt-3" style="width: 100%; height: 250px;"></canvas>
         <div class="card rounded rounded-0 mt-2">
             <div class="card-body">
                 <p class="fs-4 text-center">Today's Settlement</p>
                 <p class="fs-1 text-center">{{ todays_settlement | int | format_currency }} <i class="bi bi-check-circle-fill"></i></p>
             </div>
         </div>
-
+        
+        <canvas id="settlementsChart" class="mt-3" style="width: 100%; height: 250px;"></canvas>
         <table class="table table-bordered table-striped mt-3">
             <caption class="fs-6">Top 100 Settlements</caption>
             <thead class="table-dark">
