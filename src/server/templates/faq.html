@@ -6,28 +6,28 @@
 
 {% block body %}
 
-{{ navbar.navbar(current_user) }}
+{{ navbar.navbar(current_user, search_form) }}
 <div class="container my-5">
     <h1 class="text-center mb-4">Return Policy Q&A</h1>
     <div class="accordion" id="returnPolicyAccordion">
         {% for faq in FAQ %}
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading-{{ loop.index }}">
-                    <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
-                        aria-controls="collapse-{{ loop.index }}">
-                        {{ faq.question }}
-                    </button>
-                </h2>
-                <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#returnPolicyAccordion">
-                    <div class="accordion-body">
-                        {{ faq.answer }}
-                    </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
+                    aria-controls="collapse-{{ loop.index }}">
+                    {{ faq.question }}
+                </button>
+            </h2>
+            <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#returnPolicyAccordion">
+                <div class="accordion-body">
+                    {{ faq.answer }}
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>
 
-{{ footer.footer() }}
+{{ footer.footer(newsletter_form) }}
 
 {% endblock %}

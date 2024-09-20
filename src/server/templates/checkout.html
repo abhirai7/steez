@@ -7,7 +7,7 @@
 
 
 {% block body %}
-{{ navbar.navbar(current_user) }}
+{{ navbar.navbar(current_user, search_form) }}
 
 <div class="container">
     <hr>
@@ -106,7 +106,7 @@
         </p>
     </div>
 </div>
-{{ footer.footer() }}
+{{ footer.footer(newsletter_form) }}
 {% endblock %}
 
 {% block bottom_scripts %}

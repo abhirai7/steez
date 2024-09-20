@@ -7,9 +7,9 @@
 
 
 {% block body %}
-{{ navbar.navbar(current_user) }}
+{{ navbar.navbar(current_user, search_form) }}
 
-<div class="container-xxl mt-4">    
+<div class="container-xxl mt-4">
     <h3>Return Policy</h3>
 
     <hr>
@@ -54,7 +54,8 @@
         <div class="col-9">
             <ul class="">
                 <li>Once we receive and inspect the returned item(s), we will notify you of the approval or rejection of your refund.</li>
-                <li>If approved, your refund will be processed within 7-10 business days, and a credit will automatically be applied to your original method of payment</li>
+                <li>If approved, your refund will be processed within 7-10 business days, and a credit will automatically be applied to your original method of payment
+                </li>
                 <li>Please note that the original shipping cost is non-refundable unless the return is due to an error on our part.</li>
             </ul>
         </div>
@@ -92,7 +93,8 @@
     <hr>
 
     <div class="mb-5">
-        If you receive a defective or damaged product, please contact us immediately at [email/contact form link]. We will arrange for a replacement or full refund, including shipping costs
+        If you receive a defective or damaged product, please contact us immediately at [email/contact form link]. We will arrange for a replacement or full refund,
+        including shipping costs
     </div>
 
     <h3>Non-Returnable Items</h3>
@@ -108,5 +110,5 @@
     </div>
 </div>
 
-{{ footer.footer() }}
+{{ footer.footer(newsletter_form) }}
 {% endblock %}

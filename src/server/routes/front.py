@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arrow
-from flask import render_template
+from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.product import Product
 from src.server import TODAY, app, conn, sitemapper
-from src.server.forms import GiftCardForm
-from src.utils import FAQ_DATA, format_to_special
+from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm
+from src.utils import FAQ_DATA
 
 if TYPE_CHECKING:
     from src.user import User
@@ -26,12 +26,13 @@ def home():
 
     return render_template(
         "front.html",
-        format_to_special=format_to_special,
         products=products,
         current_user=current_user,
         gift_form=gift_form,
         show_hero=True,
         categories=categories,
+        search_form=SearchForm(),
+        newsletter_form=SubscribeNewsLetterForm(),
     )
 
 
@@ -39,28 +40,42 @@ def home():
 @app.route("/faq/")
 @app.route("/faq")
 def faq():
-    return render_template("faq.html", current_user=current_user, FAQ=FAQ_DATA)
-
-
-@app.route("/search/<string:query>", methods=["GET"])
-def search(query: str):
-    products = Product.search(conn, query)
-    gift_form: GiftCardForm = GiftCardForm()
     return render_template(
-        "front.html",
-        format_to_special=format_to_special,
-        products=products,
+        "faq.html",
         current_user=current_user,
-        gift_form=gift_form,
-        show_hero=False,
+        FAQ=FAQ_DATA,
+        search_form=SearchForm(),
+        newsletter_form=SubscribeNewsLetterForm(),
     )
+
+
+@app.route("/search/", methods=["POST"])
+@app.route("/search", methods=["POST"])
+def search():
+    form: SearchForm = SearchForm()
+
+    if form.validate_on_submit() and form.query.data and request.method == "POST":
+        query = form.query.data
+        products = Product.search(conn, query)
+        return render_template(
+            "front_search.html",
+            products=products,
+            current_user=current_user,
+            search_form=form,
+        )
+
+    return redirect(url_for("home"))
 
 
 @sitemapper.include(lastmod=TODAY, changefreq="monthly", priority=0.6)
 @app.route("/refund-policy/")
 @app.route("/refund-policy")
 def refund_policy():
-    return render_template("refund_policy.html")
+    return render_template(
+        "refund_policy.html",
+        search_form=SearchForm(),
+        newsletter_form=SubscribeNewsLetterForm(),
+    )
 
 
 @app.route("/order-history/")
@@ -69,5 +84,10 @@ def refund_policy():
 def order_history():
     orders = current_user.orders
     return render_template(
-        "order_history.html", orders=orders, current_user=current_user, arrow=arrow
+        "order_history.html",
+        orders=orders,
+        current_user=current_user,
+        arrow=arrow,
+        search_form=SearchForm(),
+        newsletter_form=SubscribeNewsLetterForm(),
     )

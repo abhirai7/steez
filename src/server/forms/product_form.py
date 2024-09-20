@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import sqlite3
+from typing import TYPE_CHECKING
 
 from flask_wtf import FlaskForm
 from wtforms import (
+    EmailField,
     FileField,
     FloatField,
     IntegerField,
     MultipleFileField,
+    SearchField,
     SelectField,
     SelectMultipleField,
     StringField,
@@ -18,8 +21,6 @@ from wtforms.validators import DataRequired, NumberRange
 
 from src.product import Category
 from src.utils import size_chart
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.product import Product
@@ -88,5 +89,14 @@ class CarouselForm(FlaskForm):
 class GiftCardForm(FlaskForm):
     amount = IntegerField("Amount", validators=[DataRequired(), NumberRange(min=50, max=2000)])
     submit = SubmitField("Buy Gift Card")
+
+
+class SearchForm(FlaskForm):
+    query  = SearchField("Search", validators=[DataRequired()])
+    submit = SubmitField("Search")
+
+class SubscribeNewsLetterForm(FlaskForm):
+    email       = EmailField("Email")
+    subscribe   = SubmitField("Subscribe")
 
 # fmt: on

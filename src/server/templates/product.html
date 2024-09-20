@@ -68,7 +68,7 @@
 {% block body %}
 
 <div class="container-fluid mt-0 overflow-hidden">
-    {{ navbar.navbar(current_user) }}
+    {{ navbar.navbar(current_user, search_form) }}
 
     <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
         <div class="col border-end border-end-1 m-0 p-0">
@@ -79,12 +79,12 @@
                     {% set display_price = product.display_price %}
                     {% set difference = display_price - product.price %}
                     {% if difference > 0 %}
-                        {% set percent = ((difference / display_price) * 100) | int %}
-                        <span class="text-danger fs-4">-{{ percent }}% </span>
+                    {% set percent = ((difference / display_price) * 100) | int %}
+                    <span class="text-danger fs-4">-{{ percent }}% </span>
                     {% endif %}
                     <span class="fs-3 fw-bold">INR. {{ product.price }}</span>
                     {% if difference > 0 %}
-                        <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
+                    <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
                     {% endif %}
                     <hr>
                 </div>
@@ -118,12 +118,12 @@
                     {% set display_price = product.display_price %}
                     {% set difference = display_price - product.price %}
                     {% if difference > 0 %}
-                        {% set percent = ((difference / display_price) * 100) | int %}
-                        <span class="text-danger fs-4">-{{ percent }}% </span>
+                    {% set percent = ((difference / display_price) * 100) | int %}
+                    <span class="text-danger fs-4">-{{ percent }}% </span>
                     {% endif %}
                     <span class="fs-3 fw-bold">INR. {{ product.price }}</span>
                     {% if difference > 0 %}
-                        <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
+                    <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
                     {% endif %}
                 </div>
                 <hr>
@@ -241,7 +241,7 @@
 <div class="row mt-5">
     <div class="col-md-12">
         <h2 class="mb-4">Customer Reviews</h2>
-        
+
         <!-- Review Form -->
         <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST" class="mb-5">
             {{ review_form.hidden_tag() }}
@@ -254,31 +254,31 @@
 
         <!-- Reviews List -->
         {% if product.reviews %}
-            <ul class="list-group">
-                {% for review in product.reviews %}
-                    <li class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h5 class="mb-1">{{ review.user.name }}</h5>
-                                <p class="mb-1">{{ review.review }}</p>
-                            </div>
-                            <small>{{ review.created_at }}</small>
-                        </div>
-                        <span class="text-warning">
-                            {% for star in range(review.stars) %}
-                                <i class="fas fa-star"></i>
-                            {% endfor %}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
+        <ul class="list-group">
+            {% for review in product.reviews %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="mb-1">{{ review.user.name }}</h5>
+                        <p class="mb-1">{{ review.review }}</p>
+                    </div>
+                    <small>{{ review.created_at }}</small>
+                </div>
+                <span class="text-warning">
+                    {% for star in range(review.stars) %}
+                    <i class="fas fa-star"></i>
+                    {% endfor %}
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
         {% else %}
-            <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+        <p class="text-muted">No reviews yet. Be the first to review this product!</p>
         {% endif %}
     </div>
 </div>
 
-{{ footer.footer() }}
+{{ footer.footer(newsletter_form) }}
 {% endblock %}
 
 {% block bottom_scripts %}

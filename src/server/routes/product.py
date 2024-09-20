@@ -10,12 +10,16 @@ from razorpay.errors import SignatureVerificationError
 from src.order import Order
 from src.product import Product
 from src.server import RAZORPAY_KEY, app, conn, razorpay_client, sitemapper
-from src.server.forms import AddReviewForm, AddToCartForm
+from src.server.forms import (
+    AddReviewForm,
+    AddToCartForm,
+    SearchForm,
+    SubscribeNewsLetterForm,
+)
 from src.user import User
 from src.utils import (
     FAQ_DATA,
     format_number,
-    format_to_special,
     get_product_pictures,
     size_chart,
 )
@@ -47,7 +51,6 @@ def product(product_id: int):
         "product.html",
         product=product,
         pictures=pictures,
-        format_to_special=format_to_special,
         size_chart=[
             (size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()
         ],
@@ -57,6 +60,8 @@ def product(product_id: int):
         error=request.args.get("error"),
         arrow=arrow,
         FAQ=FAQ_DATA,
+        search_form=SearchForm(),
+        newsletter_form=SubscribeNewsLetterForm(),
     )
 
 
@@ -114,7 +119,11 @@ def add_review(product_id: int):
 @login_required
 def checkout():
     return render_template(
-        "checkout.html", current_user=current_user, format_number=format_number
+        "checkout.html",
+        current_user=current_user,
+        format_number=format_number,
+        newsletter_form=SubscribeNewsLetterForm(),
+        search_form=SearchForm(),
     )
 
 
@@ -153,6 +162,7 @@ def razorpay_webhook():
         return {"status": "error"}, 400
 
     return {"status": "ok"}, 200
+
 
 @app.route("/delete-order/<int:order_id>")
 @login_required
