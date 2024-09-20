@@ -43,7 +43,7 @@
 <div class="container-fluid mt-5">
     {% for category, products in categories.items() %}
     <div>
-        <p class="text-center fs-1 mb-4 fw-uppercase">{{ category.name }}</p>
+        <p class="text-start fs-1 mb-4 fw-uppercase">{{ category.name }}</p>
         <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
             {% for product in products %}
             <div class="col zoom-on-hover" id="{{ product.id }}">
