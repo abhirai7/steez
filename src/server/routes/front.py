@@ -51,23 +51,24 @@ def faq():
     )
 
 
-@app.route("/search/", methods=["POST"])
-@app.route("/search", methods=["POST"])
+@app.route("/search/", methods=["GET", "POST"])
+@app.route("/search", methods=["GET", "POST"])
 def search():
     form: SearchForm = SearchForm()
 
+    query = request.args.get("query")
+
     if form.validate_on_submit() and form.query.data and request.method == "POST":
         query = form.query.data
-        products = Product.search(conn, query)
-        return render_template(
-            "front_search.html",
-            products=products,
-            current_user=current_user,
-            search_form=form,
-            newsletter_form=SubscribeNewsLetterForm(),
-        )
+    products = Product.search(conn, query)
 
-    return redirect(url_for("home"))
+    return render_template(
+        "front_search.html",
+        products=products,
+        current_user=current_user,
+        search_form=form,
+        newsletter_form=SubscribeNewsLetterForm(),
+    )
 
 
 @sitemapper.include(lastmod=TODAY, changefreq="monthly", priority=0.6)

@@ -1,7 +1,6 @@
 {% macro carousel(carousels) -%}
 <style>
     .carousel-caption {
-        display: flex;
         position: absolute;
         top: 50%;
         left: 10%;
@@ -20,9 +19,11 @@
     <div class="carousel-inner">
         {% for caro in carousels %}
             <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" data-bs-interval="2000">
-                <img src="{{ caro.image }}" class="d-block w-100" alt="..." />
-                <div class="carousel-caption d-none d-md-block">
-                    <h2 class="d-flex fw-bold">{{ caro.heading }}</h2>
+                <div class="text-center">
+                    <img src="{{ caro.image }}" class="text-center min-vw-100" alt="..." />
+                </div>
+                <div class="carousel-caption">
+                    <h1 class="d-flex fw-bold text-uppercase">{{ caro.heading }}</h1>
                     <p class="d-flex">{{ caro.description }}</p>
                 </div>
             </div>

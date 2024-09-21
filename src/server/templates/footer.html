@@ -1,9 +1,9 @@
 {% macro footer(newsletter_form) -%}
-<div class="container-fluid">
-    <div class="container-xl">
-        <footer class="p-3 mt-5">
-            <div class="row">
-                <div class="col-6 col-md-2 mb-3">
+<div class="container-fluid bg-dark" data-bs-theme="dark">
+    <div class="container-xl" data-bs-theme="dark">
+        <footer class="mt-5 bg-dark" data-bs-theme="dark">
+            <div class="row ">
+                <div class="col-6 col-md-2 mb-3 ">
                     <ul class="nav flex-column">
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">FAQs</a></li>
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">About</a></li>
@@ -12,7 +12,7 @@
                     </ul>
                 </div>
 
-                <div class="col-6 col-md-2 mb-3">
+                <div class="col-6 col-md-2 mb-3 ">
                     <ul class="nav flex-column">
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Instagram</a></li>
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Twitter</a></li>
@@ -20,14 +20,14 @@
                     </ul>
                 </div>
 
-                <div class="col-6 col-md-2 mb-3">
+                <div class="col-6 col-md-2 mb-3 ">
                     <ul class="nav flex-column">
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Partners</a></li>
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Custom Orders</a></li>
                     </ul>
                 </div>
 
-                <div class="col-md-5 offset-md-1 mb-3">
+                <div class="col-md-5 offset-md-1 mb-3 text-white ">
                     <form action="{{ url_for('home') }}" method="POST">
                         {{ newsletter_form.csrf_token }}
                         <h5>Subscribe to our newsletter</h5>
@@ -40,8 +40,8 @@
                 </div>
             </div>
 
-            <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
-                <p>© 2024 STEEZ, All rights reserved.</p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center border-top text-secondary-emphasis pt-2">
+                <p class="fs-6" style="font-family: 'Ubuntu',sans-serif; font-weight: 400; font-style: normal;">© 2024 STEEZ</p>
             </div>
         </footer>
     </div>
