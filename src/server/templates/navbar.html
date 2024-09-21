@@ -10,7 +10,7 @@
         display: none;
     }
 </style>
-<nav class="navbar bg-dark navbar-expand-lg bg-body-tertiary" id="navbar" data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" id="navbar">
     <div class="container-fluid">
         <a class="navbar-brand nav-link active horizon-font fs-4" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -20,13 +20,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto text-center "></ul>
             <li class="nav-link mx-4 fs-5">
-                <a class="nav-link text-white text-decoration-none" href="{{ url_for('search', query='oversized') }}">OVERSIZED</a>
+                <a class="nav-link text-decoration-none" href="{{ url_for('search', query='oversized') }}">OVERSIZED</a>
             </li>
             <li class="nav-link mx-4 fs-5">
-                <a class="nav-link text-white text-decoration-none" href="{{ url_for('search', query='hoodies') }}">HOODIES</a>
+                <a class="nav-link   text-decoration-none" href="{{ url_for('search', query='hoodies') }}">HOODIES</a>
             </li>
             <li class="nav-link mx-4 fs-5">
-                <a class="nav-link text-white text-decoration-none" href="{{ url_for('search', query='bottoms') }}">BOTTOMS</a>
+                <a class="nav-link   text-decoration-none" href="{{ url_for('search', query='bottoms') }}">BOTTOMS</a>
             </li>
             </ul>
             <ul class="navbar-nav ms-auto mx-3 mb-2 mb-lg-0 d-flex ">
