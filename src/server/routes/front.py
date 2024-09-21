@@ -6,11 +6,11 @@ import arrow
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from src.product import Product
 from src.carousel import Carousel
+from src.product import Product
 from src.server import TODAY, app, conn, sitemapper
 from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm
-from src.utils import FAQ_DATA
+from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
 if TYPE_CHECKING:
     from src.user import User
@@ -60,6 +60,10 @@ def search():
 
     if form.validate_on_submit() and form.query.data and request.method == "POST":
         query = form.query.data
+
+    if not query:
+        return redirect(url_for("home"))
+
     products = Product.search(conn, query)
 
     return render_template(
@@ -95,3 +99,15 @@ def order_history():
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
     )
+
+
+@app.route("/subscribe", methods=["POST"])
+@app.route("/subscribe/", methods=["POST"])
+def subscribe():
+    form: SubscribeNewsLetterForm = SubscribeNewsLetterForm()
+
+    if form.validate_on_submit() and form.email.data:
+        email = form.email.data
+        newsletter_email_add_to_db(conn, email=email)
+
+    return redirect(url_for("home"))

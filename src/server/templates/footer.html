@@ -5,10 +5,10 @@
             <div class="row ">
                 <div class="col-6 col-md-2 mb-3 ">
                     <ul class="nav flex-column">
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">FAQs</a></li>
+                        <li class="nav-item mb-2"><a href="{{ url_for('faq') }}" class="nav-link p-0 text-body-secondary">FAQs</a></li>
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">About</a></li>
                         <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Contact Us</a></li>
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Refund Policy</a></li>
+                        <li class="nav-item mb-2"><a href="{{ url_for('refund_policy') }}" class="nav-link p-0 text-body-secondary">Refund Policy</a></li>
                     </ul>
                 </div>
 
@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="col-md-5 offset-md-1 mb-3 text-white ">
-                    <form action="{{ url_for('home') }}" method="POST">
+                    <form action="{{ url_for('subscribe') }}" method="POST">
                         {{ newsletter_form.csrf_token }}
                         <h5>Subscribe to our newsletter</h5>
                         <p>Monthly digest of what's new and exciting from us.</p>

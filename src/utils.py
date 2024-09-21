@@ -7,7 +7,7 @@ import pathlib
 import random
 import secrets
 import string
-from sqlite3 import Cursor, Row, sqlite_version_info
+from sqlite3 import Connection, Cursor, Row, sqlite_version_info
 from typing import Any, Generic, TypeVar
 
 from dotenv import load_dotenv
@@ -366,3 +366,11 @@ for faq_entity in faq_data["faq"]:
     faq.add(faq_entity["question"], faq_entity["answer"])
 
 FAQ_DATA = faq
+
+
+def newsletter_email_add_to_db(conn: Connection, /, *, email: str) -> None:
+    cur = conn.cursor()
+    query = "INSERT OR IGNORE INTO NEWSLETTERS (EMAIL) VALUES (?)"
+
+    cur.execute(query, (email,))
+    conn.commit()
