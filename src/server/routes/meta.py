@@ -5,9 +5,14 @@ from flask import make_response, render_template, request
 from src.server import app, sitemapper
 
 
-@app.route("/sitemap.xml")
+@app.route(r"/sitemap.xml")
 def sitemap():
-    return sitemapper.generate(), 200, {"Content-Type": "application/xml"}
+    return sitemapper.generate(), 200, {r"Content-Type": r"application/xml"}
+
+
+@app.route(r"/robots.txt")
+def robots():
+    return app.send_static_file("robots.txt"), 200, {r"Content-Type": r"text/plain"}
 
 
 @app.route("/set-cookie")
