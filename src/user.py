@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .favourite import Favourite
     from .order import Order
     from .product import VALID_STARS, Cart, GiftCard, Product
     from .type_hints import Client as RazorpayClient
@@ -153,12 +154,16 @@ class User:
     def clear_cart(self, *, product: Product | None = None) -> None:
         self.cart.clear(product=product)
 
-    def add_to_fav(self, *, product: Product) -> None:
-        query = r"INSERT INTO FAVOURITES (USER_ID, PRODUCT_ID) VALUES (?, ?)"
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (self.id, product.id))
+    def add_to_fav(self, *, product: Product) -> Favourite:
+        from .favourite import Favourite
 
-        self.__conn.commit()
+        return Favourite.add(self.__conn, user=self, product=product)
+
+    def remove_from_fav(self, *, fav: Favourite) -> None:
+        fav.delete()
+
+    def is_fav(self, *, product: Product) -> bool:
+        return Favourite.exists(self.__conn, user=self, product=product)
 
     def partial_checkout(self, *, gift_card: GiftCard | None = None) -> list[Order]:
         from .order import Order
