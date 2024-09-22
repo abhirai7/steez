@@ -79,22 +79,19 @@
 
 {% block bottom_scripts %}
 <script>
-// Example: settlements passed from Jinja
 const settlements = {{ settlements|tojson }};
 
-// Extract the data (e.g., created_at and amount)
 const labels = settlements.items.map(item => new Date(item.created_at * 1000).toLocaleDateString());
-const amounts = settlements.items.map(item => item.amount / 100); // Assuming amount is in paise or cents
+const amounts = settlements.items.map(item => item.amount / 100);
 
-// Create the chart
 const ctx = document.getElementById('settlementsChart').getContext('2d');
 const settlementsChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: labels,  // X-axis (Dates)
+        labels: labels,
         datasets: [{
             label: 'Settlement Amount',
-            data: amounts, // Y-axis (Amount)
+            data: amounts,
             fill: false,
             borderColor: 'rgb(75, 192, 192)',
             tension: 0.1

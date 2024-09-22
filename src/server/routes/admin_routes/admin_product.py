@@ -8,7 +8,7 @@ import markdown
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user
 
-from src.product import Product, Category
+from src.product import Category, Product
 from src.server import admin_login_required, app, conn
 from src.server.forms import ProductAddForm, ProductUpdateForm
 from src.utils import size_names
@@ -28,7 +28,9 @@ def admin_manage_product():
     skip = (page - 1) * limit
     products = Product.all(conn, admin=True, limit=limit, offset=skip)
 
-    product_edit_forms: list[ProductUpdateForm] = [ProductUpdateForm(conn, product=product) for product in products]
+    product_edit_forms: list[ProductUpdateForm] = [
+        ProductUpdateForm(conn, product=product) for product in products
+    ]
     addform: ProductAddForm = ProductAddForm(conn)
     return render_template(
         "admin_manage_product.html",
@@ -38,7 +40,7 @@ def admin_manage_product():
         page=page,
         limit=limit,
         skip=skip,
-        editforms=product_edit_forms
+        editforms=product_edit_forms,
     )
 
 
@@ -97,11 +99,23 @@ def admin_edit_product(id: int):
         product.price = product_update_form.price.data or product.price
         product.stock = product_update_form.stock.data or product.stock
         product.description = (
-            markdown.markdown(product_update_form.description.data) if product_update_form.description.data else product.description
+            markdown.markdown(product_update_form.description.data)
+            if product_update_form.description.data
+            else product.description
         )
-        product.category = Category.from_id(conn, int(product_update_form.category.data)) if product_update_form.category.data else product.category 
-        product.display_price = product_update_form.display_price.data or product.display_price
-        product.keywords = product_update_form.keywords.data.split(";") if product_update_form.keywords.data else product.keywords
+        product.category = (
+            Category.from_id(conn, int(product_update_form.category.data))
+            if product_update_form.category.data
+            else product.category
+        )
+        product.display_price = (
+            product_update_form.display_price.data or product.display_price
+        )
+        product.keywords = (
+            product_update_form.keywords.data.split(";")
+            if product_update_form.keywords.data
+            else product.keywords
+        )
         product.size = product.size
 
         product.update()

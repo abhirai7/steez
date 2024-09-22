@@ -7,6 +7,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from razorpay.errors import SignatureVerificationError
 
+from src.favourite import Favourite
 from src.order import Order
 from src.product import Product
 from src.server import RAZORPAY_KEY, app, conn, razorpay_client, sitemapper
@@ -17,12 +18,7 @@ from src.server.forms import (
     SubscribeNewsLetterForm,
 )
 from src.user import User
-from src.utils import (
-    FAQ_DATA,
-    format_number,
-    get_product_pictures,
-    size_chart,
-)
+from src.utils import FAQ_DATA, format_number, get_product_pictures, size_chart
 
 if TYPE_CHECKING:
     assert isinstance(current_user, User)
@@ -115,6 +111,29 @@ def add_review(product_id: int):
     return redirect(url_for("product", product_id=product_id))
 
 
+@app.route("/products/<int:product_id>/add-to-favourites", methods=["GET"])
+@app.route("/products/<int:product_id>/add-to-favourites/", methods=["GET"])
+@login_required
+def add_to_favourites(product_id: int):
+    product = Product.from_id(conn, product_id)
+    current_user.add_to_fav(product=product)
+    return redirect(url_for("product", product_id=product_id))
+
+
+@app.route(
+    "/products/<int:product_id>/remove-from-favourites/<int:favourite_id>",
+    methods=["GET"],
+)
+@app.route(
+    "/products/<int:product_id>/remove-from-favourites/<int:favourite_id>",
+    methods=["GET"],
+)
+@login_required
+def remove_from_favourites(product_id: int, favourite_id: int):
+    current_user.remove_from_fav(fav=Favourite.from_id(conn, favourite_id))
+    return redirect(url_for("product", product_id=product_id))
+
+
 @app.route("/checkout")
 @login_required
 def checkout():
@@ -144,8 +163,8 @@ def final_checkout():
     return render_template("payment.html", **variables)
 
 
-@app.route("/razorpay-webhook-product", methods=["POST"])
-@app.route("/razorpay-webhook-product/", methods=["POST"])
+@app.route("/razorpay-webhook/product", methods=["POST"])
+@app.route("/razorpay-webhook/product/", methods=["POST"])
 def razorpay_webhook():
     data = request.get_json()
 

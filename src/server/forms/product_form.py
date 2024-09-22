@@ -29,8 +29,8 @@ if TYPE_CHECKING:
 
 class ProductAddForm(FlaskForm):
     name          = StringField("Product Name", validators=[DataRequired()])
-    display_price = FloatField("Display Price")
-    price         = FloatField("Price", validators=[DataRequired()])
+    display_price = FloatField("Price")
+    price         = FloatField("Actual Price", validators=[DataRequired()])
     description   = TextAreaField("Description", validators=[DataRequired()])
     images        = MultipleFileField("Image", validators=[DataRequired()])
     stock         = IntegerField("Stock", validators=[DataRequired()])
@@ -48,8 +48,8 @@ class ProductAddForm(FlaskForm):
 
 class ProductUpdateForm(FlaskForm):
     name          = StringField("Product Name")
-    display_price = FloatField("Display Price")
-    price         = FloatField("Price")
+    display_price = FloatField("Price")
+    price         = FloatField("Actual Price")
     description   = TextAreaField("Description")
     stock         = IntegerField("Stock")
     sizes         = SelectField("Size", choices=[(data["CODE"], size) for size, data in size_chart.items()])

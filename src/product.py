@@ -444,11 +444,11 @@ class Product:
         params = (limit, offset) if limit is not None else ()
         if limit is None:
             query = r"""
-                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)
+                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) AND STOCK > 0
             """
         else:
             query = r"""
-                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) LIMIT ? OFFSET ?
+                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) AND STOCK > 0 LIMIT ? OFFSET ?
             """
         if admin:
             if limit is None:
@@ -648,7 +648,7 @@ class GiftCard:
         from .user import User
 
         return User.from_id(self.conn, self.user_id)
-    
+
     @staticmethod
     def admin_create(conn: sqlite3.Connection, *, user: User, amount: int) -> GiftCard:
         assert user.is_admin, "Only admins can create gift cards."
