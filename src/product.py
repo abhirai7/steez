@@ -504,6 +504,19 @@ class Product:
             categories[product.category].append(product)
 
         return categories
+    
+    @classmethod
+    def get_by_category(cls, conn: sqlite3.Connection, category: Category) -> list[Product]:
+        query = r"SELECT * FROM PRODUCTS WHERE CATEGORY = ?"
+        cursor = conn.cursor()
+        cursor.execute(query, (category.id,))
+
+        products = []
+
+        while row := cursor.fetchone():
+            products.append(cls(conn, **row))
+
+        return products
 
 
 class Cart:

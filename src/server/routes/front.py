@@ -7,7 +7,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.carousel import Carousel
-from src.product import Product
+from src.product import Category, Product
 from src.server import TODAY, app, conn, sitemapper
 from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
@@ -111,3 +111,23 @@ def subscribe():
         newsletter_email_add_to_db(conn, email=email)
 
     return redirect(url_for("home"))
+
+
+for category in Category.all(conn):
+
+    def category_page(category=category):
+        products = Product.get_by_category(conn, category=category)
+        return render_template(
+            "front_search.html",
+            products=products,
+            category=category,
+            current_user=current_user,
+            search_form=SearchForm(),
+            newsletter_form=SubscribeNewsLetterForm(),
+        )
+
+    app.add_url_rule(
+        f"/category/{category.name.lower().replace(' ', '-')}",
+        f"category_{category.name.lower().replace(' ', '_')}",
+        category_page,
+    )
