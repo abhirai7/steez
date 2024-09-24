@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 def home():
     products = Product.all(conn)
     categories = Product.categorise_products(products)
+    print(categories)
     gift_form: GiftCardForm = GiftCardForm()
 
     return render_template(

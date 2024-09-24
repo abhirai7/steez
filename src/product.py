@@ -110,6 +110,9 @@ class Category:
 
     def __hash__(self) -> int:
         return hash(self.id)
+    
+    def __eq__(self, other: Category) -> bool:
+        return self.id == other.id
 
     def delete(self) -> None:
         query = r"DELETE FROM CATEGORIES WHERE ID = ?"

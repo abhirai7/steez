@@ -1,6 +1,13 @@
-{% extends 'base.html' %} {% import 'navbar.html' as navbar %} {% import
-'footer.html' as footer %} {% import 'hero.html' as hero %} {% set title =
-'STEEZ™' %} {% block styles %}
+{% extends 'base.html' %} 
+
+{% import 'navbar.html' as navbar %} 
+
+{% import 'footer.html' as footer %}
+{% import 'hero.html' as hero %}
+
+{% set title = 'STEEZ™' %} 
+
+{% block styles %}
 <style>
     .fs {
         font-size: 7rem;
@@ -19,6 +26,7 @@
         position: absolute;
         top: 0;
         left: 0;
+      
         opacity: 1;
     }
 
@@ -47,13 +55,15 @@
         <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
             {% for product in products %}
             <div class="col zoom-on-hover" id="{{ product.id }}">
-                <div class="text-center p-0 border border-1">
+                <div class="p-0 ">
                     <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0 h-100 w-100">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
-                        <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
+                        <div class="position-relative">
+                            <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="main-image" />
+                            <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="hover-image" />
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title text-center code fs-5">{{ product.name }}</h5>
-                            <h6 class="text-center text-muted">INR. {{ product.price }}</h6>
+                            <h5 class="card-title code fs-5">{{ product.name }}</h5>
+                            <h6 class="text-muted">INR. {{ product.price }}</h6>
                         </div>
                         <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                     </div>
