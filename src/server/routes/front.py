@@ -23,7 +23,6 @@ if TYPE_CHECKING:
 def home():
     products = Product.all(conn)
     categories = Product.categorise_products(products)
-    print(categories)
     gift_form: GiftCardForm = GiftCardForm()
 
     return render_template(
@@ -48,6 +47,7 @@ def faq():
         current_user=current_user,
         FAQ=FAQ_DATA,
         search_form=SearchForm(),
+        categories=Category.all(conn),
         newsletter_form=SubscribeNewsLetterForm(),
     )
 
@@ -72,6 +72,7 @@ def search():
         products=products,
         current_user=current_user,
         search_form=form,
+        categories=Category.all(conn),
         newsletter_form=SubscribeNewsLetterForm(),
     )
 
@@ -84,6 +85,7 @@ def refund_policy():
         "refund_policy.html",
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
+        categories=Category.all(conn),
     )
 
 
@@ -99,6 +101,7 @@ def order_history():
         arrow=arrow,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
+        categories=Category.all(conn),
     )
 
 
@@ -125,6 +128,7 @@ for category in Category.all(conn):
             current_user=current_user,
             search_form=SearchForm(),
             newsletter_form=SubscribeNewsLetterForm(),
+            categories=Category.all(conn),
         )
 
     app.add_url_rule(

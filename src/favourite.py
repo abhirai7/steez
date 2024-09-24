@@ -94,9 +94,7 @@ class Favourite:
         return [Product(conn, **row) for row in cursor.fetchall()]
 
     @classmethod
-    def exists(
-        cls, conn: sqlite3.Connection, *, user: User, product: Product
-    ) -> bool:
+    def exists(cls, conn: sqlite3.Connection, *, user: User, product: Product) -> bool:
         query = r"SELECT * FROM FAVOURITES WHERE USER_ID = ? AND PRODUCT_ID = ?"
 
         cursor = conn.cursor()

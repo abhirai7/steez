@@ -41,7 +41,7 @@
 
 {% endblock %}
 {% block body %}
-{{ navbar.navbar(current_user, search_form) }}
+{{ navbar.navbar(current_user, search_form, categories) }}
 {% if show_hero %}
 {{ hero.carousel(carousels) }}
 {% endif %}

@@ -110,7 +110,7 @@ class Category:
 
     def __hash__(self) -> int:
         return hash(self.id)
-    
+
     def __eq__(self, other: Category) -> bool:
         return self.id == other.id
 
@@ -507,10 +507,12 @@ class Product:
             categories[product.category].append(product)
 
         return categories
-    
+
     @classmethod
-    def get_by_category(cls, conn: sqlite3.Connection, category: Category) -> list[Product]:
-        query = r"SELECT * FROM PRODUCTS WHERE CATEGORY = ?"
+    def get_by_category(
+        cls, conn: sqlite3.Connection, category: Category
+    ) -> list[Product]:
+        query = r"SELECT * FROM PRODUCTS WHERE CATEGORY = ? AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)"
         cursor = conn.cursor()
         cursor.execute(query, (category.id,))
 
