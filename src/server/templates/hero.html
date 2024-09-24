@@ -20,7 +20,7 @@
         {% for caro in carousels %}
             <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" data-bs-interval="2000">
                 <div class="text-center">
-                    <img src="{{ caro.image }}" class="text-center min-vw-100" alt="..." />
+                    <img src="{{ caro.image }}" class="img-fluid text-center min-vw-100" alt="..." />
                 </div>
                 <div class="carousel-caption">
                     <h1 class="d-flex fw-bold text-uppercase">{{ caro.heading }}</h1>
