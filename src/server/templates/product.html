@@ -219,9 +219,9 @@
     <div class="accordion" id="returnPolicyAccordion">
         {% for faq in FAQ %}
         {% if loop.index <= 5 %}
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="heading-{{ loop.index }}">
-                <button class="accordion-button fs-5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
+        <div class="accordion-item rounded rounded-0">
+            <h2 class="accordion-header rounded rounded-0" id="heading-{{ loop.index }}">
+                <button class="accordion-button fs-5 collapsed rounded rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
                     aria-controls="collapse-{{ loop.index }}">
                     {{ faq.question }}
                 </button>
