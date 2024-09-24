@@ -20,13 +20,13 @@
             {% if categories %}
             {% for category in categories %}
                 <li class="nav-link mx-4 fs-5">
-                    <a class="nav-link text-decoration-none" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">{{ category.name }}</a>
+                    <a class="link-dark link-underline link-underline-opacity-0 link-opacity-100 link-opacity-50-hover fw-semibold"   href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">{{ category.name }}</a>
                 </li>
             {% endfor %}
             {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto mx-3 mb-2 mb-lg-0 d-flex ">
-                <li class="nav-item mx-3 fs-5">
+                <li class="nav-item mx-3 fs-5 ">
                     <button class="nav-link" id="search-btn"><i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i></button>
                 </li>
                 {% if current_user.is_authenticated %}
@@ -34,7 +34,7 @@
                     <a class="nav-link" href="{{ url_for('order_history') }}">Order History</a>
                 </li>
                 <li class="nav-item mx-1 fs-5">
-                    <a class="nav-link" href="{{ url_for('checkout') }}">Checkout {% set total = current_user.cart.count %}{% if total %}<sup>{{ total}}</sup>{% endif
+                    <a class="nav-link" href="{{ url_for('checkout') }}"><i class="fa-solid fa-cart-shopping fa-xl" style="color: #5b5c5d;"></i> {% set total = current_user.cart.count %}{% if total %}<sup>{{ total}}</sup>{% endif
                         %}</a>
                 </li>
                 <li class="nav-item mx-1 fs-5">
