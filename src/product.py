@@ -224,6 +224,7 @@ class Product:
         self.keywords = [keyword.strip() for keyword in keywords.split(";")]
 
         self._available_sizes = []
+        self.created_at = created_at
 
     def update(self) -> None:
         query = r"""
@@ -266,6 +267,11 @@ class Product:
     @property
     def reviews(self) -> list[Review]:
         return Review.from_product(self.__conn, product_id=self.id)
+
+    @property
+    def categorised_reviews(self) -> dict[VALID_STARS, list[Review]]:
+        reviews = self.reviews
+        return {i: [review for review in reviews if review.stars == i] for i in range(1, 6)}  # type: ignore
 
     @property
     def average_rating(self) -> float:

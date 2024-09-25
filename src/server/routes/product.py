@@ -32,13 +32,13 @@ def product_ids():
     url_variables={"product_id": product_ids()},
     lastmod=arrow.now().format("YYYY-MM-DD"),
     changefreq="daily",
-    priority=0.8,
 )
 @app.route("/products/<int:product_id>", methods=["GET", "POST"])
 @app.route("/products/<int:product_id>/", methods=["GET", "POST"])
 def product(product_id: int):
     product = Product.from_id(conn, product_id)
     pictures = get_product_pictures(product.unique_id)
+    reviews = product.categorised_reviews
 
     cart_form: AddToCartForm = AddToCartForm(product.available_sizes)
     review_form: AddReviewForm = AddReviewForm()
@@ -56,6 +56,7 @@ def product(product_id: int):
         error=request.args.get("error"),
         arrow=arrow,
         FAQ=FAQ_DATA,
+        reviews=reviews,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
     )

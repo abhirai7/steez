@@ -216,64 +216,112 @@
         </div>
     </div>
     <hr class="mt-0">
-    <div class="accordion" id="returnPolicyAccordion">
-        {% for faq in FAQ %}
-        {% if loop.index <= 5 %}
-        <div class="accordion-item rounded rounded-0">
-            <h2 class="accordion-header rounded rounded-0" id="heading-{{ loop.index }}">
-                <button class="accordion-button fs-5 collapsed rounded rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
-                    aria-controls="collapse-{{ loop.index }}">
-                    {{ faq.question }}
-                </button>
-            </h2>
-            <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#returnPolicyAccordion">
-                <div class="accordion-body">
-                    {{ faq.answer }}
+    <div class="container-fluid p-5">
+        <p class="fs-1 text-center">Frequently Asked Questions</p>
+        <div class="accordion" id="returnPolicyAccordion">
+            {% for faq in FAQ %}
+            {% if loop.index <= 5 %}
+            <div class="accordion-item rounded rounded-0">
+                <h2 class="accordion-header rounded rounded-0" id="heading-{{ loop.index }}">
+                    <button class="accordion-button fs-5 collapsed rounded rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
+                        aria-controls="collapse-{{ loop.index }}">
+                        {{ faq.question }}
+                    </button>
+                </h2>
+                <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#returnPolicyAccordion">
+                    <div class="accordion-body">
+                        {{ faq.answer }}
+                    </div>
                 </div>
             </div>
+            {% endif %}
+            {% endfor %}
         </div>
-        {% endif %}
-        {% endfor %}
     </div>
 </div>
 
-<div class="row mt-5">
-    <div class="col-md-12">
-        <h2 class="mb-4">Customer Reviews</h2>
+<div class="container-fluid">
+    <div class="row mt-5">
+        <div class="col-3 p-5">
+            {% set one_stars_reviews = reviews[1] | length %}
+            {% set two_stars_reviews = reviews[2] | length %}
+            {% set three_stars_reviews = reviews[3] | length %}
+            {% set four_stars_reviews = reviews[4] | length %}
+            {% set five_stars_reviews = reviews[5] | length %}
 
-        <!-- Review Form -->
-        <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST" class="mb-5">
-            {{ review_form.hidden_tag() }}
-            <div class="mb-3">
-                {{ review_form.review.label(class="form-label fw-bold") }}
-                {{ review_form.review(class="form-control form-control-lg", rows="5", placeholder="Write your review here...") }}
-            </div>
-            <button type="submit" class="btn btn-primary btn-lg">Submit Review</button>
-        </form>
-
-        <!-- Reviews List -->
-        {% if product.reviews %}
-        <ul class="list-group">
-            {% for review in product.reviews %}
-            <li class="list-group-item">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h5 class="mb-1">{{ review.user.name }}</h5>
-                        <p class="mb-1">{{ review.review }}</p>
+            <p class="fs-2">Reviews Summary</p>
+            <div class="row">
+                <div class="col-4">
+                    <div class="mt-3">
+                        <p class="fs-1 text-center">{{ product.average_rating }}</p>
+                        <p class="text-center"><i class="bi bi-people"></i> {{ product.total_reviews }}</p>
                     </div>
-                    <small>{{ review.created_at }}</small>
                 </div>
-                <span class="text-warning">
-                    {% for star in range(review.stars) %}
-                    <i class="fas fa-star"></i>
-                    {% endfor %}
-                </span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-muted">No reviews yet. Be the first to review this product!</p>
-        {% endif %}
+                <div class="col">
+                    <div class="mt-3">
+                        <span class="fs-6">5 <i class="text-warning bi bi-star-fill"></i></span>
+                        <div class="progress mb-2 h-100">
+                            <div class="progress-bar fs-6 bg-success" role="progressbar" style="width: {{ five_stars_reviews * 100 / product.total_reviews }}%" aria-valuenow="{{ five_stars_reviews }}" aria-valuemin="0"
+                                aria-valuemax="100">{{ five_stars_reviews or '0' }}</div>
+                        </div>
+                        <span class="fs-6">4 <i class="text-warning bi bi-star-fill"></i></span>
+                        <div class="progress mb-2 h-100">
+                            <div class="progress-bar fs-6 bg-primary" role="progressbar" style="width: {{ four_stars_reviews * 100 / product.total_reviews }}%" aria-valuenow="{{ four_stars_reviews }}" aria-valuemin="0"
+                                aria-valuemax="100">{{ four_stars_reviews or '0' }}</div>
+                        </div>
+                        <span class="fs-6">3 <i class="text-warning bi bi-star-fill"></i></span>
+                        <div class="progress mb-2 h-100">
+                            <div class="progress-bar fs-6 bg-warning" role="progressbar" style="width: {{ three_stars_reviews * 100 / product.total_reviews }}%" aria-valuenow="{{ three_stars_reviews }}" aria-valuemin="0"
+                                aria-valuemax="100">{{ three_stars_reviews or '0' }}</div>
+                        </div>
+                        <span class="fs-6">2 <i class="text-warning bi bi-star-fill"></i></span>
+                        <div class="progress mb-2 h-100">
+                            <div class="progress-bar fs-6 bg-info" role="progressbar" style="width: {{ two_stars_reviews * 100 / product.total_reviews }}%" aria-valuenow="{{ two_stars_reviews }}" aria-valuemin="0"
+                                aria-valuemax="100">{{ two_stars_reviews or '0' }}</div>
+                        </div>
+                        <span class="fs-6">1 <i class="text-warning bi bi-star-fill"></i></span>
+                        <div class="progress mb-2 h-100">
+                            <div class="progress-bar fs-6 bg-danger" role="progressbar" style="width: {{ one_stars_reviews * 100 / product.total_reviews }}%" aria-valuenow="{{ one_stars_reviews }}" aria-valuemin="0"
+                                aria-valuemax="100">{{ one_stars_reviews or '0' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col p-5">
+            <p class="mb-4 fs-2">Customer Reviews</p>
+
+            <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST" class="mb-5">
+                {{ review_form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ review_form.review(class="form-control rounded rounded-0", rows="5", placeholder="Write your review here...") }}
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Submit Review</button>
+            </form>
+
+            {% if product.reviews %}
+            <ul class="list-group">
+                {% for review in product.reviews %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="mb-1">{{ review.user.name }}</h5>
+                            <p class="mb-1">{{ review.review }}</p>
+                        </div>
+                        <small>{{ review.created_at }}</small>
+                    </div>
+                    <span class="text-warning">
+                        {% for star in range(review.stars) %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 
