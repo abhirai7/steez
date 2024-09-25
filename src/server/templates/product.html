@@ -5,34 +5,27 @@
 
 {% block styles %}
 <style>
-    .product-image {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
 
-    .main-image {
+    #zoom-img {
+        display: block;
+        max-width: 100%;
+    }
+    .zoomable {
         position: relative;
+        overflow: hidden;
+        border-radius: 30px;
+        box-shadow: 4px 4px 8px rgba(#000, 0.2);
     }
 
-    .small-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    .zoomable__img {
+        transform-origin: var(--zoom-pos-x, 0%) var(--zoom-pos-y, 0%);
+        transition: transform 0.15s linear;
     }
 
-    .large-image {
-        z-index: 1;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: scale(0);
-        transition: transform 0.3s ease-in-out;
+    .zoomable--zoomed .zoomable__img {
+        cursor: zoom-in;
+        transform: scale(var(--zoom, 2));
     }
-
     .star-rating label {
         cursor: pointer;
     }
@@ -56,43 +49,78 @@
 
     <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
         <div class="col border-end border-end-1 m-0 p-0">
-            <div>
-                <div class="d-block d-lg-none d-md-none text-center">
-                    <hr>
-                    <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
-                    {% set display_price = product.display_price %}
-                    {% set difference = display_price - product.price %}
-                    {% if difference > 0 %}
+            <!-- Mobile View Only: Product Name and Pricing -->
+            <div class="d-block d-lg-none d-md-none text-center">
+                <hr>
+                <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
+                {% set display_price = product.display_price %}
+                {% set difference = display_price - product.price %}
+                {% if difference > 0 %}
                     {% set percent = ((difference / display_price) * 100) | int %}
                     <span class="text-danger fs-4">-{{ percent }}% </span>
-                    {% endif %}
-                    <span class="fs-4 fw-bold">INR. {{ product.price }}</span>
-                    {% if difference > 0 %}
+                {% endif %}
+                <span class="fs-4 fw-bold">INR. {{ product.price }}</span>
+                {% if difference > 0 %}
                     <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
-                    {% endif %}
-                    <hr>
-                </div>
-                <div class="product-image">
-                    <div class="row ms-lg-5">
-                        <div class="col-12">
-                            <div class="main-image p-5">
-                                <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="small-image border border-1">
-                                <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="d-none d-lg-block large-image border border-1">
-                            </div>
-                        </div>
-                        <div class="col-12 mt-0">
-                            <div class="d-flex justify-content-center">
-                                {% for image in product.images %}
-                                <div class="thumbnail m-2">
-                                    <img src="{{ image }}" alt="{{ product.name }}" class="img-thumbnail rounded rounded-0" style="width: 100px; height: 100px;">
+                {% endif %}
+                <hr>
+            </div>
+        
+            <!-- Centered Product Image Carousel with Larger Images -->
+            <div class="product-image text-center" style="margin-top: 20%;">
+                <div class="container my-4">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10 col-md-12 col-sm-12">
+                            <div id="carouselExampleIndicators" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                                <div class="carousel-indicators">
+                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                    {% for i in range(1, product.images | length) %}
+                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ i }}" aria-label="Slide {{ i + 1 }}"></button>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
+                                <div class="carousel-inner position-relative">
+                                    {% for i in range(0, product.images | length) %}
+                                    <div class="carousel-item {% if i == 0 %}active{% endif %}">
+                                        <img src="{{ product.images[i] }}" alt="{{ product.name }}" class="d-block w-100" style="max-height: 700px; object-fit: cover;">
+                                        <!-- Zoom Button in top-right corner -->
+                                        <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-toggle="modal" data-bs-target="#zoomModal" data-img-src="{{ product.images[i] }}">
+                                            <i class="bi bi-arrows-fullscreen"></i> <!-- Fullscreen icon from Bootstrap Icons -->
+                                        </button>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next mt-5" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon mb-5 " aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            
+            <!-- Modal for Zooming Image -->
+            <div class="modal fade" id="zoomModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">  <!-- Use modal-lg for large modal -->
+                    <div class="modal-content position-relative">  <!-- Added position-relative -->
+                        <div class="modal-body d-flex justify-content-center align-items-center zoomable" style="height: 800px;"> <!-- Increased height -->
+                            <img src="" alt="{{ product.name }}" id="zoomedImage" class="zoomable__img img-fluid" style="width: 90%; height: auto; object-fit: cover;">
+                            <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px;"></button> <!-- Positioned close button -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
         </div>
+        
+        
+        
         <div class="col border-start border-start-1 m-0 p-0">
             <div class="p-5">
                 <p class="fs-1 fw-bold text-uppercase d-none d-lg-block d-md-block d-xl-block">
@@ -329,37 +357,155 @@
 
 {% block bottom_scripts %}
 <script>
-    const mainImage = document.querySelector('.main-image img');
-    const largeImage = document.querySelector('.large-image');
-    const thumbnails = document.querySelectorAll('.thumbnail img');
+    document.getElementById('zoomModal').addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        const button = event.relatedTarget;
 
-    thumbnails.forEach((thumbnail) => {
-        thumbnail.addEventListener('mouseover', () => {
-            mainImage.src = thumbnail.src;
-            largeImage.src = thumbnail.src;
-        });
+        // Extract the image source from the data attribute
+        const imgSrc = button.getAttribute('data-img-src');
+
+        // Update the modal image source
+        const modalImage = document.getElementById('zoomedImage'); // Make sure to give the image an ID
+        modalImage.src = imgSrc;
     });
-    const imageContainer = document.querySelector('.main-image');
+    /*
+ * Constants
+ */
 
-    imageContainer.addEventListener('mouseover', () => {
-        const largeImage = imageContainer.querySelector('.large-image');
-        largeImage.style.transform = 'scale(1)';
-    });
+const Default = {
+    initialZoom: 3,
+    minZoom: 1.25,
+    maxZoom: 4,
+    zoomSpeed: 0.01
+};
 
-    imageContainer.addEventListener('mouseout', () => {
-        const largeImage = imageContainer.querySelector('.large-image');
-        largeImage.style.transform = 'scale(0)';
-    });
+/*
+ * Class definition
+ */
 
-    imageContainer.addEventListener('mousemove', (event) => {
-        const largeImage = imageContainer.querySelector('.large-image');
-        const containerRect = imageContainer.getBoundingClientRect();
-        const mouseX = event.clientX - containerRect.left;
-        const mouseY = event.clientY - containerRect.top;
-        const zoomFactor = 1.5;
+class Zoomable {
+    constructor(element, config) {
+        this.element = element;
+        this.config = this._mergeConfig(config);
 
-        largeImage.style.transformOrigin = `${mouseX}px ${mouseY}px`;
-        largeImage.style.transform = `scale(${zoomFactor})`;
-    });
+        const { initialZoom, minZoom, maxZoom } = this.config;
+
+        this.zoomed = false;
+        this.initialZoom = Math.max(Math.min(initialZoom, maxZoom), minZoom);
+        this.zoom = this.initialZoom;
+
+        this.img = element.querySelector(".zoomable__img");
+        this.img.draggable = false;
+        this.element.style.setProperty("--zoom", this.initialZoom);
+
+        this._addEventListeners();
+    }
+
+    static get Default() {
+        return Default;
+    }
+
+    _addEventListeners() {
+        this.element.addEventListener("mouseover", () => this._handleMouseover());
+        this.element.addEventListener("mousemove", (evt) => this._handleMousemove(evt));
+        this.element.addEventListener("mouseout", () => this._handleMouseout());
+        this.element.addEventListener("wheel", (evt) => this._handleWheel(evt));
+
+        this.element.addEventListener("touchstart", (evt) => this._handleTouchstart(evt));
+        this.element.addEventListener("touchmove", (evt) => this._handleTouchmove(evt));
+        this.element.addEventListener("touchend", () => this._handleTouchend());
+    }
+
+    _handleMouseover() {
+        if (this.zoomed) {
+            return;
+        }
+
+        this.element.classList.add("zoomable--zoomed");
+        this.zoomed = true;
+    }
+
+    _handleMousemove(evt) {
+        if (!this.zoomed) {
+            return;
+        }
+
+        const elPos = this.element.getBoundingClientRect();
+        const percentageX = `${((evt.clientX - elPos.left) * 100) / elPos.width}%`;
+        const percentageY = `${((evt.clientY - elPos.top) * 100) / elPos.height}%`;
+
+        this.element.style.setProperty("--zoom-pos-x", percentageX);
+        this.element.style.setProperty("--zoom-pos-y", percentageY);
+    }
+
+    _handleMouseout() {
+        if (!this.zoomed) {
+            return;
+        }
+
+        this.element.style.setProperty("--zoom", this.initialZoom);
+        this.element.classList.remove("zoomable--zoomed");
+        this.zoomed = false;
+    }
+
+    _handleWheel(evt) {
+        if (!this.zoomed) {
+            return;
+        }
+
+        evt.preventDefault();
+
+        const newZoom = this.zoom + evt.deltaY * (this.config.zoomSpeed * -1);
+        const { minZoom, maxZoom } = this.config;
+
+        this.zoom = Math.max(Math.min(newZoom, maxZoom), minZoom);
+        this.element.style.setProperty("--zoom", this.zoom);
+    }
+
+    _handleTouchstart(evt) {
+        evt.preventDefault();
+        this._handleMouseover();
+    }
+
+    _handleTouchmove(evt) {
+        if (!this.zoomed) {
+            return;
+        }
+
+        const elPos = this.element.getBoundingClientRect();
+        let percentageX = ((evt.touches[0].clientX - elPos.left) * 100) / elPos.width;
+        let percentageY = ((evt.touches[0].clientY - elPos.top) * 100) / elPos.height;
+
+        percentageX = Math.max(Math.min(percentageX, 100), 0);
+        percentageY = Math.max(Math.min(percentageY, 100), 0);
+
+        this.element.style.setProperty("--zoom-pos-x", `${percentageX}%`);
+        this.element.style.setProperty("--zoom-pos-y", `${percentageY}%`);
+    }
+
+    _handleTouchend() {
+        this._handleMouseout();
+    }
+
+    _mergeConfig(config) {
+        return {
+            ...this.constructor.Default,
+            ...(typeof config === "object" ? config : {})
+        };
+    }
+}
+
+/*
+ * Implementation
+ */
+
+const zoomables = document.querySelectorAll("#zoomModal .zoomable");
+
+for (const el of zoomables) {
+    new Zoomable(el);
+}
+
+
+
 </script>
 {% endblock %}
