@@ -10,11 +10,10 @@
         display: block;
         max-width: 100%;
     }
+
     .zoomable {
         position: relative;
         overflow: hidden;
-        border-radius: 30px;
-        box-shadow: 4px 4px 8px rgba(#000, 0.2);
     }
 
     .zoomable__img {
@@ -24,7 +23,17 @@
 
     .zoomable--zoomed .zoomable__img {
         cursor: zoom-in;
-        transform: scale(var(--zoom, 2));
+        transform: scale(var(--zoom, 2)); 
+    }
+
+    .modal-body {
+        position: relative; 
+    }
+
+    .btn-close {
+        top: 20px; 
+        right: 20px;
+        z-index: 10; 
     }
     .star-rating label {
         cursor: pointer;
@@ -49,7 +58,6 @@
 
     <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
         <div class="col border-end border-end-1 m-0 p-0">
-            <!-- Mobile View Only: Product Name and Pricing -->
             <div class="d-block d-lg-none d-md-none text-center">
                 <hr>
                 <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
@@ -66,7 +74,6 @@
                 <hr>
             </div>
         
-            <!-- Centered Product Image Carousel with Larger Images -->
             <div class="product-image text-center" style="margin-top: 20%;">
                 <div class="container my-4">
                     <div class="row justify-content-center">
@@ -82,9 +89,8 @@
                                     {% for i in range(0, product.images | length) %}
                                     <div class="carousel-item {% if i == 0 %}active{% endif %}">
                                         <img src="{{ product.images[i] }}" alt="{{ product.name }}" class="d-block w-100" style="max-height: 700px; object-fit: cover;">
-                                        <!-- Zoom Button in top-right corner -->
                                         <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-toggle="modal" data-bs-target="#zoomModal" data-img-src="{{ product.images[i] }}">
-                                            <i class="bi bi-arrows-fullscreen"></i> <!-- Fullscreen icon from Bootstrap Icons -->
+                                            <i class="bi bi-arrows-fullscreen"></i> 
                                         </button>
                                     </div>
                                     {% endfor %}
@@ -104,17 +110,17 @@
             </div>
             
             
-            <!-- Modal for Zooming Image -->
             <div class="modal fade" id="zoomModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">  <!-- Use modal-lg for large modal -->
-                    <div class="modal-content position-relative">  <!-- Added position-relative -->
-                        <div class="modal-body d-flex justify-content-center align-items-center zoomable" style="height: 800px;"> <!-- Increased height -->
-                            <img src="" alt="{{ product.name }}" id="zoomedImage" class="zoomable__img img-fluid" style="width: 90%; height: auto; object-fit: cover;">
-                            <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px;"></button> <!-- Positioned close button -->
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content position-relative">
+                        <button type="button" class="btn-close position-absolute p-3" data-bs-dismiss="modal" aria-label="Close" style="top: 20px; right: 20px; z-index: 10;"></button>
+                        <div class="modal-body d-flex justify-content-center align-items-center zoomable" style="height: 800px;">
+                            <img src="" alt="{{ product.name }}" id="zoomedImage" class="zoomable__img img-fluid " style="width: 100%; height: auto; object-fit: cover;">
                         </div>
                     </div>
                 </div>
             </div>
+            
             
 
         </div>
@@ -358,19 +364,14 @@
 {% block bottom_scripts %}
 <script>
     document.getElementById('zoomModal').addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
         const button = event.relatedTarget;
 
-        // Extract the image source from the data attribute
         const imgSrc = button.getAttribute('data-img-src');
 
-        // Update the modal image source
-        const modalImage = document.getElementById('zoomedImage'); // Make sure to give the image an ID
+        const modalImage = document.getElementById('zoomedImage');
         modalImage.src = imgSrc;
     });
-    /*
- * Constants
- */
+
 
 const Default = {
     initialZoom: 3,
@@ -379,9 +380,6 @@ const Default = {
     zoomSpeed: 0.01
 };
 
-/*
- * Class definition
- */
 
 class Zoomable {
     constructor(element, config) {
@@ -495,9 +493,6 @@ class Zoomable {
     }
 }
 
-/*
- * Implementation
- */
 
 const zoomables = document.querySelectorAll("#zoomModal .zoomable");
 
