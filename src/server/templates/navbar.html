@@ -26,12 +26,12 @@
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto mx-3 mb-lg-0 d-flex">
-                {% if current_user.is_authenticated %}
                 <li class="nav-item mx-1 fs-5 d-none d-lg-block" data-bs-toggle="modal" data-bs-target="#search-modal">
                     <button class="nav-link">
                         <i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i>
                     </button>
                 </li>
+                {% if current_user.is_authenticated %}
                 <li class="nav-item mx-1 fs-5">
                     <a class="nav-link" href="{{ url_for('order_history') }}">Order History</a>
                 </li>
