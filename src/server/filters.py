@@ -14,6 +14,11 @@ def datetimeformat(value):
     dt = arrow.get(value)
     return f"{dt.format('YYYY-MM-DD HH:mm:ss')} ({dt.humanize()})"
 
+@app.template_filter("datetimeformat_short")
+def datetimeformat_short(value):
+    dt = arrow.get(value)
+    return dt.humanize()
+
 
 @app.template_filter("format_currency")
 def format_currency(value):
