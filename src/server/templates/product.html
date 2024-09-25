@@ -242,7 +242,6 @@
 
 <div class="container-fluid my-5">
     <div class="row">
-        <!-- Reviews Summary Section -->
         <div class="col-md-4 col-lg-3 p-4 bg-light rounded shadow-sm">
             {% set one_stars_reviews = reviews[1] | length %}
             {% set two_stars_reviews = reviews[2] | length %}
@@ -258,7 +257,6 @@
                 </div>
             </div>
             <div>
-                <!-- Stars Rating Progress Bars -->
                 {% for star_count, star_class, label in [
                     (5, "bg-success", "5"),
                     (4, "bg-primary", "4"),
@@ -280,11 +278,9 @@
             </div>
         </div>
 
-        <!-- Customer Reviews Section -->
         <div class="col-md-8 col-lg-9 p-4">
             <p class="fs-3 fw-bold text-dark mb-4">Customer Reviews</p>
 
-            <!-- Review Form -->
             <div class="card mb-5 shadow-sm p-4 bg-light">
                 <h5 class="card-title">Leave Your Review</h5>
                 <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
@@ -296,7 +292,6 @@
                 </form>
             </div>
 
-            <!-- Review List -->
             {% if product.reviews %}
             <ul class="list-group list-group-flush">
                 {% for review in product.reviews %}
