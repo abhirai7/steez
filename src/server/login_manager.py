@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import wraps
 from typing import TYPE_CHECKING
 
-from flask import Request, redirect, url_for
+from flask import Request, redirect, url_for, render_template
 from flask_login import current_user
 from werkzeug import Response
 
@@ -29,12 +29,6 @@ def load_user(user_id: str | int) -> User | None:
     except ValueError:
         return None
 
-
-@login_manager.unauthorized_handler
-def unauthorized() -> Response:
-    return redirect(url_for("login_route"))
-
-
 @login_manager.request_loader
 def load_user_from_request(request: Request) -> User | None:
     email = request.form.get("email") or request.args.get("email")
@@ -55,6 +49,6 @@ def admin_login_required(func):
         if current_user.is_authenticated and current_user.is_admin:
             return func(*args, **kwargs)
 
-        return redirect(url_for("login_route")), HTTP_UNAUTHORIZED
+        return render_template("error/403.html"), HTTP_UNAUTHORIZED
 
     return wrapper
