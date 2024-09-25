@@ -29,17 +29,17 @@ class RegisterForm(FlaskForm):
         super().__init__(*args, **kwargs)
         self.conn = connection
 
-    name         = StringField("Person Details", validators=[DataRequired()])
-    email        = EmailField("", validators=[DataRequired(), Email()])
-    password     = PasswordField("", validators=[DataRequired(), Length(min=8)])
-    confirm_password = PasswordField("", validators=[DataRequired(), EqualTo("password")])
+    name         = StringField("Person Details", validators=[DataRequired()], render_kw={"autocomplete": "off"})
+    email        = EmailField("", validators=[DataRequired(), Email()], render_kw={"autocomplete": "off"})
+    password     = PasswordField("", validators=[DataRequired(), Length(min=8)], render_kw={"autocomplete": "off"})
+    confirm_password = PasswordField("", validators=[DataRequired(), EqualTo("password")], render_kw={"autocomplete": "off"})
 
-    address_line1 = StringField("Address Details", validators=[DataRequired()])
+    address_line1 = StringField("Address Details", validators=[DataRequired()], render_kw={"autocomplete": "off"})
 
-    city         = StringField("", validators=[DataRequired()])
-    state        = StringField("", validators=[DataRequired()])
-    pincode      = IntegerField("", validators=[DataRequired()])
-    phone        = IntegerField("", validators=[DataRequired()])
+    city         = StringField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
+    state        = StringField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
+    pincode      = IntegerField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
+    phone        = IntegerField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
 
     submit       = SubmitField("Register")
 

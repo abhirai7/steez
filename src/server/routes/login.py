@@ -56,7 +56,7 @@ def register():
             f", {register.city.data}, {register.state.data}, {register.pincode.data}"
         )
 
-        user = User.create(
+        User.create(
             conn,
             name=register.name.data,
             email=register.email.data,
@@ -65,7 +65,6 @@ def register():
             phone=str(register.phone.data),
         )
 
-        login_user(user)
-        return redirect(url_for("home"))
+        return redirect(url_for("login_route"))
 
     return render_template("register.html", form=register)
