@@ -66,7 +66,7 @@
                     {% set percent = ((difference / display_price) * 100) | int %}
                     <span class="text-danger fs-4">-{{ percent }}% </span>
                     {% endif %}
-                    <span class="fs-3 fw-bold">INR. {{ product.price }}</span>
+                    <span class="fs-4 fw-bold">INR. {{ product.price }}</span>
                     {% if difference > 0 %}
                     <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
                     {% endif %}
@@ -95,21 +95,20 @@
         </div>
         <div class="col border-start border-start-1 m-0 p-0">
             <div class="p-5">
-                <p class="fs-1 fw-semibold text-uppercase d-none d-lg-block d-md-block d-xl-block">{{ product.name.strip() }}</p>
-
+                <p class="fs-1 fw-bold text-uppercase d-none d-lg-block d-md-block d-xl-block">
+                    {{ product.name.strip() }}
+                </p>
                 <div class="mb-4 mt-4">
-                    {% set display_price = product.display_price %}
-                    {% set difference = display_price - product.price %}
-                    {% if difference > 0 %}
-                    {% set percent = ((difference / display_price) * 100) | int %}
-                    <span class="text-danger fs-4">-{{ percent }}% </span>
+                    {% if product.display_price - product.price > 0 %}
+                    {% set percent = (((product.display_price - product.price) / product.display_price) * 100) | int %}
+                    <span class="text-danger fs-5">-{{ percent }}% </span>
                     {% endif %}
-                    <span class="fs-3 fw-bold">INR. {{ product.price }}</span>
-                    {% if difference > 0 %}
-                    <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
+                    <span class="fs-4 fw-semibold">INR. {{ product.price }}</span>
+                    {% if product.display_price - product.price > 0 %}
+                    <p class="text-muted text-decoration-line-through mt-0">INR. {{ product.display_price }}</p>
                     {% endif %}
                 </div>
-                <hr>
+
                 <div class="cta-buttons">
                     <form class="mb-5" action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
                         {{ form.hidden_tag() }}
@@ -117,14 +116,12 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group mb-4">
-                                    {{ form.quantity.label(class="form-label fw-semibold fs-5 text-muted mb-3") }}
-                                    {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6 w-100 border-dark-subtle focus-ring focus-ring-dark p-3 ",
-                                    placeholder="0") }}
+                                    {{ form.quantity.label(class="form-label fw-semibold fs-6 text-muted mb-3") }}
+                                    {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6 w-100 border-dark-subtle focus-ring focus-ring-dark p-3 ", placeholder="Ex. 1") }}
                                 </div>
                                 <div class="form-group mb-2">
-                                    {{ form.size.label(class="form-label fw-semibold fs-5 text-muted") }}
-                                    {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6 w-100 mb-3 border-dark-subtle focus-ring focus-ring-dark p-3",
-                                    placeholder="Select Size") }}
+                                    {{ form.size.label(class="form-label fw-semibold fs-6 text-muted") }}
+                                    {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6 w-100 mb-3 border-dark-subtle focus-ring focus-ring-dark p-3", placeholder="Select Size") }}
                                     <button type="button" class="btn text-start p-0 m-0" data-bs-toggle="modal" data-bs-target="#reference-chart">
                                         <span class="text-primary">Size Reference Chart</span>
                                     </button>
