@@ -9,7 +9,11 @@
     }
     #search-btn {
         position:absolute;
+        {% if current_user.is_authenticated %}
+        margin-left: 78%;
+        {% else %}
         margin-left: 85%;
+        {% endif %}
     }
     @media (max-width: 768px) {
         #search-btn {
