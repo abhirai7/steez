@@ -2,41 +2,82 @@
 <style>
     #search-input-bar {
         position: absolute;
-        top: 0;
-        left: 0;
+        margin-top: 6%;
+        margin-left: 3%;
         width: 90%;
         display: none;
     }
+    #search-btn {
+        position:absolute;
+        margin-left: 85%;
+    }
+    @media (max-width: 768px) {
+        #search-btn {
+            position: fixed;
+            margin-left: 80%;
+            vertical-align: top;
+            /* transform: translateY(-100%); */
+
+        }
+        #hamburger-menu {
+            position: fixed;
+            margin-right: 85%;
+        }
+        #search-input-bar {
+            position: relative;
+            width: 100%;
+            margin-top: 3%;
+            margin-left: 0%;
+
+        }  
+        #search-input {
+            font-size: 1rem;
+        }
+        #nav-head {
+            position: relative;
+            margin-left: 35%;
+        }
+        #close-btn {
+            width: 15%;
+            font-size: 1rem;
+        }
+
+        
+    }
 </style>
-<nav class="navbar navbar-expand-lg bg-body-tertiary" id="navbar">
-    <div class="container-fluid">
-        <a class="navbar-brand nav-link active horizon-font fs-4" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+<nav class="navbar navbar-expand-lg bg-body-tertiary" >
+    <div class="container-fluid d-flex align-items-start" id="navbar">
+        <a class="navbar-brand nav-link active horizon-font fs-4" id = "nav-head" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
+        
+        <button class="navbar-toggler" id = "hamburger-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <ul class="navbar-nav" id="search-btn">
+            <li class="nav-item mx-3 fs-5">
+                <button class="nav-link"><i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i></button>
+            </li>
+        </ul>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto text-center"></ul>
-            {% if categories %}
-            {% for category in categories %}
-                <li class="nav-link mx-4 fs-5">
-                    <a class="link-dark link-underline link-underline-opacity-0 link-opacity-100 link-opacity-50-hover fw-semibold"   href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">{{ category.name }}</a>
-                </li>
-            {% endfor %}
-            {% endif %}
+            <ul class="navbar-nav ms-auto text-center">
+                {% if categories %}
+                {% for category in categories %}
+                    <li class="nav-link mx-4 fs-5">
+                        <a class="link-dark link-underline link-underline-opacity-0 link-opacity-100 link-opacity-50-hover fw-semibold" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+                {% endif %}
             </ul>
-            <ul class="navbar-nav ms-auto mx-3 mb-2 mb-lg-0 d-flex ">
-                <li class="nav-item mx-3 fs-5 ">
-                    <button class="nav-link" id="search-btn"><i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i></button>
-                </li>
+            <ul class="navbar-nav ms-auto mx-3 mb-lg-0 d-flex">
                 {% if current_user.is_authenticated %}
                 <li class="nav-item mx-1 fs-5">
                     <a class="nav-link" href="{{ url_for('order_history') }}">Order History</a>
                 </li>
                 <li class="nav-item mx-1 fs-5">
-                    <a class="nav-link" href="{{ url_for('checkout') }}">
-                        <i class="fa-solid fa-cart-shopping fa-xl" style="color: #5b5c5d;"></i> {% set total = current_user.cart.count %}{% if total %}<sup>{{ total}}</sup>{% endif%}
-                    </a>
+                    <a class="nav-link" href="{{ url_for('checkout') }}"><i class="fa-solid fa-cart-shopping fa-xl" style="color: #5b5c5d;"></i> {% set total = current_user.cart.count %}{% if total %}<sup>{{ total}}</sup>{% endif
+                        %}</a>
                 </li>
                 <li class="nav-item mx-1 fs-5">
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
@@ -52,16 +93,18 @@
             </ul>
         </div>
     </div>
-    <div class="mb-0 p-2" id="search-input-bar">
-        <form action="{{ url_for('search') }}" method="POST" class="input-group input-group-lg mx-4">
+
+    <div id="search-input-bar" class="container-fluid">
+        <form action="{{ url_for('search') }}" method="POST" class="input-group input-group-lg">
             {{ search_form.hidden_tag() }}
-            {{ search_form.query(class="form-control ms-5", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby":
-            "button-addon2"}) }}
+            {{ search_form.query(class="form-control", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby": "button-addon2"}) }}
             {{ search_form.submit(class="d-none") }}
-            <button class="btn btn-secondary" type="button" id="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="btn btn-outline-secondary" type="button" id="close-btn" aria-label="Close search">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </form>
     </div>
-
+    
 </nav>
 
 <script>
@@ -89,7 +132,7 @@
         Admin Dashboard
     </a>
     <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
+    <ul class="nav nav-pills flex-column">
         <li>
             <a href="{{ url_for('admin_manage_product') }}" class="nav-link text-white">
                 Products
