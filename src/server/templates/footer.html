@@ -2,7 +2,7 @@
 <div class="container-fluid bg-dark" data-bs-theme="dark">
     <div class="container-xl" data-bs-theme="dark">
         <footer class="mt-5 bg-dark" data-bs-theme="dark">
-            <div class="row ">
+            <div class="row">
                 <div class="col-6 col-md-2 mb-3 ">
                     <ul class="nav flex-column">
                         <li class="nav-item mb-2"><a href="{{ url_for('faq') }}" class="nav-link p-0 text-body-secondary">FAQs</a></li>
@@ -14,9 +14,21 @@
 
                 <div class="col-6 col-md-2 mb-3 ">
                     <ul class="nav flex-column">
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Instagram</a></li>
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Twitter</a></li>
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Facebook</a></li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">
+                                <i class="bi bi-instagram me-1"></i> Instagram
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">
+                                <i class="bi bi-twitter me-1"></i> Twitter
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">
+                                <i class="bi bi-facebook me-1"></i> Facebook
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -46,4 +58,5 @@
         </footer>
     </div>
 </div>
+
 {%- endmacro %}
