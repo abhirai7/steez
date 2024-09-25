@@ -33,35 +33,6 @@
         transition: transform 0.3s ease-in-out;
     }
 
-    .faq-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .faq-item {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .faq-item h3 {
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-
-    .faq-item p {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .fs-max {
-        font-size: 3.5rem;
-    }
-
-    .fs-min {
-        font-size: 0.95rem;
-    }
     .star-rating label {
         cursor: pointer;
     }
@@ -70,10 +41,9 @@
         cursor: pointer;
     }
 
-    /* When a label is hovered, highlight the current and all previous stars */
     .star-rating label:hover i,
-    .star-rating label:hover ~ label i,
-    .star-rating input[type="radio"]:checked ~ label i {
+    .star-rating label:hover~label i,
+    .star-rating input[type="radio"]:checked~label i {
         color: #ffc107 !important;
     }
 </style>
@@ -89,7 +59,7 @@
             <div>
                 <div class="d-block d-lg-none d-md-none text-center">
                     <hr>
-                    <p class="fs-max fw-semibold text-uppercase">{{ product.name.strip() }}</p>
+                    <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
                     {% set display_price = product.display_price %}
                     {% set difference = display_price - product.price %}
                     {% if difference > 0 %}
@@ -125,7 +95,7 @@
         </div>
         <div class="col border-start border-start-1 m-0 p-0">
             <div class="p-5">
-                <p class="fs-max fw-semibold text-uppercase d-none d-lg-block d-md-block d-xl-block">{{ product.name.strip() }}</p>
+                <p class="fs-1 fw-semibold text-uppercase d-none d-lg-block d-md-block d-xl-block">{{ product.name.strip() }}</p>
 
                 <div class="mb-4 mt-4">
                     {% set display_price = product.display_price %}
@@ -195,7 +165,7 @@
                                 </div>
                             </div>
                         </div>
-                    
+
                         <div class="row mt-2 row-cols-1 row-cols-md-2 row-cols-lg-2">
                             {% if current_user.is_authenticated %}
                             <div class="col">
@@ -233,118 +203,125 @@
     </div>
     <hr class="mt-0">
     <div class="container-fluid p-lg-5 p-3">
-        <p class="fs-1 fw-semibold m-2 mb-3">Frequently Asked Questions</p>
+        <p class="fs-2 fw-semibold m-2 mb-3">Frequently Asked Questions</p>
         <div class="accordion" id="returnPolicyAccordion">
             {% for faq in FAQ %}
-            {% if loop.index <= 5 %}
-            <div class="accordion-item rounded rounded-0">
+            {% if loop.index <= 5 %} <div class="accordion-item rounded rounded-0">
                 <h2 class="accordion-header rounded rounded-0" id="heading-{{ loop.index }}">
-                    <button class="accordion-button fs-5 collapsed rounded rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="true"
-                        aria-controls="collapse-{{ loop.index }}">
+                    <button class="accordion-button collapsed rounded rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}"
+                        aria-expanded="true" aria-controls="collapse-{{ loop.index }}">
                         {{ faq.question }}
                     </button>
                 </h2>
-                <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#returnPolicyAccordion">
+                <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}"
+                    data-bs-parent="#returnPolicyAccordion">
                     <div class="accordion-body">
                         {{ faq.answer }}
                     </div>
                 </div>
-            </div>
-            {% endif %}
-            {% endfor %}
         </div>
+        {% endif %}
+        {% endfor %}
     </div>
 </div>
+</div>
 
-<div class="container-fluid mt-lg-5 mt-3 ps-lg-5 pe-lg-5">
-    <p class="fs-1 fw-semibold m-2 mb-3">Reviews</p>
+<div class="container-fluid mt-lg-4 mt-3 ps-lg-5 pe-lg-5">
+    <p class="fs-2 fw-semibold m-2 mb-3">Reviews</p>
+    <hr>
 
-    <div class="row">
-        <div class="col-md-4 col-lg-3 p-4 bg-light rounded rounded-0">
-            {% set one_stars_reviews = reviews[1] | length %}
-            {% set two_stars_reviews = reviews[2] | length %}
-            {% set three_stars_reviews = reviews[3] | length %}
-            {% set four_stars_reviews = reviews[4] | length %}
-            {% set five_stars_reviews = reviews[5] | length %}
+    <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
+        <div class="col-md-4 col-lg-3">
+            <div class="p-4 bg-light rounded rounded-0">
+                {% set one_stars_reviews = reviews[1] | length %}
+                {% set two_stars_reviews = reviews[2] | length %}
+                {% set three_stars_reviews = reviews[3] | length %}
+                {% set four_stars_reviews = reviews[4] | length %}
+                {% set five_stars_reviews = reviews[5] | length %}
 
-            <div class="row text-center mb-4">
-                <div class="col">
-                    <p class="display-4 text-dark mb-1">{{ product.average_rating }}</p>
-                    <p class="text-muted"><i class="bi bi-people"></i> {{ product.total_reviews }} reviews</p>
+                <div class="row text-center mb-4">
+                    <div class="col">
+                        <p class="display-4 text-dark mb-1">{{ product.average_rating }}</p>
+                        <p class="text-muted"><i class="bi bi-people"></i> {{ product.total_reviews }} reviews</p>
+                    </div>
                 </div>
-            </div>
-            <div>
-                {% for star_count, star_class, label in [
+                <div>
+                    {% for star_count, star_class, label in [
                     (5, "bg-warning", "5"),
                     (4, "bg-warning", "4"),
                     (3, "bg-warning", "3"),
                     (2, "bg-info", "2"),
                     (1, "bg-danger", "1")
-                ] %}
-                <div class="d-flex align-items-center mb-3">
-                    <div>
-                        <span class="fs-6 me-2">{{ label }} <i class="text-warning bi bi-star-fill"></i> </span>
-                    </div>
-                    <div class="progress w-100">
-                        <div class="progress-bar text-dark {{ star_class }}" role="progressbar"
-                            style="width: {{ reviews[star_count] | length * 100 / (product.total_reviews or 1) }}%"
-                            aria-valuenow="{{ reviews[star_count] | length }}" aria-valuemin="0"
-                            aria-valuemax="100">{{ reviews[star_count] | length or '0' }}
+                    ] %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div>
+                            <span class="fs-6 me-2">{{ label }} <i class="text-warning bi bi-star-fill"></i> </span>
+                        </div>
+                        <div class="progress w-100">
+                            <div class="progress-bar text-dark {{ star_class }}" role="progressbar"
+                                style="width: {{ reviews[star_count] | length * 100 / (product.total_reviews or 1) }}%" aria-valuenow="{{ reviews[star_count] | length }}"
+                                aria-valuemin="0" aria-valuemax="100">{{ reviews[star_count] | length or '0' }}
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
         </div>
 
-        <div class="col-md-8 col-lg-9 p-4">
-            <div class="card mb-5 rounded rounded-0 p-4 bg-light">
-                <h5 class="card-title">Leave Your Review</h5>
-                <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
-                    {{ review_form.hidden_tag() }}
-                    <div class="mb-3">
-                        <label for="rating" class="form-label">Rate this product:</label>
-                        <div class="star-rating d-flex justify-content-start">
-                            {% for i in range(1, 6) %}
-                            <input type="radio" name="stars" value="{{ i }}" id="star{{ i }}" class="d-none">
-                            <label for="star{{ i }}" class="me-1 text-muted">
-                                <i class="bi bi-star-fill"></i>
-                            </label>
-                            {% endfor %}
+        <div class="col-lg-9 col-md-8 m-0 p-0">
+            <div class="card border border-0 mb-5 rounded rounded-0 p-4 bg-light">
+                <div class="border border-1 p-5 shadow-sm">
+                    <h5 class="card-title">Leave Your Review</h5>
+                    <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
+                        {{ review_form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Rate this product:</label>
+                            <div class="star-rating d-flex justify-content-start">
+                                {% for i in range(1, 6) %}
+                                <input type="radio" name="stars" value="{{ i }}" id="star{{ i }}" class="d-none">
+                                <label for="star{{ i }}" class="me-1 text-muted">
+                                    <i class="bi bi-star-fill"></i>
+                                </label>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        {{ review_form.review(class="form-control rounded-0 shadow-sm", rows="5", placeholder="Write your review here...") }}
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                </form>
-            </div>
-
-            {% if product.reviews %}
-            {% for review in product.reviews %}
-            <div class="row ms-5 p-3 border border-1 shadow">
-                <div class="col-1 text-center m-0 p-0">
-                    {% set placeholder = "https://ui-avatars.com/api/?name=" + review.user.name + "&background=random&rounded=true" %}
-                    <img src="{{ placeholder }}" alt="{{ review.user.name }}" class="img-thumbnail bg-transparent rounded rounded-0 border border-0">
-                    <p class="text-center">{{ review.user.name }}</p>
+                        <div class="mb-3">
+                            {{ review_form.review(class="form-control rounded-0 shadow-sm", rows="5", placeholder="Write your review here...") }}
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary rounded rounded-0 shadow-sm">Submit Review</button>
+                    </form>
                 </div>
-                <div class="col">
-                    <div class="card bg-transparent border border-0 mb-2">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2 align-middle">
-                                <p class="text-muted">{{ review.review }}</p>
+
+
+                {% if product.reviews %}
+                {% for review in product.reviews %}
+                <div class="row p-4 shadow-sm m-0 mt-3">
+                    <div class="col-2 col-lg-1 col-sm-2 col-md-3 text-center m-0 p-0">
+                        {% set placeholder = "https://ui-avatars.com/api/?name=" + review.user.name + "&background=random&rounded=true" %}
+                        <img src="{{ placeholder }}" alt="{{ review.user.name }}" class="img-thumbnail bg-transparent rounded rounded-0 border border-0">
+                    </div>
+                    <div class="col">
+                        <div class="card bg-transparent border border-0">
+                            <div class="card-header p-0 bg-transparent border border-0 d-flex justify-content-between">
+                                <h5 class="card-title">{{ review.user.name }}</h5>
                                 <small class="text-muted">{{ review.created_at | datetimeformat_short }}</small>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="align-middle">
+                                    <p class="text-muted">{{ review.review }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
+                {% else %}
+                <div class="alert alert-secondary text-center p-2 rounded rounded-0" role="alert">
+                    No reviews yet. Be the first to review this product!
+                </div>
+                {% endif %}
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="alert alert-secondary text-center p-2 rounded rounded-0" role="alert">
-                No reviews yet. Be the first to review this product!
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>
