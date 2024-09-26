@@ -66,9 +66,9 @@
 {% endblock %}
 
 {% block body %}
-<div class="container my-5 border border-1 p-5 shadow-sm">
+<div class="container my-5 border border-1 p-lg-5 p-3 shadow-sm">
     <p class="text-center horizon-font fs-1 mb-4" id="heading">STEEZ<sup>TM</sup> - REGISTER</p>
-    <div class="form-container p-5">
+    <div class="form-container p-lg-5 p-3">
         <form action="{{ url_for('register') }}" method="POST">
             {{ form.csrf_token }}
             {% if error %}
