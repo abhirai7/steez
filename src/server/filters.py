@@ -23,6 +23,17 @@ def datetimeformat_short(value):
 @app.template_filter("format_currency")
 def format_currency(value):
     try:
-        return locale.currency((value or 0) / 100, grouping=True)
+        cur = locale.currency((value or 0) / 100, grouping=True)
+        RUPEE = "₹"
+        return cur.replace(RUPEE, "INR. ")
     except ValueError:
         return f"INR. {(value or 0) / 100}"
+
+@app.template_filter("format_currency_direct")
+def format_currency_direct(value):
+    try:
+        cur = locale.currency((value or 0), grouping=True)
+        RUPEE = "₹"
+        return cur.replace(RUPEE, "INR. ")
+    except ValueError:
+        return f"{(value or 0)}"
