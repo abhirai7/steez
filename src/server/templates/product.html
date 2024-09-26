@@ -66,7 +66,7 @@
                                 <div class="carousel-inner position-relative">
                                     {% for i in range(0, product.images | length) %}
                                     <div class="carousel-item {% if i == 0 %}active{% endif %}">
-                                        <img src="{{ product.images[i] }}" alt="{{ product.name }}" class="d-block w-100" style="max-height: 700px; object-fit: cover;">
+                                        <img src="{{ product.images[i] }}" alt="{{ product.name }}" class="d-block w-100">
                                         <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-toggle="modal" data-bs-target="#zoomModal" data-img-src="{{ product.images[i] }}">
                                             <i class="bi bi-arrows-fullscreen"></i> 
                                         </button>
