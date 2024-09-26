@@ -79,7 +79,7 @@
 
             <div class="mb-3">
                 {{ form.name.label(class="form-label fs-5") }}
-                {{ form.name(class="form-control", id="username", placeholder="Enter your Name") }}
+                {{ form.name(class="form-control", id="username", placeholder="Enter your Full Name") }}
                 {% if form.name.errors %}
                 <div class="alert alert-danger mt-2 p-2" role="alert">
                     {% for error in form.name.errors %}

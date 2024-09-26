@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arrow
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for, flash
 from flask_login import current_user, login_required
 
 from src.carousel import Carousel
@@ -24,7 +24,7 @@ def home():
     products = Product.all(conn)
     categories = Product.categorise_products(products)
     gift_form: GiftCardForm = GiftCardForm()
-
+    flash("Welcome to the store!", "info")
     return render_template(
         "front.html",
         products=products,
