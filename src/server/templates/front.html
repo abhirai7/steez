@@ -39,7 +39,7 @@
     {{ hero.carousel(carousels) }}
 {% endif %}
 
-<div class="position-fixed bottom-0 end-0 m-5 z-5 shadow">
+<div class="position-fixed bottom-0 end-0 m-5 z-5 shadow bg-transparent" style="z-index: 10;">
     <button class="btn btn-warning z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
         <i class="bi bi-gift"></i> GIFTS
     </button>
@@ -65,8 +65,14 @@
                         <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
                     </div>
                     <div class="card-body">
-                        <p class="card-title code fs-6 text-uppercase fw-semibold">{{ product.name }}</p>
-                        <p class="text-muted text-uppercase fw-semibold">{{ product.price | format_currency_direct }}</p>
+                        <p class="card-title code text-uppercase fw-semibold">{{ product.name }}</p>
+                        <p class="text-dark text-uppercase fw-semibold">
+                            {{ product.price | format_currency_direct }}
+                            {% if product.discount > 0 %}
+                            <span class="text-decoration-line-through text-muted">{{ product.display_price | format_currency_direct }}</span>
+                            <span class="badge bg-danger rounded-pill align-middle">{{ product.discount }}% OFF</span>
+                            {% endif %}
+                        </p>
                     </div>
                     <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                 </div>

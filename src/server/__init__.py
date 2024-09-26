@@ -6,6 +6,7 @@ import sqlite3
 from typing import TYPE_CHECKING
 
 import razorpay
+from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager, current_user
@@ -13,7 +14,7 @@ from flask_sitemapper import Sitemapper
 from flask_wtf import CSRFProtect
 
 from src.user import User
-from src.utils import SQLITE_OLD, sqlite_row_factory
+from src.utils import SQLITE_OLD, backup_sqlite_database, sqlite_row_factory
 
 load_dotenv()
 
@@ -52,6 +53,17 @@ if SQLITE_OLD:
     app.logger.warning(
         "**SQLITE VERSION IS TOO OLD. PLEASE USE 3.35.0 OR NEWER. FEW FEATURES MAY NOT WORK.**"
     )
+
+scheduler = BackgroundScheduler()
+
+scheduler.add_job(
+    backup_sqlite_database,
+    "interval",
+    seconds=5,
+    args=(conn,),
+)
+
+scheduler.start()
 
 from .filters import *  # noqa
 from .login_manager import *  # noqa

@@ -283,6 +283,10 @@ class Product:
     @property
     def total_reviews(self) -> int:
         return len(self.reviews)
+    
+    @property
+    def discount(self) -> int:
+        return int((abs(self.price - self.display_price) / self.price) * 100)
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
         return Review.create(
