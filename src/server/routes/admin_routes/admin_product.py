@@ -33,7 +33,7 @@ def admin_manage_product():
     ]
     addform: ProductAddForm = ProductAddForm(conn)
     return render_template(
-        "admin_manage_product.html",
+        "admin/admin_manage_product.html",
         products=products,
         size_names=size_names,
         form=addform,

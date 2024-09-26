@@ -8,4 +8,4 @@ from src.user import User
 @admin_login_required
 def admin_manage_user():
     users = User.all(conn)
-    return render_template("admin_manage_user.html", users=users)
+    return render_template("admin/admin_manage_user.html", users=users)

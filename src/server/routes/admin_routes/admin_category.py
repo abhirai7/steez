@@ -11,7 +11,7 @@ def admin_manage_category():
     categories = Category.all(conn)
     addform: CategoryAddForm = CategoryAddForm()
     return render_template(
-        "admin_manage_category.html", categories=categories, form=addform
+        "admin/admin_manage_category.html", categories=categories, form=addform
     )
 
 
@@ -28,7 +28,7 @@ def admin_add_category():
         )
 
         return redirect(url_for("admin_manage_category"))
-    return render_template("admin_manage_category.html", form=addform)
+    return render_template("admin/admin_manage_category.html", form=addform)
 
 
 @app.route("/admin/manage/category/delete/<int:id>", methods=["GET"])

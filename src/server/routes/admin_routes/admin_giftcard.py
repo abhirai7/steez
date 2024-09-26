@@ -21,7 +21,7 @@ def admin_giftcards():
     gift_cards = GiftCard.all(conn)
     form = GiftCardForm()
     return render_template(
-        "admin_manage_giftcard.html", gift_cards=gift_cards, form=form
+        "admin/admin_manage_giftcard.html", gift_cards=gift_cards, form=form
     )
 
 

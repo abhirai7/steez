@@ -34,7 +34,7 @@ def admin_login():
         login_user(admin)
         return redirect(url_for("admin_dashboard"))
 
-    return render_template("admin_login.html", form=form, current_user=current_user)
+    return render_template("admin/admin_login.html", form=form, current_user=current_user)
 
 
 @app.route("/admin/logout")
@@ -57,7 +57,7 @@ def admin_dashboard():
     settlements = razorpay_client.settlement.all({"count": 100})
 
     return render_template(
-        "admin_dashboard.html",
+        "admin/admin_dashboard.html",
         product_count=product_count,
         user_count=user_count,
         order_count=order_count,

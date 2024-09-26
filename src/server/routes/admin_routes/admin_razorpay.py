@@ -24,7 +24,7 @@ def admin_manage_razorpay_order():
     total_due = sum(item["amount_due"] for item in response["items"])
 
     return render_template(
-        "admin_manage_order.html",
+        "admin/admin_manage_order.html",
         total_order_amount=total_order_amount,
         total_paid=total_paid,
         total_due=total_due,
@@ -46,7 +46,7 @@ def admin_manage_order():
     orders = Order.all(conn, limit=limit, offset=skip)
 
     return render_template(
-        "admin_manage_partial_order.html",
+        "admin/admin_manage_partial_order.html",
         orders=orders,
         page=page,
         skip=skip,
@@ -64,5 +64,5 @@ def admin_payments():
     payments = razorpay_client.payment.all({"count": limit, "skip": skip})
 
     return render_template(
-        "admin_payments.html", payments=payments, page=page, skip=skip, limit=limit
+        "admin/admin_payments.html", payments=payments, page=page, skip=skip, limit=limit
     )
