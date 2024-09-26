@@ -9,24 +9,15 @@
 
 {% block styles %}
 <style>
-    .fs {
-        font-size: 7rem;
-    }
-
     .product-card:hover {
         transition: transform 0.3s ease-in;
     }
 
     .product-card img {
         transition: opacity 0.2s ease-out;
-        object-fit: cover;
     }
 
     .product-card .hover-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-      
         opacity: 1;
     }
 
@@ -48,36 +39,36 @@
     {{ hero.carousel(carousels) }}
 {% endif %}
 
-<div class="position-fixed bottom-0 end-0 m-5 z-5">
-    <button class="btn btn-warning z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-gift"></i>
-        GIFTS</button>
+<div class="position-fixed bottom-0 end-0 m-5 z-5 shadow">
+    <button class="btn btn-warning z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+        <i class="bi bi-gift"></i> GIFTS
+    </button>
 </div>
 {% if products %}
-<hr />
-<div class="container-fluid mt-5">
+<div class="container-fluid p-0">
     {% for category, products in categories.items() %}
-    <div>
-        <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
-            <div class="col-3 m-0 p-0 border border-1">
+    <div class="m-0 p-0">
+        <div class="row row-cols-lg-4 row-cols-2 m-0 p-0">
+            <div class="col m-0 p-0 border border-1">
                 <div class="h-100 d-flex align-items-center justify-content-center">
                     <div class="text-center align-middle">
-                        <p class="fs-2 horizon-font align-middle">{{ category.name }}</p>
-                        <p class="text-muted align-middle">Shop Now</p>
+                        <p class="fs-lg-2 fs-3 horizon-font align-middle">{{ category.name }}</p>
+                        <p class="text-muted align-middle fw-semibold text-uppercase">Shop Now</p>
                     </div>
                 </div>
             </div>
             {% for product in products %}
-            <div class="col m-0 p-0" id="{{ product.id }}">
-                <div class="d-flex justify-content-center">
-                    <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0 w-100">
+            <div class="col-lg-3 m-0 p-0 border border-1" id="{{ product.id }}">
+                <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0">
+                    <div class="d-flex justify-content-center position-relative">
                         <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
-                        <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
-                        <div class="card-body">
-                            <p class="card-title code fs-6">{{ product.name }}</p>
-                            <p class="text-muted">INR. {{ product.price }}</p>
-                        </div>
-                        <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+                        <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
                     </div>
+                    <div class="card-body">
+                        <p class="card-title code fs-6 text-uppercase fw-semibold">{{ product.name }}</p>
+                        <p class="text-muted text-uppercase fw-semibold">{{ product.price | format_currency_direct }}</p>
+                    </div>
+                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                 </div>
             </div>
             {% endfor %}
