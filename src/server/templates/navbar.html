@@ -1,184 +1,33 @@
 {% macro navbar(current_user, search_form, categories=None) -%}
 <style>
     #search-input-bar {
-        position: absolute;
-        margin-top: 6%;
-        margin-left: 3%;
+        position: relative;
         width: 90%;
         display: none;
     }
-    #search-btn {
-        position:fixed;
-        right:14%
-        /* margin-left: 80%; */
-
-    }
-    #search-input {
-        font-size: 1.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        #search-btn {
-            position: fixed;
-            right: 5%;
-            vertical-align: top;
-
-        }
-        #hamburger-menu {
-            position: fixed;
-            margin-right: 85%;
-        }
-        #search-input-bar {
-            position: relative;
-            width: 100%;
-            margin-top: 3%;
-            margin-left: 0%;
-
-        }  
+    @media (max-width: 990px) {
         #search-input {
             font-size: 1rem;
         }
         #nav-head {
+            left : 50%;
+            z-index: 1;
             position: relative;
-            margin-left: 35%;
+            transform: translateX(-50%);
         }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
-        }
-
-        
-    }
-    @media (min-width : 790px){
         #search-btn {
-            position: fixed;
-            right: 10%;
-            vertical-align: top;
+            left: 0;
+            position: relative;
+            margin-left: 0;
+            z-index: 0;
+            transform: translateX(0%);
         }
-        #search-input-bar {
-            position: absolute;
-            width: 100%;
-            margin-top: 12%;
-            margin-left: 0%;
-
-        }  
-        #search-input {
-            font-size: 1rem;
-        }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
+        #hamburger-menu {
+            position: relative;
+            right: 55%;
         }
     }
-    @media (min-width : 988px) {
-        #search-btn {
-            position: fixed;
-            right: 23%;
-            vertical-align: top;
-        }
-        #search-input-bar {
-            position: absolute;
-            width: 100%;
-            margin-top: 11%;
-            /* top:5%; */
-            margin-left: 0%;
-
-        }  
-        #search-input {
-            font-size: 1rem;
-        }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
-        }
-        
-    }
-    @media(min-width: 1200px) {
-        #search-btn {
-            position: fixed;
-            right: 18%;
-            vertical-align: top;
-        }
-        #search-input-bar {
-            position: absolute;
-            width: 100%;
-            margin-top: 8%;
-            margin-left: 0%;
-
-        }  
-        #search-input {
-            font-size: 1rem;
-        }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
-        }
-    }
-    @media(min-width : 1400px) {
-        #search-btn {
-            position: fixed;
-            right: 18%;
-            vertical-align: top;
-        }
-        #search-input-bar {
-            position: absolute;
-            width: 100%;
-            margin-top: 7%;
-            margin-left: 0%;
-
-        }  
-        #search-input {
-            font-size: 1rem;
-        }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
-        }
-    }
-
-    @media(min-width : 1600px) {
-        #search-btn {
-            position: fixed;
-            right: 15%;
-            vertical-align: top;
-        }
-        #search-input-bar {
-            position: absolute;
-            width: 100%;
-            margin-top: 6%;
-            margin-left: 0%;
-
-        }  
-        #search-input {
-            font-size: 1rem;
-        }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
-        }
-    }
-
-    @media(min-width : 1800px) {
-        #search-btn {
-            position: fixed;
-            right: 15%;
-            vertical-align: top;
-        }
-        #search-input-bar {
-            position: absolute;
-            width: 100%;
-            margin-top: 6%;
-            margin-left: 0%;
-
-        }  
-        #search-input {
-            font-size: 1rem;
-        }
-        #close-btn {
-            width: 15%;
-            font-size: 1rem;
-        }
-    }
+    
 </style>
 <nav class="navbar navbar-expand-lg bg-body-tertiary" >
     <div class="container-fluid d-flex align-items-start" id="navbar">
