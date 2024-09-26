@@ -21,18 +21,6 @@ class AddToCartForm(FlaskForm):
         if available_sizes:
             self.size.choices = [(size, size_names[size]) for size in available_sizes]
 
-    def validate_quantity(self, field: IntegerField) -> bool:
-        if field.data is None:
-            error = "Quantity must be a number"
-            raise ValidationError(error)
-
-        if field.data < 0:
-            error = "Quantity must be greater than 0"
-            raise ValidationError(error)
-
-        return True
-
-
 class AddReviewForm(FlaskForm):
     review = TextAreaField("Review")
     submit = SubmitField("Add Review")
