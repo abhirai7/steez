@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, SubmitField, TextAreaField
-from wtforms.validators import NumberRange, ValidationError
+from wtforms.validators import NumberRange
 
 from src.utils import size_chart, size_names
 

@@ -24,7 +24,6 @@ def home():
     products = Product.all(conn)
     categories = Product.categorise_products(products)
     gift_form: GiftCardForm = GiftCardForm()
-    flash("Welcome to the store!", "info")
     return render_template(
         "front.html",
         products=products,
