@@ -62,6 +62,10 @@
         background-color: #ffffff;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .address-tooltip {
+        --bs-tooltip-max-width: 380px;
+    }
 </style>
 {% endblock %}
 
@@ -121,10 +125,21 @@
                 </div>
                 {% endif %}
             </div>
-
             <div class="mb-3">
                 {{ form.address_line1.label(class="form-label fs-5") }}
-                {{ form.address_line1(class="form-control", id="address_line", placeholder="Enter your Address") }}
+                {{ 
+                    form.address_line1(
+                        class="form-control",
+                        id="address_line",
+                        placeholder="Enter your Address",
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "data-bs-title": "Ex. 123/4 A, XYZ Society, Street Name, Near PQR",
+                            "data-bs-custom-class": "address-tooltip"
+                        }
+                    ) 
+                }}
                 {% if form.address_line1.errors %}
                 <div class="alert alert-danger mt-2 p-2" role="alert">
                     {% for error in form.address_line1.errors %}
@@ -133,6 +148,11 @@
                 </div>
                 {% endif %}
             </div>
+            <script>
+                $(function () {
+                    $('[data-bs-toggle="tooltip"]').tooltip();
+                });
+            </script>
 
             <div class="mb-3">
                 {{ form.pincode(class="form-control", id="pincode", placeholder="Enter your Pincode") }}
