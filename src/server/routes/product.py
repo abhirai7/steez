@@ -66,14 +66,9 @@ def product(product_id: int):
 @login_required
 def add_to_cart(product_id: int):
     product = Product.from_id(conn, product_id)
-    form: AddToCartForm = AddToCartForm(product.available_sizes)
-
-    if (
-        form.validate_on_submit()
-        and request.method == "POST"
-        and form.quantity.data
-        and form.size.data
-    ):
+    form: AddToCartForm = AddToCartForm()
+    print(form.quantity.errors)
+    if form.validate_on_submit():
         product = Product.from_size(conn, id=product.id, size=form.size.data)
 
         current_user.add_to_cart(product=product, quantity=int(form.quantity.data))

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, SubmitField, TextAreaField
-from wtforms.validators import NumberRange
+from wtforms.validators import NumberRange, ValidationError
 
 from src.utils import size_chart, size_names
 
@@ -13,13 +13,24 @@ class AddToCartForm(FlaskForm):
         choices=[(size_chart[size]["CODE"], size) for size in size_chart],
     )
 
-    quantity = IntegerField("Quantity", default=1, validators=[NumberRange(min=1)])
-
+    quantity = IntegerField("Quantity", validators=[NumberRange(min=1)])
     submit = SubmitField("Add to Cart")
 
-    def __init__(self, available_sizes: list[str], *args, **kwargs) -> None:
+    def __init__(self, available_sizes: list[str] | None = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.size.choices = [(size, size_names[size]) for size in available_sizes]
+        if available_sizes:
+            self.size.choices = [(size, size_names[size]) for size in available_sizes]
+
+    def validate_quantity(self, field: IntegerField) -> bool:
+        if field.data is None:
+            error = "Quantity must be a number"
+            raise ValidationError(error)
+
+        if field.data < 0:
+            error = "Quantity must be greater than 0"
+            raise ValidationError(error)
+
+        return True
 
 
 class AddReviewForm(FlaskForm):

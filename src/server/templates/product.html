@@ -26,28 +26,6 @@
         transform: scale(var(--zoom, 2)); 
     }
 
-    .modal-body {
-        position: relative; 
-    }
-
-    .btn-close {
-        top: 20px; 
-        right: 20px;
-        z-index: 10; 
-    }
-    .star-rating label {
-        cursor: pointer;
-    }
-
-    .star-rating label {
-        cursor: pointer;
-    }
-
-    .star-rating label:hover i,
-    .star-rating label:hover~label i,
-    .star-rating input[type="radio"]:checked~label i {
-        color: #ffc107 !important;
-    }
 </style>
 {% endblock %}
 
@@ -74,7 +52,7 @@
                 <hr>
             </div>
         
-            <div class="product-image text-center" style="margin-top: 20%;">
+            <div class="product-image text-center my-5">
                 <div class="container my-4">
                     <div class="row justify-content-center">
                         <div class="col-lg-10 col-md-12 col-sm-12">
@@ -108,8 +86,7 @@
                     </div>
                 </div>
             </div>
-            
-            
+
             <div class="modal fade" id="zoomModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content position-relative">
@@ -120,15 +97,9 @@
                     </div>
                 </div>
             </div>
-            
-            
-
         </div>
-        
-        
-        
         <div class="col border-start border-start-1 m-0 p-0">
-            <div class="p-5">
+            <div class="px-5 pb-5">
                 <p class="fs-1 fw-bold text-uppercase d-none d-lg-block d-md-block d-xl-block">
                     {{ product.name.strip() }}
                 </p>
@@ -153,6 +124,7 @@
                                     {{ form.quantity.label(class="form-label fw-semibold fs-6 text-muted mb-3") }}
                                     {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6 w-100 border-dark-subtle focus-ring focus-ring-dark p-3 ", placeholder="Ex. 1") }}
                                 </div>
+
                                 <div class="form-group mb-2">
                                     {{ form.size.label(class="form-label fw-semibold fs-6 text-muted") }}
                                     {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6 w-100 mb-3 border-dark-subtle focus-ring focus-ring-dark p-3", placeholder="Select Size") }}
@@ -302,7 +274,7 @@
 
         <div class="col-lg-9 col-md-8 m-0 p-0">
             <div class="card border border-0 mb-5 rounded rounded-0 p-4 bg-light">
-                <div class="border border-1 p-5 shadow-sm">
+                <div class="border border-1 p-lg-5 p-3 shadow-sm">
                     <h5 class="card-title">Leave Your Review</h5>
                     <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
                         {{ review_form.hidden_tag() }}

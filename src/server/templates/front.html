@@ -41,11 +41,17 @@
 
 {% endblock %}
 {% block body %}
+
 {{ navbar.navbar(current_user, search_form, categories) }}
+
 {% if show_hero %}
-{{ hero.carousel(carousels) }}
+    {{ hero.carousel(carousels) }}
 {% endif %}
 
+<div class="position-fixed bottom-0 end-0 m-5 z-5">
+    <button class="btn btn-warning z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-gift"></i>
+        GIFTS</button>
+</div>
 {% if products %}
 <hr />
 <div class="container-fluid mt-5">
@@ -71,14 +77,6 @@
     {% endfor %}
 </div>
 {% endif %}
-
-
-
-<div class="position-fixed bottom-0 end-0 m-5">
-    <button class="btn btn-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-gift"></i>
-        GIFTS</button>
-
-</div>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
     <div class="offcanvas-header">
