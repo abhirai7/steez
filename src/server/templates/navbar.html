@@ -1,4 +1,4 @@
-{% macro navbar(current_user, search_form, categories=None) -%}
+{% macro navbar(current_user, search_form, categories=None) %}
     <style>
         #search-input-bar {
             position: relative;
@@ -129,10 +129,8 @@
             </div>
         </form>
     </div>
-</nav>
-</div>
-{%- endmacro %}
-{% macro admin_navbar(current_user) -%}
+{% endmacro %}
+{% macro admin_navbar(current_user) %}
     <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark h-100">
         <a href="{{ url_for("admin_dashboard") }}" class="d-flex align-items-center text-white text-decoration-none text-center">Admin Dashboard</a>
         <hr>
@@ -166,4 +164,4 @@
         <hr>
         <p class="text-center">{{ current_user.name }}</p>
     </div>
-{%- endmacro %}
+{% endmacro %}

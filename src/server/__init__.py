@@ -65,6 +65,9 @@ scheduler.add_job(
 
 scheduler.start()
 
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
+
 from .filters import *  # noqa
 from .login_manager import *  # noqa
 from .routes import *  # noqa
