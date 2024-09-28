@@ -9,7 +9,7 @@ from src.utils import size_chart, size_names
 
 class AddToCartForm(FlaskForm):
     size = SelectField(
-        "Size",
+        "Select Size",
         choices=[(size_chart[size]["CODE"], size) for size in size_chart],
     )
 

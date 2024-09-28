@@ -35,7 +35,7 @@
     {{ navbar.navbar(current_user, search_form) }}
 
     <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
-        <div class="col border-end border-end-1 m-0 p-0">
+        <div class="col border-end border-end-1 border border-top-1 m-0 p-0">
             <div class="d-block d-lg-none d-md-none text-center">
                 <hr>
                 <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
@@ -54,15 +54,9 @@
         
             <div class="product-image text-center my-5">
                 <div class="container my-4">
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-center m-0 p-0">
                         <div class="col-lg-10 col-md-12 col-sm-12">
-                            <div id="carouselExampleIndicators" class="carousel carousel-dark slide" data-bs-ride="carousel">
-                                <div class="carousel-indicators">
-                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                    {% for i in range(1, product.images | length) %}
-                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ i }}" aria-label="Slide {{ i + 1 }}"></button>
-                                    {% endfor %}
-                                </div>
+                            <div id="product-image-indicators" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-inner position-relative">
                                     {% for i in range(0, product.images | length) %}
                                     <div class="carousel-item {% if i == 0 %}active{% endif %}">
@@ -73,14 +67,21 @@
                                     </div>
                                     {% endfor %}
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next mt-5" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon mb-5 " aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <button class="border border-0 btn btn-outline-secondary rounded rounded-0 " type="button" data-bs-target="#product-image-indicators" data-bs-slide="prev">
+                                        <i class="fa-solid fa-arrow-left fa-lg" style="color: #000000;"></i>
+                                    </button>
+                                    <div class="carousel-indicators">
+                                        {% for i in range(product.images | length) %}
+                                        <button type="button" data-bs-target="#product-image-indicators" class="bg-light border border-0 fw-bold text-dark fs-3 {% if i == 0 %}active{% endif %}" data-bs-slide-to="{{ i }}" aria-label="Slide {{ i }}" {% if i == 0 %}aria-current="true"{% endif %}>
+                                            <div class=" bg-dark rounded rounded-5" style="height: 8px; width: 25px;"></div>
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="border border-0 btn btn-outline-secondary rounded rounded-0" type="button" data-bs-target="#product-image-indicators" data-bs-slide="next">
+                                        <i class="fa-solid fa-arrow-right fa-lg" style="color: #000000;"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -98,8 +99,8 @@
                 </div>
             </div>
         </div>
-        <div class="col border-start border-start-1 m-0 p-0">
-            <div class="px-lg-5 px-2 pb-5">
+        <div class="col border-start border-start-1 border border-top-1 m-0 p-0">
+            <div class="px-lg-5 px-4 pb-5 mt-4">
                 <p class="fs-1 fw-bold text-uppercase d-none d-lg-block d-md-block d-xl-block">
                     {{ product.name.strip() }}
                 </p>
@@ -119,48 +120,71 @@
 
                     <div class="row">
                         <div class="col">
-                            <div class="form-group mb-4">
-                                {{ form.quantity.label(class="form-label fw-semibold fs-6 text-muted mb-3") }}
-                                {{ form.quantity(class="form-control form-control-lg rounded rounded-0 fs-6 w-100 border-dark-subtle focus-ring focus-ring-dark p-3 ", placeholder="Ex. 1") }}
+                            <div class="form-group mb-2">
+                                {{ form.size.label(class="form-label fw-semibold text-muted") }}
+                                {{ form.size(class="form-select rounded rounded-0 w-100 mb-3 border-dark-subtle focus-ring fw-semibold focus-ring-dark p-3", placeholder="Select Size") }}
                             </div>
 
-                            <div class="form-group mb-2">
-                                {{ form.size.label(class="form-label fw-semibold fs-6 text-muted") }}
-                                {{ form.size(class="form-select form-select-lg rounded rounded-0 fs-6 w-100 mb-3 border-dark-subtle focus-ring focus-ring-dark p-3", placeholder="Select Size") }}
-                                <button type="button" class="btn text-start p-0 m-0" data-bs-toggle="modal" data-bs-target="#reference-chart">
-                                    <span class="text-primary">Size Reference Chart</span>
-                                </button>
+                            <div class="form-group">
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-dark border p-3 border-1 rounded rounded-0 h-100 text-center decrement">
+                                        <span class="fw-semibold"><i class="bi bi-dash fw-bold"></i></span>
+                                    </button>
+                                    {{ form.quantity(class="form-control text-center rounded rounded-0 fw-semibold border-dark-subtle focus-ring focus-ring-dark p-3", id="quantity") }}
+                                    <button type="button" class="btn btn-outline-dark border p-3 border-1 rounded rounded-0 h-100 text-center increment">
+                                        <span class="fw-semibold"><i class="bi bi-plus fs-bold"></i></span>
+                                    </button>
+                                </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                            const amount = document.getElementById('quantity');
+                                            const increment = document.querySelector('.increment');
+                                            const decrement = document.querySelector('.decrement');
 
-                                <div class="modal fade rounded rounded-0" id="reference-chart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog rounded rounded-0">
-                                        <div class="modal-content rounded rounded-0">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reference Chart</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <table class="table table-bordered table-hover text-center">
-                                                    <thead class="thead-dark">
-                                                        <tr>
-                                                            <th>SIZE</th>
-                                                            <th>CHEST</th>
-                                                            <th>LENGTH</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for size, chest, length in size_chart %}
-                                                        <tr>
-                                                            <td>{{ size }}</td>
-                                                            <td>{{ chest }}</td>
-                                                            <td>{{ length }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary rounded rounded-0" data-bs-dismiss="modal">Close</button>
-                                            </div>
+                                            increment.addEventListener('click', () => {
+                                                amount.stepUp();
+                                            });
+
+                                            decrement.addEventListener('click', () => {
+                                                amount.stepDown();
+                                            });
+                                        });
+                                </script>
+                            </div>
+
+                            <button type="button" class="btn text-start p-0 my-3" data-bs-toggle="modal" data-bs-target="#reference-chart">
+                                <span class="text-primary">Size Reference Chart</span>
+                            </button>
+
+                            <div class="modal fade rounded rounded-0" id="reference-chart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog rounded rounded-0">
+                                    <div class="modal-content rounded rounded-0">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Reference Chart</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table class="table table-bordered table-hover text-center">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>SIZE</th>
+                                                        <th>CHEST</th>
+                                                        <th>LENGTH</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for size, chest, length in size_chart %}
+                                                    <tr>
+                                                        <td>{{ size }}</td>
+                                                        <td>{{ chest }}</td>
+                                                        <td>{{ length }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary rounded rounded-0" data-bs-dismiss="modal">Close</button>
                                         </div>
                                     </div>
                                 </div>
