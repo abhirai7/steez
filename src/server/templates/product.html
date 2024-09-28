@@ -27,6 +27,27 @@
     }
 
 </style>
+<style>
+    .product-card:hover {
+        transition: transform 0.3s ease-in;
+    }
+
+    .product-card img {
+        transition: opacity 0.2s ease-out;
+    }
+
+    .product-card .hover-image {
+        opacity: 1;
+    }
+
+    .product-card:hover .hover-image {
+        opacity: 0;
+    }
+
+    .product-card:hover .main-image {
+        opacity: 1;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
@@ -45,9 +66,9 @@
                     {% set percent = ((difference / display_price) * 100) | int %}
                     <span class="text-danger fs-4">-{{ percent }}% </span>
                 {% endif %}
-                <span class="fs-4 fw-bold">INR. {{ product.price }}</span>
+                <span class="fs-4 fw-bold">{{ product.price | format_currency_direct }}</span>
                 {% if difference > 0 %}
-                    <p class="text-muted text-decoration-line-through mt-0">INR. {{ display_price }}</p>
+                    <p class="text-muted text-decoration-line-through mt-0">{{ display_price | format_currency_direct }}</p>
                 {% endif %}
                 <hr>
             </div>
@@ -60,7 +81,7 @@
                                 <div class="carousel-inner position-relative">
                                     {% for i in range(0, product.images | length) %}
                                     <div class="carousel-item {% if i == 0 %}active{% endif %}">
-                                        <img src="{{ product.images[i] }}" alt="{{ product.name }}" class="d-block w-100" style="max-height: 700px; object-fit: cover;">
+                                        <img src="{{ product.images[i] }}" alt="{{ product.name }}" class="d-block w-100">
                                         <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-toggle="modal" data-bs-target="#zoomModal" data-img-src="{{ product.images[i] }}">
                                             <i class="bi bi-arrows-fullscreen"></i> 
                                         </button>
@@ -105,13 +126,12 @@
                     {{ product.name.strip() }}
                 </p>
                 <div class="mb-4 mt-4">
-                    {% if product.display_price - product.price > 0 %}
-                    {% set percent = (((product.display_price - product.price) / product.display_price) * 100) | int %}
-                    <span class="text-danger fs-5">-{{ percent }}% </span>
+                    {% if product.discount > 0 %}
+                    <span class="text-danger fs-5">-{{ product.discount }}% </span>
                     {% endif %}
-                    <span class="fs-4 fw-semibold">INR. {{ product.price }}</span>
+                    <span class="fs-4 fw-semibold">{{ product.price | format_currency_direct }}</span>
                     {% if product.display_price - product.price > 0 %}
-                    <p class="text-muted text-decoration-line-through mt-0">INR. {{ product.display_price }}</p>
+                    <p class="text-muted text-decoration-line-through mt-0">{{ product.display_price | format_currency_direct }}</p>
                     {% endif %}
                 </div>
 
@@ -220,13 +240,41 @@
                         {% endif %}
                     </div>
                 </form>
-                <div class="text-dark p-2 shadow-sm text-center fs-6 lh-lg text-uppercase">
+                <div class="text-dark p-2 text-center fs-6 lh-lg text-uppercase">
                     {{ product.description | safe }}
                 </div>
             </div>
         </div>
     </div>
-    <hr class="mt-0">
+</div>
+<div class="container-fluid">
+    <div class="row row-cols-lg-4 row-cols-2 m-0 p-0">
+        <div class="col m-0 p-0 border border-1">
+            <div class="h-100 d-flex align-items-center justify-content-center">
+                <div class="text-center align-middle">
+                    <p class="fs-lg-2 fs-3 horizon-font align-middle">You may also like</p>
+                    <p class="text-muted align-middle fw-semibold text-uppercase">Shop Now</p>
+                </div>
+            </div>
+        </div>
+        {% for prod in product.similar_products() %}
+        <div class="col-lg-3 m-0 p-0 border border-1" id="{{ prod.id }}">
+            <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0">
+                <div class="d-flex justify-content-center position-relative">
+                    <img src="{{ prod.images[0] }}" alt="{{ prod.name }}" class="img-fluid main-image" />
+                    <img src="{{ prod.images[1] }}" alt="{{ prod.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
+                </div>
+                <div class="card-body">
+                    <p class="card-title code fs-6 text-uppercase fw-semibold">{{ prod.name }}</p>
+                    <p class="text-muted text-uppercase fw-semibold">{{ prod.price | format_currency_direct }}</p>
+                </div>
+                <a href="{{ url_for('product', product_id=prod.id) }}" class="stretched-link"></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="ccontainer-fluid mt-0 overflow-hidden">
     <div class="container-fluid p-lg-5 p-3">
         <p class="fs-2 fw-semibold m-2 mb-3">Frequently Asked Questions</p>
         <div class="accordion" id="returnPolicyAccordion">
@@ -248,7 +296,6 @@
         {% endif %}
         {% endfor %}
     </div>
-</div>
 </div>
 
 <div class="container-fluid mt-lg-4 mt-3 ps-lg-5 pe-lg-5">

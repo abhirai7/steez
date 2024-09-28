@@ -254,7 +254,7 @@ class Product:
             [f"KEYWORDS LIKE '%{keyword}%'" for keyword in self.keywords]
         )
 
-        query = f"SELECT * FROM PRODUCTS WHERE ID != ? AND ({keywords_query}) LIMIT 3 ORDER BY CREATED_AT DESC"
+        query = f"SELECT * FROM PRODUCTS WHERE ID != ? AND ({keywords_query}) AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) ORDER BY CREATED_AT DESC LIMIT 3"
         cursor = self.__conn.cursor()
         cursor.execute(query, (self.id,))
 
@@ -302,6 +302,10 @@ class Product:
     @property
     def total_reviews(self) -> int:
         return len(self.reviews)
+    
+    @property
+    def discount(self) -> int:
+        return int((abs(self.price - self.display_price) / self.price) * 100)
 
     @property
     def discount(self) -> int:
