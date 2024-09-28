@@ -52,13 +52,12 @@
 
 {% block body %}
 
-<div class="container-fluid mt-0 overflow-hidden">
-    {{ navbar.navbar(current_user, search_form) }}
+{{ navbar.navbar(current_user, search_form) }}
+<div class="container-fluid overflow-hidden">
 
-    <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1 pt-3">
-        <div class="col border-end border-end-1 border border-top-1 m-0 p-0">
+    <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1">
+        <div class="col border-end border-end-1">
             <div class="d-block d-lg-none d-md-none text-center">
-                <hr>
                 <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
                 {% set display_price = product.display_price %}
                 {% set difference = display_price - product.price %}
@@ -70,7 +69,6 @@
                 {% if difference > 0 %}
                     <p class="text-muted text-decoration-line-through mt-0">{{ display_price | format_currency_direct }}</p>
                 {% endif %}
-                <hr>
             </div>
         
             <div class="product-image text-center my-5">
@@ -120,7 +118,7 @@
                 </div>
             </div>
         </div>
-        <div class="col border-start border-start-1 border border-top-1 m-0 p-0">
+        <div class="col border-start border-start-1 m-0 p-0">
             <div class="px-lg-5 px-4 pb-5 mt-4">
                 <p class="fs-1 fw-bold text-uppercase d-none d-lg-block d-md-block d-xl-block">
                     {{ product.name.strip() }}
