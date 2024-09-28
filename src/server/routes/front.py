@@ -29,7 +29,6 @@ def home():
         products=products,
         current_user=current_user,
         gift_form=GiftCardForm(),
-        gift_form=GiftCardForm(),
         show_hero=True,
         categories=categories,
         search_form=SearchForm(),
