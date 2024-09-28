@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import arrow
 import sqlite3
 from typing import TYPE_CHECKING, Literal
+
+import arrow
 
 from .utils import SQLITE_OLD
 

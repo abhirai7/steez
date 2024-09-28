@@ -1,65 +1,55 @@
 {% extends 'base.html' %}
-
 {% import 'navbar.html' as navbar %}
-
-{% set title = 'STEEZ™ - Admin Users' %}
-
+{% set title = "STEEZ™ - Admin Users" %}
 {% block body %}
-<div class="row">
-    <div class="col-2">
-        {{ navbar.admin_navbar(current_user) }}
-    </div>
-    <div class="col-10 overflow-y-auto" style="height: 100vh;">
-        <div class="border border-1 mt-3">
-            <div class="card-header">
-                <p class="fs-1 m-0 text-center">Users</p>
-                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+    <div class="row">
+        <div class="col-2">{{ navbar.admin_navbar(current_user) }}</div>
+        <div class="col-10 overflow-y-auto" style="height: 100vh;">
+            <div class="border border-1 mt-3">
+                <div class="card-header">
+                    <p class="fs-1 m-0 text-center">Users</p>
+                    <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+                </div>
             </div>
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Role</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if users %}
+                        {% for user in users %}
+                            <tr>
+                                <td>USR_{{ user['id'] }}</td>
+                                <td>{{ user['name'] }}</td>
+                                <td>{{ user['email'] }}</td>
+                                <td>{{ user['phone'] }}</td>
+                                <td>
+                                    <p class="d-inline-flex gap-1">
+                                        <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-address-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="collapse-address-{{ loop.index }}">View Address</a>
+                                    </p>
+                                    <div class="collapse" id="collapse-address-{{ loop.index }}">
+                                        <div class="card card-body">{{ user['address'] }}</div>
+                                    </div>
+                                </td>
+                                <td>{{ user['role'] }}</td>
+                                <td>{{ user['created_at'] | datetimeformat }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No users found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
-
-        <table class="table table-bordered table-striped mt-3">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Role</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if users %}
-                {% for user in users %}
-                <tr>
-                    <td>USR_{{ user['id'] }}</td>
-                    <td>{{ user['name'] }}</td>
-                    <td>{{ user['email'] }}</td>
-                    <td>{{ user['phone'] }}</td>
-                    <td>
-                        <p class="d-inline-flex gap-1">
-                            <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-address-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="collapse-address-{{ loop.index }}">
-                                View Address
-                            </a>
-                        </p>
-                        <div class="collapse" id="collapse-address-{{ loop.index }}">
-                            <div class="card card-body">
-                                {{ user['address'] }}
-                            </div>
-                        </div>
-                    </td>
-                    <td>{{ user['role'] }}</td>
-                    <td>{{ user['created_at'] | datetimeformat }}</td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">No users found</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
     </div>
-</div>
 {% endblock %}

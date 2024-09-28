@@ -10,6 +10,7 @@ from wtforms import (
     PasswordField,
     StringField,
     SubmitField,
+    TelField,
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
@@ -39,7 +40,7 @@ class RegisterForm(FlaskForm):
     city         = StringField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
     state        = StringField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
     pincode      = IntegerField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
-    phone        = IntegerField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
+    phone        = TelField("", validators=[DataRequired()], render_kw={"autocomplete": "off"})
 
     submit       = SubmitField("Register")
 

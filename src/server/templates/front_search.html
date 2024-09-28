@@ -1,63 +1,59 @@
 {% extends 'base.html' %}
-
 {% import 'navbar.html' as navbar %}
 {% import 'footer.html' as footer %}
-{% set title = 'STEEZ™' %}
+{% set title = "STEEZ™" %}
 {% block styles %}
-<style>
-    .fs {
-        font-size: 7rem;
-    }
+    <style>
+        .fs {
+            font-size: 7rem;
+        }
 
-    .product-card:hover {
-        transition: transform 0.3s ease-in;
-    }
+        .product-card:hover {
+            transition: transform 0.3s ease-in;
+        }
 
-    .product-card img {
-        transition: opacity 0.2s ease-out;
-        object-fit: cover;
-    }
+        .product-card img {
+            transition: opacity 0.2s ease-out;
+            object-fit: cover;
+        }
 
-    .product-card .hover-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        opacity: 1;
-    }
+        .product-card .hover-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 1;
+        }
 
-    .product-card:hover .hover-image {
-        opacity: 0;
-    }
+        .product-card:hover .hover-image {
+            opacity: 0;
+        }
 
-    .product-card:hover .main-image {
-        opacity: 1;
-    }
-</style>
+        .product-card:hover .main-image {
+            opacity: 1;
+        }
+    </style>
 {% endblock %}
 {% block body %}
-
-{{ navbar.navbar(current_user, search_form) }}
-
-{% if products %}
-<hr />
-<div class="container-fluid mt-5">
-    <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
-        {% for product in products %}
-            <div class="col m-0 p-0 d-flex justify-content-center" id="{{ product.id }}">
-                <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0" style="max-width: 17rem; max-height: 25rem;">
-                    <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
-                    <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
-                    <div class="card-body">
-                        <h5 class="card-title code fs-5">{{ product.name }}</h5>
-                        <h6 class="text-muted">INR. {{ product.price }}</h6>
+    {{ navbar.navbar(current_user, search_form) }}
+    {% if products %}
+        <hr />
+        <div class="container-fluid mt-5">
+            <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
+                {% for product in products %}
+                    <div class="col m-0 p-0 d-flex justify-content-center" id="{{ product.id }}">
+                        <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0" style="max-width: 17rem; max-height: 25rem">
+                            <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
+                            <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image" />
+                            <div class="card-body">
+                                <h5 class="card-title code fs-5">{{ product.name }}</h5>
+                                <h6 class="text-muted">INR. {{ product.price }}</h6>
+                            </div>
+                            <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+                        </div>
                     </div>
-                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
-                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-
-{{ footer.footer(newsletter_form) }}
+        </div>
+    {% endif %}
+    {{ footer.footer(newsletter_form) }}
 {% endblock %}

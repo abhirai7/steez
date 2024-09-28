@@ -22,7 +22,9 @@ def generate_unique_identifier():
 def admin_manage_carousel():
     form = CarouselForm()
     carousels = Carousel.all(conn)
-    return render_template("admin/admin_manage_carousel.html", form=form, carousels=carousels)
+    return render_template(
+        "admin/admin_manage_carousel.html", form=form, carousels=carousels
+    )
 
 
 @app.route("/admin/delete/carousel/<int:id>")

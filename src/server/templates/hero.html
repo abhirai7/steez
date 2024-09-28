@@ -1,43 +1,42 @@
 {% macro carousel(carousels) -%}
-<style>
-    .carousel-caption {
-        position: absolute;
-        top: 50%;
-        left: 10%;
-    }
-</style>
-<div id="carousel-front" class="carousel carousel-secondary slide">
-    <div class="carousel-indicators">
-        {% for caro in carousels %}
-            {% if loop.index == 1 %}
-                <button type="button" data-bs-target="#carousel-front" data-bs-slide-to="{{ loop.index0 }}" class="active" aria-current="true" aria-label="Slide {{ loop.index }}"></button>
-            {% else %}
-                <button type="button" data-bs-target="#carousel-front" data-bs-slide-to="{{ loop.index0 }}" aria-label="Slide {{ loop.index }}"></button>
-            {% endif %}
-        {% endfor %}
-    </div>
-    <div class="carousel-inner">
-        {% for caro in carousels %}
-            <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" data-bs-interval="2000">
-                <div class="text-center">
-                    <img src="{{ caro.image }}" class="img-fluid text-center min-vw-100" alt="..." />
+    <style>
+        .carousel-caption {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+        }
+    </style>
+    <div id="carousel-front" class="carousel carousel-secondary slide">
+        <div class="carousel-indicators">
+            {% for caro in carousels %}
+                {% if loop.index == 1 %}
+                    <button type="button" data-bs-target="#carousel-front" data-bs-slide-to="{{ loop.index0 }}" class="active" aria-current="true" aria-label="Slide {{ loop.index }}"></button>
+                {% else %}
+                    <button type="button" data-bs-target="#carousel-front" data-bs-slide-to="{{ loop.index0 }}" aria-label="Slide {{ loop.index }}"></button>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="carousel-inner">
+            {% for caro in carousels %}
+                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" data-bs-interval="2000">
+                    <div class="text-center">
+                        <img src="{{ caro.image }}" class="img-fluid text-center min-vw-100" alt="..." />
+                    </div>
+                    <div class="carousel-caption">
+                        <h1 class="d-flex text-uppercase text-light" style="font-family: 'Roboto Mono', monospace; font-optical-sizing: auto; font-weight: 600; font-style: semibold">{{ caro.heading }}</h1>
+                        <p class="d-flex text-light">{{ caro.description }}</p>
+                    </div>
                 </div>
-                <div class="carousel-caption">
-                    <h1 class="d-flex text-uppercase text-light" style="font-family: 'Roboto Mono', monospace; font-optical-sizing: auto; font-weight: 600; font-style: semibold;">{{ caro.heading }}</h1>
-                    <p class="d-flex text-light">{{ caro.description }}</p>
-                </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+        <!-- Previous and Next Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-front" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carousel-front" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
-    <!-- Previous and Next Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-front" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carousel-front" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
-
 {%- endmacro %}

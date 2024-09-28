@@ -9,7 +9,12 @@ from flask_login import current_user, login_required
 from src.carousel import Carousel
 from src.product import Category, Product
 from src.server import TODAY, app, conn, sitemapper
-from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm, LoginForm
+from src.server.forms import (
+    GiftCardForm,
+    LoginForm,
+    SearchForm,
+    SubscribeNewsLetterForm,
+)
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
 if TYPE_CHECKING:
@@ -34,7 +39,7 @@ def home():
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
         carousels=Carousel.all(conn),
-        LoginForm = LoginForm()
+        LoginForm=LoginForm(),
     )
 
 

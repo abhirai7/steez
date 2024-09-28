@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import sqlite3
-import arrow
 from typing import TYPE_CHECKING
+
+import arrow
 
 if TYPE_CHECKING:
     from .favourite import Favourite

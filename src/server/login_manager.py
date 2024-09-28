@@ -3,9 +3,8 @@ from __future__ import annotations
 from functools import wraps
 from typing import TYPE_CHECKING
 
-from flask import Request, redirect, url_for, render_template
+from flask import Request, render_template
 from flask_login import current_user
-from werkzeug import Response
 
 from src.server import conn, login_manager
 from src.user import Admin, User
@@ -28,6 +27,7 @@ def load_user(user_id: str | int) -> User | None:
         return User.from_id(conn, user_id)
     except ValueError:
         return None
+
 
 @login_manager.request_loader
 def load_user_from_request(request: Request) -> User | None:

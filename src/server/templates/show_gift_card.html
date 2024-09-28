@@ -1,104 +1,92 @@
 {% extends "base.html" %}
-
-{% set title = 'STEEZ™ - Gift Card' %}
-
+{% set title = "STEEZ™ - Gift Card" %}
 {% import 'navbar.html' as navbar %}
 {% import 'footer.html' as footer %}
-
 {% block styles %}
-<style>
-    .text-spacing {
-        letter-spacing: 4px;
-    }
-</style>
+    <style>
+        .text-spacing {
+            letter-spacing: 4px;
+        }
+    </style>
 {% endblock %}
-
 {% block body %}
-
-{% set code = gift_card.code %}
-{% set username = gift_card.user.name %}
-{% set amount = gift_card.price %}
-{% set created_at = gift_card.created_at %}
-{% set used = 'Yes' if gift_card.used else 'No' %}
-
-<div class="container mt-5">
-    <div class="justify-content-center">
-        <div class="card shadow">
-            <div class="card-body p-5">
-                <p class="card-title fs-1">Gift Card Code:</p>
-                <div class="card-text">
-                    <div class="row row-cols-1 row-cols-lg-2">
-                        <div class="col">
-                            <p id="gift-card-code" class="text-monospace form-control fs-5 border border-0 text-spacing text-center" aria-readonly="true">{{ code }}
-                            </p>
+    {% set code = gift_card.code %}
+    {% set username = gift_card.user.name %}
+    {% set amount = gift_card.price %}
+    {% set created_at = gift_card.created_at %}
+    {% set used = 'Yes' if gift_card.used else 'No' %}
+    <div class="container mt-5">
+        <div class="justify-content-center">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <p class="card-title fs-1">Gift Card Code:</p>
+                    <div class="card-text">
+                        <div class="row row-cols-1 row-cols-lg-2">
+                            <div class="col">
+                                <p id="gift-card-code" class="text-monospace form-control fs-5 border border-0 text-spacing text-center" aria-readonly="true">{{ code }}</p>
+                            </div>
+                            <div class="col d-flex justify-content-end h-100">
+                                <button class="btn btn-outline-primary text-center" id="copier" style="width: 100%">Copy Code to Clipboard</button>
+                            </div>
                         </div>
-                        <div class="col d-flex justify-content-end h-100">
-                            <button class="btn btn-outline-primary text-center" id="copier" style="width: 100%;">
-                                Copy Code to Clipboard
-                            </button>
-                        </div>
+                        <hr>
+                        <table class="table mt-2">
+                            <tr>
+                                <td>Username:</td>
+                                <td>{{ username }}</td>
+                            </tr>
+                            <tr>
+                                <td>Amount:</td>
+                                <td>{{ amount }}</td>
+                            </tr>
+                            <tr>
+                                <td>Created At:</td>
+                                <td>{{ arrow.get(created_at).humanize() }}</td>
+                            </tr>
+                            <tr>
+                                <td>Used:</td>
+                                <td>{{ used }}</td>
+                            </tr>
+                        </table>
                     </div>
-                    <hr>
-                    <table class="table mt-2">
-                        <tr>
-                            <td>Username:</td>
-                            <td>{{ username }}</td>
-                        </tr>
-                        <tr>
-                            <td>Amount:</td>
-                            <td>{{ amount }}</td>
-                        </tr>
-                        <tr>
-                            <td>Created At:</td>
-                            <td>{{ arrow.get(created_at).humanize() }}</td>
-                        </tr>
-                        <tr>
-                            <td>Used:</td>
-                            <td>{{ used }}</td>
-                        </tr>
-                    </table>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
 {% endblock %}
-
 {% block bottom_scripts %}
-<script>
-    const copies = [
-        "Copied!",
-        "Double Copied!",
-        "Triple Copied!",
-        "Quadruple Copied!",
-        "More Copied!",
-        "Even More Copied!",
-        "So Much Copied!",
-        "Copied again!",
-        "STOP!!",
-        "SUPER COPIED!",
-        "MEGA COPIED!",
-        "ULTRA COPIED!",
-        "HYPER COPIED!",
-        "GOD LIKE",
-        "AAAAAAAAAAAAAAAA",
-        "...",
-        "I'm done!",
-    ];
-    const copier = document.getElementById('copier');
-    const giftCardCode = document.getElementById('gift-card-code');
-    var i = 0;
-    copier.addEventListener('click', () => {
-        navigator.clipboard.writeText(giftCardCode.innerText).then(() => {
-            copier.innerText = copies[i];
-            i++;
-            if (i === copies.length) {
-                copier.innerText = 'Copy Code to Clipboard';
-                i = 0;
-            }
+    <script>
+        const copies = [
+            "Copied!",
+            "Double Copied!",
+            "Triple Copied!",
+            "Quadruple Copied!",
+            "More Copied!",
+            "Even More Copied!",
+            "So Much Copied!",
+            "Copied again!",
+            "STOP!!",
+            "SUPER COPIED!",
+            "MEGA COPIED!",
+            "ULTRA COPIED!",
+            "HYPER COPIED!",
+            "GOD LIKE",
+            "AAAAAAAAAAAAAAAA",
+            "...",
+            "I'm done!",
+        ];
+        const copier = document.getElementById('copier');
+        const giftCardCode = document.getElementById('gift-card-code');
+        var i = 0;
+        copier.addEventListener('click', () => {
+            navigator.clipboard.writeText(giftCardCode.innerText).then(() => {
+                copier.innerText = copies[i];
+                i++;
+                if (i === copies.length) {
+                    copier.innerText = 'Copy Code to Clipboard';
+                    i = 0;
+                }
+            });
         });
-    });
-
-</script>
+    </script>
 {% endblock %}

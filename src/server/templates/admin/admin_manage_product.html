@@ -1,241 +1,216 @@
 {% extends 'base.html' %}
-
 {% import 'navbar.html' as navbar %}
-
-{% set title = 'STEEZ™ - Admin' %}
-
+{% set title = "STEEZ™ - Admin" %}
 {% block body %}
-<div class="row">
-    <div class="col-2">
-        {{ navbar.admin_navbar(current_user) }}
-    </div>
-    <div class="col-10 ms-0 overflow-y-auto" style="height: 100vh;">
-        <div class="border border-1 mt-3">
-            <div class="card-header">
-                <p class="fs-1 m-0 text-center">Products</p>
+    <div class="row">
+        <div class="col-2">{{ navbar.admin_navbar(current_user) }}</div>
+        <div class="col-10 ms-0 overflow-y-auto" style="height: 100vh;">
+            <div class="border border-1 mt-3">
+                <div class="card-header">
+                    <p class="fs-1 m-0 text-center">Products</p>
+                </div>
+                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
             </div>
-            <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
-        </div>
-
-        <button type="button" class="btn btn-success w-100 mt-3 rounded rounded-0" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            Add Product
-        </button>
-
-        <table class="table table-bordered table-striped mt-3 table-responsive">
-            <thead class="table-dark">
-                <tr>
-                    <th>Sr. No.</th>
-                    <th>ID</th>
-                    <th>Unique ID</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Description</th>
-                    <th>Stock</th>
-                    <th>Category</th>
-                    <th>Preview</th>
-                    <th>Size</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if products %}
-                {% for product in products %}
-                <tr>
-                    <td class="align-middle">{{ skip + loop.index }}</td>
-                    <td class="align-middle">PROD_{{ product['id'] }}</td>
-                    <td class="align-middle">{{ product['unique_id'] }}</td>
-                    <td class="align-middle">{{ product['name'] }}</td>
-                    <td class="align-middle">{{ (product['price'] * 100) | format_currency }}</td>
-                    <td class="align-middle text-center">
-                        <p class="d-inline-flex gap-1">
-                            <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"
-                                aria-controls="collapse-{{ loop.index }}">
-                                View Description
-                            </a>
-                        </p>
-                        <div class="collapse" id="collapse-{{ loop.index }}">
-                            <div class="card card-body">
-                                {{ product['description'] | safe }}
-                            </div>
-                        </div>
-                    </td>
-                    <td class="align-middle">{{ product['stock'] }}</td>
-                    <td class="align-middle text-uppercase">{{ product['category'].name }}</td>
-                    <td class="align-middle">
-                        {% for image in product['images'] %}
-                        <img src="{{ image }}" alt="{{ product['name'] }}" class="img-thumbnail" style="width: 100px; height: 100px;">
+            <button type="button" class="btn btn-success w-100 mt-3 rounded rounded-0" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
+            <table class="table table-bordered table-striped mt-3 table-responsive">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>ID</th>
+                        <th>Unique ID</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Stock</th>
+                        <th>Category</th>
+                        <th>Preview</th>
+                        <th>Size</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if products %}
+                        {% for product in products %}
+                            <tr>
+                                <td class="align-middle">{{ skip + loop.index }}</td>
+                                <td class="align-middle">PROD_{{ product['id'] }}</td>
+                                <td class="align-middle">{{ product['unique_id'] }}</td>
+                                <td class="align-middle">{{ product['name'] }}</td>
+                                <td class="align-middle">{{ (product['price'] * 100) | format_currency }}</td>
+                                <td class="align-middle text-center">
+                                    <p class="d-inline-flex gap-1">
+                                        <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="collapse-{{ loop.index }}">View Description</a>
+                                    </p>
+                                    <div class="collapse" id="collapse-{{ loop.index }}">
+                                        <div class="card card-body">{{ product['description'] | safe }}</div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">{{ product['stock'] }}</td>
+                                <td class="align-middle text-uppercase">{{ product['category'].name }}</td>
+                                <td class="align-middle">
+                                    {% for image in product['images'] %}<img src="{{ image }}" alt="{{ product['name'] }}" class="img-thumbnail" style="width: 100px; height: 100px">{% endfor %}
+                                </td>
+                                <td class="align-middle">{{ size_names[product['size']] }}</td>
+                                <td class="align-middle text-center">
+                                    <p class="d-inline-flex gap-1">
+                                        <a class="btn btn-danger" data-bs-toggle="collapse" href="#collapse-actions-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="collapse-actions-{{ loop.index }}">Delete</a>
+                                    </p>
+                                    <div class="collapse" id="collapse-actions-{{ loop.index }}">
+                                        <div class="card card-body">
+                                            <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger">Confirm Delete</a>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal-{{ product.id }}">Edit</button>
+                                    <div class="modal fade" id="editProductModal-{{ product.id }}" tabindex="-1" aria-labelledby="editProductModalLabel-{{ product.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content p-3">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editProductModalLabel-{{ product.id }}">Edit Product</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ url_for('admin_edit_product', id=product.id) }}" method="POST">
+                                                        {{ editforms[loop.index0].hidden_tag() }}
+                                                        <div class="mb-1">
+                                                            {{ editforms[loop.index0].name.label(class="form-label") }}
+                                                            {{ editforms[loop.index0].name(class="form-control", placeholder=product.name) }}
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="mb-1">
+                                                                    {{ editforms[loop.index0].price.label(class="form-label") }}
+                                                                    {{ editforms[loop.index0].price(class="form-control", placeholder=product.price) }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="mb-1">
+                                                                    {{ editforms[loop.index0].display_price.label(class="form-label") }}
+                                                                    {{ editforms[loop.index0].display_price(class="form-control", placeholder=product.display_price) }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-1">
+                                                            {{ editforms[loop.index0].description.label(class="form-label") }}
+                                                            {{ editforms[loop.index0].description(class="form-control", placeholder=product.description) }}
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="mb-1">
+                                                                    {{ editforms[loop.index0].stock.label(class="form-label") }}
+                                                                    {{ editforms[loop.index0].stock(class="form-control", placeholder=product.stock) }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="mb-1">
+                                                                    {{ editforms[loop.index0].category.label(class="form-label") }}
+                                                                    {{ editforms[loop.index0].category(class="form-select") }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-1">
+                                                            {{ editforms[loop.index0].keywords.label(class="form-label") }}
+                                                            {{ editforms[loop.index0].keywords(class="form-control", placeholder=";".join(product.keywords) ) }}
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            {{ editforms[loop.index0].submit(class="btn btn-primary") }}
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
-                    </td>
-                    <td class="align-middle">{{ size_names[product['size']] }}</td>
-                    <td class="align-middle text-center">
-                        <p class="d-inline-flex gap-1">
-                            <a class="btn btn-danger" data-bs-toggle="collapse" href="#collapse-actions-{{ loop.index }}" role="button" aria-expanded="false"
-                                aria-controls="collapse-actions-{{ loop.index }}">
-                                Delete
-                            </a>
-                        </p>
-                        <div class="collapse" id="collapse-actions-{{ loop.index }}">
-                            <div class="card card-body">
-                                <a href="{{ url_for('admin_delete_product', id=product.id) }}" class="btn btn-danger">Confirm Delete</a>
-                            </div>
+                    {% else %}
+                        <tr>
+                            <td colspan="11" class="align-middle text-center">No products available</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for("admin_add_product") }}" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-1">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
                         </div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal-{{ product.id }}">
-                            Edit
-                        </button>
-                        <div class="modal fade" id="editProductModal-{{ product.id }}" tabindex="-1" aria-labelledby="editProductModalLabel-{{ product.id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content p-3">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editProductModalLabel-{{ product.id }}">Edit Product</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="{{ url_for('admin_edit_product', id=product.id) }}" method="POST">
-                                            {{ editforms[loop.index0].hidden_tag() }}
-                                            <div class="mb-1">
-                                                {{ editforms[loop.index0].name.label(class="form-label") }}
-                                                {{ editforms[loop.index0].name(class="form-control", placeholder=product.name) }}
-                                            </div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="mb-1">
-                                                        {{ editforms[loop.index0].price.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].price(class="form-control", placeholder=product.price) }}
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="mb-1">
-                                                        {{ editforms[loop.index0].display_price.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].display_price(class="form-control", placeholder=product.display_price) }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-1">
-                                                {{ editforms[loop.index0].description.label(class="form-label") }}
-                                                {{ editforms[loop.index0].description(class="form-control", placeholder=product.description) }}
-                                            </div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="mb-1">
-                                                        {{ editforms[loop.index0].stock.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].stock(class="form-control", placeholder=product.stock) }}
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="mb-1">
-                                                        {{ editforms[loop.index0].category.label(class="form-label") }}
-                                                        {{ editforms[loop.index0].category(class="form-select") }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-1">
-                                                {{ editforms[loop.index0].keywords.label(class="form-label") }}
-                                                {{ editforms[loop.index0].keywords(class="form-control", placeholder=";".join(product.keywords)) }}
-                                            </div>
-                                            <div class="modal-footer">
-                                                {{ editforms[loop.index0].submit(class="btn btn-primary") }}
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            </div>
-                                        </form>
-                                    </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-1">
+                                    {{ form.price.label(class="form-label") }}
+                                    {{ form.price(class="form-control") }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-1">
+                                    {{ form.display_price.label(class="form-label") }}
+                                    {{ form.display_price(class="form-control") }}
                                 </div>
                             </div>
                         </div>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="11" class="align-middle text-center">No products available</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content p-3">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{{ url_for('admin_add_product') }}" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
-                    <div class="mb-1">
-                        {{ form.name.label(class="form-label") }}
-                        {{ form.name(class="form-control") }}
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="mb-1">
-                                {{ form.price.label(class="form-label") }}
-                                {{ form.price(class="form-control") }}
+                        <div class="mb-1">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control") }}
+                        </div>
+                        <div class="mb-1">
+                            {{ form.images.label(class="form-label") }}
+                            {{ form.images(class="form-control") }}
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-1">
+                                    {{ form.stock.label(class="form-label") }}
+                                    {{ form.stock(class="form-control") }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-1">
+                                    {{ form.category.label(class="form-label") }}
+                                    {{ form.category(class="form-select") }}
+                                </div>
                             </div>
                         </div>
-                        <div class="col">
-                            <div class="mb-1">
-                                {{ form.display_price.label(class="form-label") }}
-                                {{ form.display_price(class="form-control") }}
-                            </div>
+                        <div class="mb-1">
+                            {{ form.keywords.label(class="form-label") }}
+                            {{ form.keywords(class="form-control") }}
                         </div>
-                    </div>
-                    <div class="mb-1">
-                        {{ form.description.label(class="form-label") }}
-                        {{ form.description(class="form-control") }}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.images.label(class="form-label") }}
-                        {{ form.images(class="form-control") }}
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="mb-1">
-                                {{ form.stock.label(class="form-label") }}
-                                {{ form.stock(class="form-control") }}
-                            </div>
+                        <div class="mb-1">
+                            {{ form.sizes.label(class="form-label") }}
+                            {{ form.sizes(class="form-control") }}
                         </div>
-                        <div class="col">
-                            <div class="mb-1">
-                                {{ form.category.label(class="form-label") }}
-                                {{ form.category(class="form-select") }}
-                            </div>
+                        <div class="modal-footer">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         </div>
-                    </div>
-                    <div class="mb-1">
-                        {{ form.keywords.label(class="form-label") }}
-                        {{ form.keywords(class="form-control") }}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.sizes.label(class="form-label") }}
-                        {{ form.sizes(class="form-control") }}
-                    </div>
-                    <div class="modal-footer">
-                        {{ form.submit(class="btn btn-primary") }}
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 {% endblock %}

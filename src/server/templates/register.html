@@ -1,252 +1,221 @@
 {% extends 'base.html' %}
-
-{% set title = 'STEEZ™ - Register' %}
-
+{% set title = "STEEZ™ - Register" %}
 {% block scripts %}
-<script>
-    function glitchText() {
-        let heading = document.getElementById('heading');
+    <script>
+        function glitchText() {
+            let heading = document.getElementById('heading');
 
-        function generateRandomText() {
-            let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
-            let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
-            let randomE1 = Es[Math.floor(Math.random() * Es.length)];
-            let randomE2 = Es[Math.floor(Math.random() * Es.length)];
-            return `ST${randomEs}Z<sup>TM</sup> - R${randomE1}GIST${randomE2}R`;
-        }
-
-        let iterations = 9;
-        let interval = 80;
-
-        let randomHtmls = [];
-
-        for (let i = 0; i < iterations; i++) {
-            randomHtmls.push(generateRandomText());
-        }
-
-        let reversedRandomHtmls = randomHtmls.slice().reverse();
-
-        var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
-        allRandomHtmls.push('STEEZ<sup>TM</sup> - REGISTER');
-
-
-        allRandomHtmls.forEach((randomHtml, index) => {
-            setTimeout(() => {
-                heading.innerHTML = randomHtml;
-            }, index * interval);
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            glitchText();
-        }, 14000);
-    });
-</script>
-{% endblock %}
-
-{% block styles %}
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        justify-content: center;
-        align-items: center;
-    }
-
-    .form-container {
-        margin: 0 auto;
-        max-width: 700px;
-        background-color: #ffffff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .address-tooltip {
-        --bs-tooltip-max-width: 380px;
-    }
-</style>
-{% endblock %}
-
-{% block body %}
-<div class="container my-5 border border-1 p-lg-5 p-3 shadow-sm">
-    <p class="text-center horizon-font fs-1 mb-4" id="heading">STEEZ<sup>TM</sup> - REGISTER</p>
-    <div class="form-container p-lg-5 p-3">
-        <form action="{{ url_for('register') }}" method="POST">
-            {{ form.csrf_token }}
-            {% if error %}
-            <div class="alert alert-danger mb-3" role="alert">
-                <i class="bi bi-exclamation-circle"></i> {{ error }}
-            </div>
-            {% endif %}
-
-            <div class="mb-3">
-                {{ form.name.label(class="form-label fs-5") }}
-                {{ form.name(class="form-control", id="username", placeholder="Enter your Full Name") }}
-                {% if form.name.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.name.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="mb-3">
-                {{ form.email(class="form-control", id="email", placeholder="Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
-                {% if form.email.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.email.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="mb-3">
-                {{ form.password(class="form-control", id="password", placeholder="Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
-                {% if form.password.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.password.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="mb-4">
-                {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="Confirm your Password") }}
-                {% if form.confirm_password.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.confirm_password.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                {{ form.address_line1.label(class="form-label fs-5") }}
-                {{ 
-                    form.address_line1(
-                        class="form-control",
-                        id="address_line",
-                        placeholder="Enter your Address",
-                        **{
-                            "data-bs-toggle": "tooltip",
-                            "data-bs-placement": "top",
-                            "data-bs-title": "Ex. 123/4 A, XYZ Society, Street Name, Near PQR",
-                            "data-bs-custom-class": "address-tooltip"
-                        }
-                    ) 
-                }}
-                {% if form.address_line1.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.address_line1.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            <script>
-                $(function () {
-                    $('[data-bs-toggle="tooltip"]').tooltip();
-                });
-            </script>
-
-            <div class="mb-3">
-                {{ form.pincode(class="form-control", id="pincode", placeholder="Enter your Pincode") }}
-                {% if form.pincode.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.pincode.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="mb-3">
-                <div class="row">
-                    <div class="col">
-                        {{ form.city(class="form-control", id="city", placeholder="Enter your City", **{"readonly": ""}) }}
-                        {% if form.city.errors %}
-                        <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.city.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="col">
-                        {{ form.state(class="form-control", id="state", placeholder="Enter your State", **{"readonly": ""}) }}
-                        {% if form.state.errors %}
-                        <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.state.errors %}
-                            <i class="bi bi-exclamation-circle"></i> {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                {{ form.phone(class="form-control", id="phone", placeholder="Enter your Phone Number") }}
-                {% if form.phone.errors %}
-                <div class="alert alert-danger mt-2 p-2" role="alert">
-                    {% for error in form.phone.errors %}
-                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="text-center mb-3">
-                <p class="fs-6">Already have an account? <a href="{{ url_for('login_route') }}" class="link-secondary">Login here</a></p>
-                {{ form.submit(class="btn btn-success") }}
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock %}
-
-{% block bottom_scripts %}
-<script>
-    function autofillCityState() {
-        const pincode = document.getElementById('pincode');
-        if (!pincode.value) {
-            return;
-        }
-        if (pincode.value.length !== 6) {
-            return;
-        }
-        let api = `https://api.postalpincode.in/pincode/${pincode.value}`;
-
-        response = fetch(api);
-        response.then((response) => {
-            return response.json();
-        }).then((data) => {
-            if (data[0].Status === 'Success') {
-                let city = data[0].PostOffice[0].District;
-                let state = data[0].PostOffice[0].State;
-
-                const cityField = document.getElementById('city');
-                const stateField = document.getElementById('state');
-
-                cityField.value = city;
-                stateField.value = state;
-
-                city.innerHTML = city;
-                state.innerHTML = state;
+            function generateRandomText() {
+                let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
+                let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
+                let randomE1 = Es[Math.floor(Math.random() * Es.length)];
+                let randomE2 = Es[Math.floor(Math.random() * Es.length)];
+                return `ST${randomEs}Z<sup>TM</sup> - R${randomE1}GIST${randomE2}R`;
             }
-        });
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('pincode').addEventListener('focusout', () => {
-            autofillCityState();
-        });
-    });
+            let iterations = 9;
+            let interval = 80;
 
-</script>
+            let randomHtmls = [];
+
+            for (let i = 0; i < iterations; i++) {
+                randomHtmls.push(generateRandomText());
+            }
+
+            let reversedRandomHtmls = randomHtmls.slice().reverse();
+
+            var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
+            allRandomHtmls.push('STEEZ<sup>TM</sup> - REGISTER');
+
+
+            allRandomHtmls.forEach((randomHtml, index) => {
+                setTimeout(() => {
+                    heading.innerHTML = randomHtml;
+                }, index * interval);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                glitchText();
+            }, 14000);
+        });
+    </script>
+{% endblock %}
+{% block styles %}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            margin: 0 auto;
+            max-width: 700px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .address-tooltip {
+            --bs-tooltip-max-width: 380px;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="container my-5 border border-1 p-lg-5 p-3 shadow-sm">
+        <p class="text-center horizon-font fs-1 mb-4" id="heading">
+            STEEZ<sup>TM</sup> - REGISTER
+        </p>
+        <div class="form-container p-lg-5 p-3">
+            <form action="{{ url_for("register") }}" method="POST">
+                {{ form.csrf_token }}
+                {% if error %}
+                    <div class="alert alert-danger mb-3" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    </div>
+                {% endif %}
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label fs-5") }}
+                    {{ form.name(class="form-control", id="username", placeholder="Enter your Full Name") }}
+                    {% if form.name.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.name.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.email(class="form-control", id="email", placeholder="Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
+                    {% if form.email.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.email.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.password(class="form-control", id="password", placeholder="Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
+                    {% if form.password.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.password.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="Confirm your Password") }}
+                    {% if form.confirm_password.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.confirm_password.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.address_line1.label(class="form-label fs-5") }}
+                    {{ form.address_line1(class="form-control",
+                                        id="address_line",
+                                        placeholder="Enter your Address",
+                                        **{
+                                        "data-bs-toggle": "tooltip",
+                                        "data-bs-placement": "top",
+                                        "data-bs-title": "Ex. 123/4 A, XYZ Society, Street Name, Near PQR",
+                                        "data-bs-custom-class": "address-tooltip"
+                                        }) 
+                    }}
+                    {% if form.address_line1.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.address_line1.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <script>
+                    $(function() {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                    });
+                </script>
+                <div class="mb-3">
+                    {{ form.pincode(class="form-control", id="pincode", placeholder="Enter your Pincode") }}
+                    {% if form.pincode.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.pincode.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col">
+                            {{ form.city(class="form-control", id="city", placeholder="Enter your City", **{"readonly": ""}) }}
+                            {% if form.city.errors %}
+                                <div class="alert alert-danger mt-2 p-2" role="alert">
+                                    {% for error in form.city.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            {{ form.state(class="form-control", id="state", placeholder="Enter your State", **{"readonly": ""}) }}
+                            {% if form.state.errors %}
+                                <div class="alert alert-danger mt-2 p-2" role="alert">
+                                    {% for error in form.state.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.phone(class="form-control", id="phone", placeholder="Enter your Phone Number") }}
+                    {% if form.phone.errors %}
+                        <div class="alert alert-danger mt-2 p-2" role="alert">
+                            {% for error in form.phone.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="text-center mb-3">
+                    <p class="fs-6">
+                        Already have an account? <a href="{{ url_for("login_route") }}" class="link-secondary">Login here</a>
+                    </p>
+                    {{ form.submit(class="btn btn-success") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block bottom_scripts %}
+    <script>
+        function autofillCityState() {
+            const pincode = document.getElementById('pincode');
+            if (!pincode.value) {
+                return;
+            }
+            if (pincode.value.length !== 6) {
+                return;
+            }
+            let api = `https://api.postalpincode.in/pincode/${pincode.value}`;
+
+            response = fetch(api);
+            response.then((response) => {
+                return response.json();
+            }).then((data) => {
+                if (data[0].Status === 'Success') {
+                    let city = data[0].PostOffice[0].District;
+                    let state = data[0].PostOffice[0].State;
+
+                    const cityField = document.getElementById('city');
+                    const stateField = document.getElementById('state');
+
+                    cityField.value = city;
+                    stateField.value = state;
+
+                    city.innerHTML = city;
+                    state.innerHTML = state;
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('pincode').addEventListener('focusout', () => {
+                autofillCityState();
+            });
+        });
+    </script>
 {% endblock %}

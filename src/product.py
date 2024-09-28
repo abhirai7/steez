@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import sqlite3
 from typing import TYPE_CHECKING, Literal
-import arrow
 
+import arrow
 from fuzzywuzzy.fuzz import partial_ratio
 
 from .utils import SQLITE_OLD, generate_gift_card_code, get_product_pictures, size_names
@@ -302,7 +302,7 @@ class Product:
     @property
     def total_reviews(self) -> int:
         return len(self.reviews)
-    
+
     @property
     def discount(self) -> int:
         return int((abs(self.price - self.display_price) / self.price) * 100)

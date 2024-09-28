@@ -34,7 +34,9 @@ def admin_login():
         login_user(admin)
         return redirect(url_for("admin_dashboard"))
 
-    return render_template("admin/admin_login.html", form=form, current_user=current_user)
+    return render_template(
+        "admin/admin_login.html", form=form, current_user=current_user
+    )
 
 
 @app.route("/admin/logout")

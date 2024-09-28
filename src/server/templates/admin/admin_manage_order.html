@@ -1,154 +1,140 @@
 {% extends 'base.html' %}
-
 {% import 'navbar.html' as navbar %}
-
-{% set title = 'STEEZ™ - Admin' %}
-
-
+{% set title = "STEEZ™ - Admin" %}
 {% block body %}
-<div class="row">
-    <div class="col-2">
-        {{ navbar.admin_navbar(current_user) }}
-    </div>
-    <div class="col-10 overflow-y-auto" style="height: 100vh;">
-        <div class="border border-1 mt-3">
-            <div class="card-header">
-                <p class="fs-1 m-0 text-center">Razorpay Orders Created/Recorded</p>
-                <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+    <div class="row">
+        <div class="col-2">{{ navbar.admin_navbar(current_user) }}</div>
+        <div class="col-10 overflow-y-auto" style="height: 100vh;">
+            <div class="border border-1 mt-3">
+                <div class="card-header">
+                    <p class="fs-1 m-0 text-center">Razorpay Orders Created/Recorded</p>
+                    <p class="fs-6 font-monospace text-center m-2" id="date-time"></p>
+                </div>
             </div>
+            <canvas id="ordersChart" class="mt-3" style="width: 100%; height: 250px;"></canvas>
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Order ID</th>
+                        <th>Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Amount Due</th>
+                        <th>Status</th>
+                        <th>Attempts</th>
+                        <th>Created At</th>
+                        <th>Notes (Developer Use)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if response["items"] %}
+                        {% for order in response["items"] %}
+                            <tr>
+                                <td>{{ skip + loop.index }}</td>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.amount | format_currency }}</td>
+                                <td>{{ order.amount_paid | format_currency }}</td>
+                                <td>{{ order.amount_due | format_currency }}</td>
+                                <td>{{ order.status }}</td>
+                                <td>{{ order.attempts }}</td>
+                                <td>{{ order.created_at | datetimeformat }}</td>
+                                <td class="font-monospace pre">
+                                    <p class="d-inline-flex gap-1">
+                                        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="collapse-{{ loop.index }}">Show JSON Notes</a>
+                                    </p>
+                                    <div class="collapse" id="collapse-{{ loop.index }}">
+                                        <div class="card card-body">{{ order.notes | tojson | safe }}</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center">No orders for today</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="2">Total</th>
+                        <th>{{ total_order_amount | format_currency }}</th>
+                        <th>{{ total_paid | format_currency }}</th>
+                        <th>{{ total_due | format_currency }}</th>
+                        <th colspan="4"></th>
+                    </tr>
+                </tfoot>
+            </table>
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <canvas id="ordersChart" class="mt-3" style="width: 100%; height: 250px;"></canvas>
-        <table class="table table-bordered table-striped mt-3">
-            <thead class="table-dark">
-                <tr>
-                    <th>Sr. No.</th>
-                    <th>Order ID</th>
-                    <th>Amount</th>
-                    <th>Amount Paid</th>
-                    <th>Amount Due</th>
-                    <th>Status</th>
-                    <th>Attempts</th>
-                    <th>Created At</th>
-                    <th>Notes (Developer Use)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if response["items"] %}
-                {% for order in response["items"] %}
-                <tr>
-                    <td>{{ skip + loop.index }}</td>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.amount | format_currency }}</td>
-                    <td>{{ order.amount_paid | format_currency }}</td>
-                    <td>{{ order.amount_due | format_currency }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>{{ order.attempts }}</td>
-                    <td>{{ order.created_at | datetimeformat }}</td>
-                    <td class="font-monospace pre">
-                        <p class="d-inline-flex gap-1">
-                            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapse-{{ loop.index }}" role="button" aria-expanded="false"
-                                aria-controls="collapse-{{ loop.index }}">
-                                Show JSON Notes
-                            </a>
-                        </p>
-                        <div class="collapse" id="collapse-{{ loop.index }}">
-                            <div class="card card-body">
-                                {{ order.notes | tojson | safe }}
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="9" class="text-center">No orders for today</td>
-                </tr>
-                {% endif %}
-            </tbody>
-            <tfoot class="table-light">
-                <tr>
-                    <th colspan="2">Total</th>
-                    <th>{{ total_order_amount | format_currency }}</th>
-                    <th>{{ total_paid | format_currency }}</th>
-                    <th>{{ total_due | format_currency }}</th>
-                    <th colspan="4"></th>
-                </tr>
-            </tfoot>
-        </table>
-
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
     </div>
-</div>
 {% endblock %}
-
 {% block bottom_scripts %}
-<script>
-const orders = {{ response|tojson }};
-
-const labels = orders.items.map(item => new Date(item.created_at * 1000).toLocaleDateString());
-const amounts = orders.items.map(item => item.amount);
-const amountsPaid = orders.items.map(item => item.amount_paid);
-const amountsDue = orders.items.map(item => item.amount_due);
-
-const ctx = document.getElementById('ordersChart').getContext('2d');
-const ordersChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: labels,  // X-axis (Dates)
-        datasets: [
+    <script>
+        const orders = {
             {
-                label: 'Total Amount',
-                data: amounts, // Y-axis (Total Amount)
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            },
-            {
-                label: 'Amount Paid',
-                data: amountsPaid, // Y-axis (Amount Paid)
-                fill: false,
-                borderColor: 'rgb(54, 162, 235)',
-                tension: 0.1
-            },
-            {
-                label: 'Amount Due',
-                data: amountsDue,
-                fill: false,
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
+                response | tojson
             }
-        ]
-    },
-    options: {
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: 'Date'
-                }
+        };
+
+        const labels = orders.items.map(item => new Date(item.created_at * 1000).toLocaleDateString());
+        const amounts = orders.items.map(item => item.amount);
+        const amountsPaid = orders.items.map(item => item.amount_paid);
+        const amountsDue = orders.items.map(item => item.amount_due);
+
+        const ctx = document.getElementById('ordersChart').getContext('2d');
+        const ordersChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // X-axis (Dates)
+                datasets: [{
+                    label: 'Total Amount',
+                    data: amounts, // Y-axis (Total Amount)
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }, {
+                    label: 'Amount Paid',
+                    data: amountsPaid, // Y-axis (Amount Paid)
+                    fill: false,
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1
+                }, {
+                    label: 'Amount Due',
+                    data: amountsDue,
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
             },
-            y: {
-                title: {
-                    display: true,
-                    text: 'Amount (INR)'
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount (INR)'
+                        }
+                    }
                 }
             }
-        }
-    }
-});
-</script>
+        });
+    </script>
 {% endblock %}

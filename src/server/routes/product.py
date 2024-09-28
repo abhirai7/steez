@@ -40,7 +40,7 @@ def product(product_id: int):
     pictures = get_product_pictures(product.unique_id)
     reviews = product.categorised_reviews
 
-    cart_form: AddToCartForm = AddToCartForm(product.available_sizes)
+    cart_form: AddToCartForm = AddToCartForm(product)
     review_form: AddReviewForm = AddReviewForm()
 
     return render_template(

@@ -1,117 +1,108 @@
 {% extends 'base.html' %}
-
-{% set title = 'STEEZ™ - Login' %}
-
+{% set title = "STEEZ™ - Login" %}
 {% block scripts %}
-<script>
-    function glitchText() {
-        let heading = document.getElementById('heading');
+    <script>
+        function glitchText() {
+            let heading = document.getElementById('heading');
 
-        function generateRandomText() {
-            let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
-            let Os = ["ó", "ò", "ô", "ö", "õ", "ō"];
-            let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
-            let randomOs = Os[Math.floor(Math.random() * Os.length)];
-            return `ST${randomEs}Z<sup>TM</sup> - L${randomOs}GIN`;
+            function generateRandomText() {
+                let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
+                let Os = ["ó", "ò", "ô", "ö", "õ", "ō"];
+                let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
+                let randomOs = Os[Math.floor(Math.random() * Os.length)];
+                return `ST${randomEs}Z<sup>TM</sup> - L${randomOs}GIN`;
+            }
+
+            let iterations = 9;
+            let interval = 80;
+
+            let randomHtmls = [];
+
+            for (let i = 0; i < iterations; i++) {
+                randomHtmls.push(generateRandomText());
+            }
+
+            let reversedRandomHtmls = randomHtmls.slice().reverse();
+
+            var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
+            allRandomHtmls.push('STEEZ<sup>TM</sup> - LOGIN');
+
+
+            allRandomHtmls.forEach((randomHtml, index) => {
+                setTimeout(() => {
+                    heading.innerHTML = randomHtml;
+                }, index * interval);
+            });
         }
 
-        let iterations = 9;
-        let interval = 80;
-
-        let randomHtmls = [];
-
-        for (let i = 0; i < iterations; i++) {
-            randomHtmls.push(generateRandomText());
-        }
-
-        let reversedRandomHtmls = randomHtmls.slice().reverse();
-
-        var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
-        allRandomHtmls.push('STEEZ<sup>TM</sup> - LOGIN');
-
-
-        allRandomHtmls.forEach((randomHtml, index) => {
+        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                heading.innerHTML = randomHtml;
-            }, index * interval);
+                glitchText();
+            }, 14000);
         });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            glitchText();
-        }, 14000);
-    });
-</script>
+    </script>
 {% endblock %}
-
 {% block styles %}
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        justify-content: center;
-        align-items: center;
-    }
-
-    .container {
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 40px;
-        background-color: #fff;
-    }
-
-    .login-section {
-        max-width: 800px;
-        background-image: url('{{ url_for("static", filename="images/login-background.jpg") }}');
-        border: 1px solid #ddd;
-    }
-</style>
-
-{% endblock %}
-
-{% block body %}
-<div class="p-lg-5 p-3 login-section shadow w-100">
-    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - LOGIN</p>
-    <div class="container shadow-sm">
-        <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">
-            {{ form.csrf_token }}
-            {% if error %}
-            <div class="alert alert-danger mt-2" role="alert">
-                <i class="bi bi-exclamation-circle"></i> {{ error }}
-            </div>
-            {% endif %}
-
-            <div class="input-group mb-3">
-                {{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}
-            </div>
-
-            <div class="input-group mb-2">
-                {{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
-            </div>
-
-            <div class="text-center">
-                <p class="fs-6 mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="link-secondary">Register here</a></p>
-                {{ form.submit(class="btn btn-primary") }}
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock %}
-
-{% block bottom_scripts %}
-<script>
-    const password = document.getElementById('password');
-    const showPassword = document.getElementById('show-password');
-
-    showPassword.addEventListener('click', () => {
-        if (password.type === 'password') {
-            password.type = 'text';
-        } else {
-            password.type = 'password';
+    <style>
+        * {
+            box-sizing: border-box;
         }
-    });
-</script>
+
+        body {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+
+        .login-section {
+            max-width: 800px;
+            background-image: url('{{ url_for("static", filename="images/login-background.jpg") }}');
+            border: 1px solid #ddd;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="p-lg-5 p-3 login-section shadow w-100">
+        <p class="text-center horizon-font fs-1" id="heading">
+            STEEZ<sup>TM</sup> - LOGIN
+        </p>
+        <div class="container shadow-sm">
+            <form action="{{ url_for("login_route") }}" method="POST" class="mt-5">
+                {{ form.csrf_token }}
+                {% if error %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    </div>
+                {% endif %}
+                <div class="input-group mb-3">{{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}</div>
+                <div class="input-group mb-2">{{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}</div>
+                <div class="text-center">
+                    <p class="fs-6 mt-3">
+                        Don't have an account? <a href="{{ url_for("register") }}" class="link-secondary">Register here</a>
+                    </p>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block bottom_scripts %}
+    <script>
+        const password = document.getElementById('password');
+        const showPassword = document.getElementById('show-password');
+
+        showPassword.addEventListener('click', () => {
+            if (password.type === 'password') {
+                password.type = 'text';
+            } else {
+                password.type = 'password';
+            }
+        });
+    </script>
 {% endblock %}

@@ -87,7 +87,7 @@ class CarouselForm(FlaskForm):
 
 
 class GiftCardForm(FlaskForm):
-    amount = IntegerField("Amount", validators=[DataRequired(), NumberRange(min=50, max=2000)])
+    amount = IntegerField("Amount", validators=[DataRequired(), NumberRange(min=50, max=2000)], default=100)
     submit = SubmitField("Buy Gift Card")
 
 

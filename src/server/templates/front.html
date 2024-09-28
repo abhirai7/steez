@@ -1,154 +1,147 @@
 {% extends 'base.html' %}
-
 {% import 'navbar.html' as navbar %}
-
 {% import 'footer.html' as footer %}
 {% import 'hero.html' as hero %}
-
-{% set title = 'STEEZ™' %}
-
+{% set title = "STEEZ™" %}
 {% block styles %}
-<style>
-    .product-card:hover {
-        transition: transform 0.3s ease-in;
-    }
+    <style>
+        .product-card:hover {
+            transition: transform 0.3s ease-in;
+        }
 
-    .product-card img {
-        transition: opacity 0.2s ease-out;
-    }
+        .product-card img {
+            transition: opacity 0.2s ease-out;
+        }
 
-    .product-card .hover-image {
-        opacity: 1;
-    }
+        .product-card .hover-image {
+            opacity: 1;
+        }
 
-    .product-card:hover .hover-image {
-        opacity: 0;
-    }
+        .product-card:hover .hover-image {
+            opacity: 0;
+        }
 
-    .product-card:hover .main-image {
-        opacity: 1;
-    }
-</style>
+        .product-card:hover .main-image {
+            opacity: 1;
+        }
 
+        .fs-max {
+            font-size: 4rem;
+        }
+    </style>
 {% endblock %}
 {% block body %}
-
-{{ navbar.navbar(current_user, search_form, categories) }}
-
-{% if show_hero %}
-{{ hero.carousel(carousels) }}
-{% endif %}
-
-{% if products %}
-<div class="container-fluid p-0">
-    {% for category, products in categories.items() %}
-    <div class="m-0 p-0">
-        <div class="row row-cols-lg-4 row-cols-2 m-0 p-0">
-            <div class="col m-0 p-0 border border-1">
-                <div class="h-100 d-flex align-items-center justify-content-center">
-                    <div class="text-center align-middle">
-                        <p class="fs-lg-2 fs-3 horizon-font align-middle">{{ category.name }}</p>
-                        <p class="text-muted align-middle fw-semibold text-uppercase">Shop Now</p>
-                    </div>
-                </div>
-            </div>
-            {% for product in products %}
-            <div class="col-lg-3 m-0 p-0 border border-1" id="{{ product.id }}">
-                <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0">
-                    <div class="d-flex justify-content-center position-relative">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
-                        <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
-                    </div>
-                    <div class="card-body">
-                        <p class="card-title code text-uppercase fw-semibold">{{ product.name }}</p>
-                        <p class="text-dark text-uppercase fw-semibold">
-                            {{ product.price | format_currency_direct }}
-                            {% if product.discount > 0 %}
-                            <span class="text-decoration-line-through text-muted">{{ product.display_price | format_currency_direct }}</span>
-                            <span class="badge bg-danger rounded-pill align-middle">{{ product.discount }}% OFF</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
-        <div class="col border border-1 rounded rounded-0">
-            <div class="h-100 d-flex align-items-center justify-content-center">
-                <div class="text-center p-5 m-5">
-                    <p class="fs-lg-2 fs-1 horizon-font">Gift Cards</p>
-                    <p class="text-muted fs-6">Are the perfect gift for any occasion.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col border border-1 rounded rounded-0">
-            <div class="p-lg-5 p-3">
-                <p class="fs-2 text-center text-uppercase fw-bold d-none d-lg-block d-xl-block d-md-block">
-                    STEEZ Gift Cards
-                </p>
-                <p class="text-center text-muted">
-                    Available in any amount between INR. 50 to INR. 2000.
-                </p>
-                <form method="POST" action="{{ url_for('buy_gift_card') }}">
-                    {{ gift_form.csrf_token }}
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-2">
-                                <div class="input-group">
-                                    <span class="h-100">
-                                        <button type="button" class="btn btn-outline-dark border p-2 px-3 border-1 rounded rounded-0 h-100 text-center decrement">
-                                            -
-                                        </button>
-                                    </span>
-                                    {{ gift_form.amount(class="form-control p-2 rounded rounded-0 text-center fw-semibold", id="amount") }}
-                                    <span class="h-100">
-                                        <button type="button" class="btn btn-outline-dark border p-2 px-3 border-1 rounded rounded-0 h-100 text-center increment">
-                                            +
-                                        </button>
-                                    </span>
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', () => {
-                                            const amount = document.getElementById('amount');
-                                            const increment = document.querySelector('.increment');
-                                            const decrement = document.querySelector('.decrement');
-
-                                            increment.addEventListener('click', () => {
-                                                amount.stepUp();
-                                            });
-
-                                            decrement.addEventListener('click', () => {
-                                                amount.stepDown();
-                                            });
-                                        });
-                                    </script>
+    {{ navbar.navbar(current_user, search_form, categories) }}
+    {% if show_hero %}{{ hero.carousel(carousels) }}{% endif %}
+    {% if products %}
+        <div class="container-fluid p-0">
+            {% for category, products in categories.items() %}
+                <div class="m-0 p-0">
+                    <div class="row row-cols-lg-4 row-cols-2 m-0 p-0">
+                        <div class="col m-0 p-0 border border-1">
+                            <div class="h-100 d-flex align-items-center justify-content-center">
+                                <div class="text-center align-middle">
+                                    <p class="fs-lg-2 fs-3 horizon-font align-middle">{{ category.name }}</p>
+                                    <p class="text-muted align-middle fw-semibold text-uppercase">Shop Now</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="mb-1">
-                                {% if current_user.is_authenticated %}
-                                    {{ gift_form.submit(class="btn btn-outline-dark rounded rounded-5 w-100 fw-semibold") }}
-                                {% else %}
-                                    <a href="{{ url_for('login_route') }}" class="btn btn-outline-dark w-100 rounded rounded-5 fw-semibold">Login to Buy</a>
-                                {% endif %}
+                        {% for product in products %}
+                            <div class="col-lg-3 m-0 p-0 border border-1" id="{{ product.id }}">
+                                <div class="card image-transition product-card bg-transparent rounded rounded-0 border border-0">
+                                    <div class="d-flex justify-content-center position-relative">
+                                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
+                                        <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-title code text-uppercase fw-semibold">{{ product.name }}</p>
+                                        <p class="text-dark text-uppercase fw-semibold">
+                                            {{ product.price | format_currency_direct }}
+                                            {% if product.discount > 0 %}
+                                                <span class="text-decoration-line-through text-muted">{{ product.display_price | format_currency_direct }}</span>
+                                                <span class="badge bg-danger rounded-pill align-middle">{{ product.discount }}% OFF</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+                                </div>
                             </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
+                <div class="col border border-1 rounded rounded-0">
+                    <div class="h-100 d-flex align-items-center justify-content-center">
+                        <div class="text-center p-5 m-5">
+                            <p class="fs-lg-2 fs-max horizon-font">Gift Cards</p>
+                            <p class="text-muted fs-6">Are the perfect gift for any occasion.</p>
                         </div>
                     </div>
+                </div>
+                <div class="col border border-1 rounded rounded-0">
+                    <div class="p-lg-5 p-3 m-3 m-lg-5">
+                        <p class="text-muted">Available in any amount between INR. 50 to INR. 2000.</p>
+                        <form method="POST" action="{{ url_for("buy_gift_card") }}" class="mt-4">
+                            {{ gift_form.csrf_token }}
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <div class="input-group">
+                                            <span>
+                                                <button type="button" class="btn btn-outline-dark shadow-none border border-1 rounded rounded-0 text-center p-2 decrement">
+                                                    <span class="fs-5 px-2">-</span>
+                                                </button>
+                                            </span>
+                                            {{ gift_form.amount(class="form-control rounded rounded-0 bg-transparent shadow-none text-center fw-semibold p-2", id="amount") }}
+                                            <span>
+                                                <button type="button" class="btn btn-outline-dark shadow-none border border-1 rounded rounded-0 text-center p-2 increment">
+                                                    <span class="fs-5 px-2">+</span>
+                                                </button>
+                                            </span>
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', () => {
+                                                    const amount = document.getElementById('amount');
+                                                    const increment = document.querySelector('.increment');
+                                                    const decrement = document.querySelector('.decrement');
 
-                    <p class="text-muted text-small mt-3">
-                        *Gift cards are non-refundable. For more information
-                        <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a>
-                    </p>
-                </form>
+                                                    increment.addEventListener('click', () => {
+                                                        amount.stepUp(50);
+
+                                                        if (amount.value > 50) {
+                                                            decrement.classList.remove('disabled');
+                                                        } else if (amount.value <= 50) {
+                                                            decrement.classList.add('disabled');
+                                                        }
+                                                    });
+
+                                                    decrement.addEventListener('click', () => {
+                                                        amount.stepDown(50);
+                                                    });
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="mb-1">
+                                        {% if current_user.is_authenticated %}
+                                            {{ gift_form.submit(class="btn btn-outline-dark rounded rounded-5 w-100 fw-semibold p-2") }}
+                                        {% else %}
+                                            <a href="{{ url_for("login_route") }}" class="btn btn-outline-dark w-100 rounded rounded-5 fw-semibold p-2">Login to Buy</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-muted text-small mt-3">
+                                *Gift cards are non-refundable. For more information
+                                <a href="{{ url_for("refund_policy") }}" class="link-underlink-dark text-muted">Click Here</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-{% endif %}
-
-{{ footer.footer(newsletter_form) }}
+    {% endif %}
+    {{ footer.footer(newsletter_form) }}
 {% endblock %}

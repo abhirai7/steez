@@ -64,5 +64,9 @@ def admin_payments():
     payments = razorpay_client.payment.all({"count": limit, "skip": skip})
 
     return render_template(
-        "admin/admin_payments.html", payments=payments, page=page, skip=skip, limit=limit
+        "admin/admin_payments.html",
+        payments=payments,
+        page=page,
+        skip=skip,
+        limit=limit,
     )
