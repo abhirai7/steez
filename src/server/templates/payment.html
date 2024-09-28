@@ -6,19 +6,11 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function razorPayCallback(response) {
-            {
-                %
-                if webhook %
-            }
-            const url = `{{ url_for(webhook) }}`;
-            {
-                %
-                else %
-            }
-            const url = `{{ url_for('razorpay_webhook') }}`;
-            {
-                % endif %
-            }
+            {% if webhook %}
+                const url = `{{ url_for(webhook) }}`;
+            {% else %}
+                const url = `{{ url_for('razorpay_webhook') }}`;
+            {% endif %}
 
             const data = {
                 razorpay_payment_id: response.razorpay_payment_id,

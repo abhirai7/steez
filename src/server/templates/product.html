@@ -144,17 +144,14 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group mb-4">
-                                    {{ form.size(class="form-select rounded rounded-0 fs-7 w-100 mb-3 border-dark-subtle fw-semibold p-2-5 shadow-none focus-ring
-                                                                        focus-ring-dark",
-                                                                        placeholder="Select Size") }}
+                                    {{ form.size(class="form-select rounded rounded-0 fs-7 w-100 mb-3 border-dark-subtle fw-semibold p-2-5 shadow-none focus-ring focus-ring-dark", placeholder="Select Size") }}
                                 </div>
                                 <div class="form-group">
                                     <div class="d-flex justify-content-between">
                                         <button type="button" class="btn btn-outline-dark border px-3 border-1 rounded rounded-0 h-100 text-center decrement disabled">
                                             <span class="fw-semibold fs-5">-</span>
                                         </button>
-                                        {{ form.quantity(class="form-control text-center bg-transparent rounded rounded-0 fw-semibold shadow-none focus-ring focus-ring-dark",
-                                                                                id="quantity") }}
+                                        {{ form.quantity(class="form-control text-center bg-transparent rounded rounded-0 fw-semibold shadow-none focus-ring focus-ring-dark", id="quantity") }}
                                         <button type="button" class="btn btn-outline-dark border px-3 border-1 rounded rounded-0 h-100 text-center increment">
                                             <span class="fw-semibold fs-5">+</span>
                                         </button>
@@ -194,11 +191,11 @@
                                 <button type="button" class="btn text-start p-0 my-3" data-bs-toggle="modal" data-bs-target="#reference-chart">
                                     <span class="text-primary">Click to view Size Chart</span>
                                 </button>
-                                <div class="modal fade rounded rounded-0" id="reference-chart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal fade rounded rounded-0" id="reference-chart" tabindex="-1" aria-labelledby="reference-chart-label" aria-hidden="true">
                                     <div class="modal-dialog rounded rounded-0">
                                         <div class="modal-content rounded rounded-0">
                                             <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reference Chart</h1>
+                                                <h1 class="modal-title fs-5" id="reference-chart-label">Reference Chart</h1>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
@@ -232,10 +229,7 @@
                         <div class="row mt-2">
                             {% if current_user.is_authenticated %}
                                 <div class="col">
-                                    <div class="m-1">
-                                        {{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-2-5 border border-2
-                                                                                border-dark", id="add-to-cart") }}
-                                    </div>
+                                    <div class="m-1">{{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-2-5 border border-2 border-dark", id="add-to-cart") }}</div>
                                 </div>
                                 <div class="col">
                                     <div class="m-1">

@@ -1,5 +1,4 @@
 {% import "login.html" as login %}
-
 {% macro navbar(current_user, search_form, login_form, categories=None) %}
     <style>
         #search-input-bar {
@@ -118,7 +117,7 @@
             searchBtn.style.left = searchBtn.style.left - window.innerWidth;
         });
     </script>
-    <div class="modal fade rounded rounded-0 bg-transparent w-100" id="search-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade rounded rounded-0 bg-transparent w-100" id="search-modal" tabindex="-1" aria-labelledby="search-modal-label" aria-hidden="true">
         <form action="{{ url_for("search") }}" method="POST" class="input-group input-group-lg">
             <div class="modal-dialog modal-dialog-centered w-100 bg-transparent border border-0">
                 <div class="modal-content bg-transparent border border-0">
