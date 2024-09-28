@@ -84,7 +84,7 @@ class Order:
     ) -> Order:
         cursor = connection.cursor()
         cursor.execute(
-            "SELECT * FROM ORDERS WHERE razorpay_order_id = ?", (razorpay_order_id,)
+            "SELECT * FROM ORDERS WHERE RAZORPAY_ORDER_ID = ?", (razorpay_order_id,)
         )
         row = cursor.fetchone()
         if row is None:
@@ -137,7 +137,7 @@ class Order:
         assert razorpay_order_id == self.razorpay_order_id
 
         cursor.execute(
-            r"UPDATE ORDERS SET STATUS = ? WHERE RAZORPAY_ORDER_ID = ? AND ID = ? AND STATUS = 'CONF' AND USER_ID = ?",
+            r"UPDATE ORDERS SET STATUS = ? WHERE RAZORPAY_ORDER_ID = ? AND ID = ? AND STATUS = 'CONF' AND USER_ID = ? AND RAZORPAY_ORDER_ID IS NULL",
             (status, razorpay_order_id, self.id, self.user_id),
         )
         self.connection.commit()

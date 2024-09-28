@@ -6,9 +6,9 @@
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand ms-auto nav-link active horizon-font fs-4 p-1 align-middle" id="nav-head" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
+        <a class="navbar-brand ms-auto nav-link active horizon-font p-1 align-middle" id="nav-head" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
         <ul class="navbar-nav ms-auto me-3 d-sm-block d-lg-none d-md-block d-block">
-            <li class="nav-item mx-1 fs-5 ">
+            <li class="nav-item mx-1 ">
                 <button class="nav-link" data-bs-toggle="modal" data-bs-target="#search-modal">
                     <i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i>
                 </button>
@@ -18,7 +18,7 @@
             <ul class="navbar-nav ms-auto text-center">
                 {% if categories %}
                 {% for category in categories %}
-                <li class="nav-link mx-4 fs-5">
+                <li class="nav-link mx-4">
                     <a class="link-dark link-underline link-underline-opacity-0 link-opacity-100 link-opacity-50-hover fw-semibold"
                         href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">{{ category.name }}</a>
                 </li>
@@ -26,29 +26,29 @@
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto mx-3 mb-lg-0 d-flex">
-                <li class="nav-item mx-1 fs-5 d-none d-lg-block" data-bs-toggle="modal" data-bs-target="#search-modal">
+                <li class="nav-item mx-1 d-none d-lg-block" data-bs-toggle="modal" data-bs-target="#search-modal">
                     <button class="nav-link">
                         <i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i>
                     </button>
                 </li>
                 {% if current_user.is_authenticated %}
-                <li class="nav-item mx-1 fs-5">
+                <li class="nav-item mx-1">
                     <a class="nav-link" href="{{ url_for('order_history') }}">Order History</a>
                 </li>
-                <li class="nav-item mx-1 fs-5">
+                <li class="nav-item mx-1">
                     <a class="nav-link" href="{{ url_for('checkout') }}">
                         <i class="fa-solid fa-cart-shopping fa-xl" style="color: #5b5c5d;"></i>
                         {% set total = current_user.cart.count %}{% if total %}<sup>{{ total}}</sup>{% endif %}
                     </a>
                 </li>
-                <li class="nav-item mx-1 fs-5">
+                <li class="nav-item mx-1">
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                 </li>
                 {% else %}
-                <li class="nav-item mx-1 fs-5">
+                <li class="nav-item mx-1">
                     <a class="nav-link" href="{{ url_for('login_route') }}">Login</a>
                 </li>
-                <li class="nav-item mx-1 fs-5">
+                <li class="nav-item mx-1">
                     <a class="nav-link" href="{{ url_for('register') }}">Register</a>
                 </li>
                 {% endif %}
@@ -76,7 +76,7 @@
 
 {% macro admin_navbar(current_user) -%}
 <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark h-100">
-    <a href="{{ url_for('admin_dashboard') }}" class="d-flex align-items-center fs-4 text-white text-decoration-none text-center">
+    <a href="{{ url_for('admin_dashboard') }}" class="d-flex align-items-center text-white text-decoration-none text-center">
         Admin Dashboard
     </a>
     <hr>

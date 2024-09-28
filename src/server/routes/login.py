@@ -7,8 +7,8 @@ from src.user import User
 
 
 @sitemapper.include()
-@app.route("/login", methods=["GET", "POST"])
-@app.route("/login/", methods=["GET", "POST"])
+@app.route("/login", methods=["POST"])
+@app.route("/login/", methods=["POST"])
 def login_route():
     login: LoginForm = LoginForm()
 
@@ -19,13 +19,13 @@ def login_route():
             user = User.from_email(
                 conn, email=login.email.data, password=login.password.data
             )
-        except ValueError as e:
-            return render_template("login.html", error=str(e), form=login)
+        except ValueError:
+            redirect(url_for("home"))
 
         login_user(user)
         return redirect(url_for("home"))
 
-    return render_template("login.html", form=login)
+    return redirect(url_for("home"))
 
 
 @app.route("/logout")

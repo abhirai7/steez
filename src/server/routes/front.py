@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arrow
-from flask import redirect, render_template, request, url_for, flash
+from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.carousel import Carousel
 from src.product import Category, Product
 from src.server import TODAY, app, conn, sitemapper
-from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm
+from src.server.forms import GiftCardForm, SearchForm, SubscribeNewsLetterForm, LoginForm
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
 if TYPE_CHECKING:
@@ -23,17 +23,18 @@ if TYPE_CHECKING:
 def home():
     products = Product.all(conn)
     categories = Product.categorise_products(products)
-    gift_form: GiftCardForm = GiftCardForm()
+
     return render_template(
         "front.html",
         products=products,
         current_user=current_user,
-        gift_form=gift_form,
+        gift_form=GiftCardForm(),
         show_hero=True,
         categories=categories,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
         carousels=Carousel.all(conn),
+        LoginForm = LoginForm()
     )
 
 

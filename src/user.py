@@ -230,7 +230,7 @@ class User:
         query = r"""
             UPDATE `ORDERS` 
             SET `RAZORPAY_ORDER_ID` = ?, `STATUS` = 'CONF'
-            WHERE `USER_ID` = ? AND `STATUS` = 'PEND'
+            WHERE `USER_ID` = ? AND `STATUS` = 'PEND' AND `RAZORPAY_ORDER_ID` IS NULL
         """
         cursor = self.__conn.cursor()
         update = cursor.execute(query, (order_id, self.id))
