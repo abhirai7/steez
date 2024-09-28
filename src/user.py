@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
-from datetime import datetime
+import arrow
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ class User:
         self.email = email
         self.password = password
         self.name = name
-        self.created_at = datetime.fromisoformat(created_at) if created_at else None
+        self.created_at = arrow.get(created_at) if created_at else arrow.now()
         self.address = address
         self.phone = phone
 

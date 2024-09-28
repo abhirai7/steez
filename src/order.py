@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import arrow
 import sqlite3
 from typing import TYPE_CHECKING, Literal
 
@@ -34,9 +34,7 @@ class Order:
         self.product_id = product_id
         self.quantity = quantity
         self.total_price = total_price
-        self.created_at = (
-            datetime.datetime.fromisoformat(created_at) if created_at else None
-        )
+        self.created_at = arrow.get(created_at)
         self.status = status
         self.razorpay_order_id = razorpay_order_id
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 from typing import TYPE_CHECKING, Literal
+import arrow
 
 from fuzzywuzzy.fuzz import partial_ratio
 
@@ -33,7 +34,7 @@ class Review:
         self.product_id = product_id
         self.stars = stars
         self.review = review
-        self.created_at = created_at
+        self.created_at = arrow.get(created_at) if created_at else None
 
     @property
     def user(self) -> User:
@@ -224,7 +225,7 @@ class Product:
         self.keywords = [keyword.strip() for keyword in keywords.split(";")]
 
         self._available_sizes = []
-        self.created_at = created_at
+        self.created_at = arrow.get(created_at)
 
     def update(self) -> None:
         query = r"""
@@ -247,6 +248,22 @@ class Product:
                 self.id,
             ),
         )
+
+    def similar_products(self) -> list[Product]:
+        keywords_query = " OR ".join(
+            [f"KEYWORDS LIKE '%{keyword}%'" for keyword in self.keywords]
+        )
+
+        query = f"SELECT * FROM PRODUCTS WHERE ID != ? AND ({keywords_query}) LIMIT 3 ORDER BY CREATED_AT DESC"
+        cursor = self.__conn.cursor()
+        cursor.execute(query, (self.id,))
+
+        products = []
+
+        while row := cursor.fetchone():
+            products.append(Product(self.__conn, **row))
+
+        return products
 
     @property
     def available_sizes(self) -> list[str]:
@@ -271,7 +288,9 @@ class Product:
     @property
     def categorised_reviews(self) -> dict[VALID_STARS, list[Review]]:
         reviews = self.reviews
-        return {i: [review for review in reviews if review.stars == i] for i in range(1, 6)}  # type: ignore
+        return {
+            i: [review for review in reviews if review.stars == i] for i in range(1, 6)
+        }  # type: ignore
 
     @property
     def average_rating(self) -> float:
@@ -283,6 +302,10 @@ class Product:
     @property
     def total_reviews(self) -> int:
         return len(self.reviews)
+
+    @property
+    def discount(self) -> int:
+        return int((abs(self.price - self.display_price) / self.price) * 100)
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
         return Review.create(
@@ -660,7 +683,7 @@ class GiftCard:
         self.user_id = user_id
         self.__code = code
         self.used = bool(int(used))
-        self.created_at = created_at
+        self.created_at = arrow.get(created_at) if created_at else None
         self.used_at = used_at
 
     @property
