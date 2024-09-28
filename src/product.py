@@ -307,10 +307,6 @@ class Product:
     def discount(self) -> int:
         return int((abs(self.price - self.display_price) / self.price) * 100)
 
-    @property
-    def discount(self) -> int:
-        return int((abs(self.price - self.display_price) / self.price) * 100)
-
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
         return Review.create(
             self.__conn, user_id=user_id, product_id=self.id, stars=stars, review=review

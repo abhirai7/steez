@@ -1,4 +1,83 @@
 {% macro navbar(current_user, search_form, categories=None) -%}
+<style>
+    #search-input-bar {
+        position: relative;
+        display: none;
+    }
+    @media (max-width: 1202px) {
+        #search-input {
+            font-size: 1rem;
+        }
+        #nav-head {
+            left : 50%;
+            z-index: 1;
+            position: relative;
+            transform: translateX(-50%);
+        }
+        #search-btn {
+            left: 0;
+            position: relative;
+            margin-left: 0;
+            z-index: 0;
+            transform: translateX(0%);
+        }
+        #hamburger-menu {
+            left: -54%;
+            position: relative;
+            margin-right: 0;
+            z-index: 0;
+        }
+    }
+    
+</style>
+<nav class="navbar navbar-expand-xl bg-body-tertiary" >
+    <div class="container-fluid d-flex align-items-start" id="navbar">
+        <a class="navbar-brand nav-link active horizon-font fs-4" id = "nav-head" aria-current="page" href="{{ url_for('home') }}">STEEZ<sup>TM</sup></a>
+        
+        <button class="navbar-toggler" id = "hamburger-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <ul class="navbar-nav" id="search-btn">
+            <li class="nav-item mx-3 fs-5">
+                <button class="nav-link"><i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i></button>
+            </li>
+        </ul>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto text-center">
+                {% if categories %}
+                {% for category in categories %}
+                    <li class="nav-link mx-4 fs-5">
+                        <a class="link-dark link-underline link-underline-opacity-0 link-opacity-100 link-opacity-50-hover fw-semibold" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ms-auto mx-3 mb-lg-0 d-flex">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item mx-1 fs-5 searchNext">
+                    <a class="nav-link" href="{{ url_for('order_history') }}">Order History</a>
+                </li>
+                <li class="nav-item mx-1 fs-5">
+                    <a class="nav-link" href="{{ url_for('checkout') }}"><i class="fa-solid fa-cart-shopping fa-xl" style="color: #5b5c5d;"></i> {% set total = current_user.cart.count %}{% if total %}<sup>{{ total}}</sup>{% endif
+                        %}</a>
+                </li>
+                <li class="nav-item mx-1 fs-5">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item mx-1 fs-5 searchNext">
+                    <a class="nav-link" href="{{ url_for('login_route') }}">Login</a>
+                </li>
+                <li class="nav-item mx-1 fs-5">
+                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
 
 <div class="border border-1 m-0 p-0">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -57,6 +136,43 @@
             </div>
         </div>
 
+    <div id="search-input-bar" class="container ">
+        <form action="{{ url_for('search') }}" method="POST" class="input-group input-group-lg">
+            {{ search_form.hidden_tag() }}
+            {{ search_form.query(class="form-control", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby": "button-addon2"}) }}
+            {{ search_form.submit(class="d-none") }}
+            <button class="btn btn-outline-secondary" type="button" id="close-btn" aria-label="Close search">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </form>
+    </div>
+    
+</nav>
+
+<script>
+    
+    let previousWidth = window.innerWidth; 
+    const searchBtn = document.getElementById("search-btn");
+    const searchInputBar = document.getElementById("search-input-bar");
+    const closeBtn = document.getElementById("close-btn");
+    const searchInput = document.getElementById("search-input");
+
+    searchBtn.addEventListener("click", () => {
+        searchInputBar.style.display = "flex";
+        searchInput.focus(); // Auto-focus on search input
+    });
+
+    closeBtn.addEventListener("click", () => {
+        searchInputBar.style.display = "none";
+    });
+    window.addEventListener('resize', function() {
+        searchBtn.style.left = searchBtn.style.left - window.innerWidth;
+    });
+    window.addEventListener('onload', function() {
+        searchBtn.style.left = searchBtn.style.left - window.innerWidth;
+    });
+
+</script>
         <div class="modal fade rounded rounded-0 bg-transparent w-100" id="search-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <form action="{{ url_for('search') }}" method="POST" class="input-group input-group-lg">
                 <div class="modal-dialog modal-dialog-centered w-100 bg-transparent border border-0">

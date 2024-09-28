@@ -33,8 +33,8 @@ def product_ids():
     lastmod=arrow.now().format("YYYY-MM-DD"),
     changefreq="daily",
 )
-@app.route("/products/<int:product_id>", methods=["GET", "POST"])
-@app.route("/products/<int:product_id>/", methods=["GET", "POST"])
+@app.route("/products/<int:product_id>", methods=["GET"])
+@app.route("/products/<int:product_id>/", methods=["GET"])
 def product(product_id: int):
     product = Product.from_id(conn, product_id)
     pictures = get_product_pictures(product.unique_id)
@@ -67,7 +67,7 @@ def product(product_id: int):
 def add_to_cart(product_id: int):
     product = Product.from_id(conn, product_id)
     form: AddToCartForm = AddToCartForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and form.quantity.data:
         product = Product.from_size(conn, id=product.id, size=form.size.data)
 
         current_user.add_to_cart(product=product, quantity=int(form.quantity.data))
