@@ -15,6 +15,7 @@ from src.server.forms import (
     AddReviewForm,
     AddToCartForm,
     SearchForm,
+    LoginForm,
     SubscribeNewsLetterForm,
 )
 from src.user import User
@@ -59,6 +60,7 @@ def product(product_id: int):
         reviews=reviews,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
+        login_form=LoginForm(),
     )
 
 
@@ -138,6 +140,7 @@ def checkout():
         format_number=format_number,
         newsletter_form=SubscribeNewsLetterForm(),
         search_form=SearchForm(),
+        login_form=LoginForm(),
     )
 
 

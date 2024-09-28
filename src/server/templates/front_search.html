@@ -34,7 +34,7 @@
     </style>
 {% endblock %}
 {% block body %}
-    {{ navbar.navbar(current_user, search_form) }}
+    {{ navbar.navbar(current_user, search_form, login_form) }}
     {% if products %}
         <hr />
         <div class="container-fluid mt-5">

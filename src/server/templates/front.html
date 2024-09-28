@@ -31,7 +31,7 @@
     </style>
 {% endblock %}
 {% block body %}
-    {{ navbar.navbar(current_user, search_form, categories) }}
+    {{ navbar.navbar(current_user, search_form, login_form, categories) }}
     {% if show_hero %}{{ hero.carousel(carousels) }}{% endif %}
     {% if products %}
         <div class="container-fluid p-0">

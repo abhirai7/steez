@@ -3,7 +3,7 @@
 {% import 'navbar.html' as navbar %}
 {% import 'footer.html' as footer %}
 {% block body %}
-    {{ navbar.navbar(current_user, search_form) }}
+    {{ navbar.navbar(current_user, search_form, login_form) }}
     <div class="container">
         <hr>
         <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">

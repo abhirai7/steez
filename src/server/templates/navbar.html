@@ -1,4 +1,6 @@
-{% macro navbar(current_user, search_form, categories=None) %}
+{% import "login.html" as login %}
+
+{% macro navbar(current_user, search_form, login_form, categories=None) %}
     <style>
         #search-input-bar {
             position: relative;
@@ -72,7 +74,7 @@
                             </li>
                         {% else %}
                             <li class="nav-item mx-1 searchNext">
-                                <a class="nav-link" href="{{ url_for("login_route") }}">Login</a>
+                                <button type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#login-modal">Login</button>
                             </li>
                             <li class="nav-item mx-1">
                                 <a class="nav-link" href="{{ url_for("register") }}">Register</a>
@@ -129,6 +131,7 @@
             </div>
         </form>
     </div>
+    {{ login.login(login_form, "login-modal") }}
 {% endmacro %}
 {% macro admin_navbar(current_user) %}
     <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark h-100">

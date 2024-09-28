@@ -3,7 +3,7 @@
 {% import 'navbar.html' as navbar %}
 {% import 'footer.html' as footer %}
 {% block body %}
-    {{ navbar.navbar(current_user, search_form) }}
+    {{ navbar.navbar(current_user, search_form, login_form) }}
     <div class="container my-5">
         <h1 class="text-center mb-4">Return Policy Q&A</h1>
         <div class="accordion" id="returnPolicyAccordion">

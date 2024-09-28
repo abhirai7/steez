@@ -39,7 +39,7 @@ def home():
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
         carousels=Carousel.all(conn),
-        LoginForm=LoginForm(),
+        login_form=LoginForm(),
     )
 
 
@@ -54,6 +54,7 @@ def faq():
         search_form=SearchForm(),
         categories=Category.all(conn),
         newsletter_form=SubscribeNewsLetterForm(),
+        login_form=LoginForm(),
     )
 
 
@@ -79,6 +80,7 @@ def search():
         search_form=form,
         categories=Category.all(conn),
         newsletter_form=SubscribeNewsLetterForm(),
+        login_form=LoginForm(),
     )
 
 
@@ -91,6 +93,7 @@ def refund_policy():
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
         categories=Category.all(conn),
+        login_form=LoginForm(),
     )
 
 
@@ -107,6 +110,7 @@ def order_history():
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
         categories=Category.all(conn),
+        login_form=LoginForm(),
     )
 
 
@@ -134,6 +138,7 @@ for category in Category.all(conn):
             search_form=SearchForm(),
             newsletter_form=SubscribeNewsLetterForm(),
             categories=Category.all(conn),
+            login_form=LoginForm(),
         )
 
     app.add_url_rule(
