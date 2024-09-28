@@ -23,12 +23,11 @@ if TYPE_CHECKING:
 def home():
     products = Product.all(conn)
     categories = Product.categorise_products(products)
-    gift_form: GiftCardForm = GiftCardForm()
     return render_template(
         "front.html",
         products=products,
         current_user=current_user,
-        gift_form=gift_form,
+        gift_form=GiftCardForm(),
         show_hero=True,
         categories=categories,
         search_form=SearchForm(),
@@ -51,8 +50,8 @@ def faq():
     )
 
 
-@app.route("/search/", methods=["GET", "POST"])
-@app.route("/search", methods=["GET", "POST"])
+@app.route("/search/", methods=["POST"])
+@app.route("/search", methods=["POST"])
 def search():
     form: SearchForm = SearchForm()
 
