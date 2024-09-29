@@ -8,9 +8,14 @@ import random
 import secrets
 import string
 from sqlite3 import Connection, Cursor, Row, sqlite_version_info
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from dotenv import load_dotenv
+from qrcode import QRCode
+from qrcode.constants import ERROR_CORRECT_H
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 load_dotenv()
 
@@ -383,3 +388,44 @@ def backup_sqlite_database(
     with backup_path_connection:
         conn.backup(backup_path_connection)
     backup_path_connection.close()
+
+
+class OrderQR:
+    BASE62_CHARS = string.digits + string.ascii_lowercase + string.ascii_uppercase
+    BASE = len(BASE62_CHARS)
+
+    def __init__(self, /, *, order_id: int) -> None:
+        self.__order_id = order_id
+
+    def generate_qr_code(self, /) -> Image.Image:
+        text = "QR_" + self.num_to_text(self.__order_id)
+        qr = QRCode(
+            version=1,
+            error_correction=ERROR_CORRECT_H,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(text)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        return img
+
+    def num_to_text(self, num: int):
+        if num == 0:
+            return OrderQR.BASE62_CHARS[0]
+
+        result = []
+        while num > 0:
+            remainder = num % OrderQR.BASE
+            result.append(OrderQR.BASE62_CHARS[remainder])
+            num //= OrderQR.BASE
+
+        return "".join(reversed(result))
+
+    def text_to_num(self, text: str):
+        num = 0
+        for char in text:
+            num = num * OrderQR.BASE + OrderQR.BASE62_CHARS.index(char)
+
+        return num

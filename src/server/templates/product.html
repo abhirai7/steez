@@ -71,7 +71,7 @@
         <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 row-cols-1">
             <div class="col">
                 <div class="d-block d-lg-none d-md-none d-xl-none text-center">
-                    <p class="fs-1 fw-semibold text-uppercase">{{ product.name.strip() }}</p>
+                    <p class="fs-1 fw-bold text-uppercase mt-3">{{ product.name.strip() }}</p>
                     {% set display_price = product.display_price %}
                     {% set difference = display_price - product.price %}
                     {% if difference > 0 %}
@@ -130,7 +130,61 @@
             <div class="col border-start border-start-1 border-bottom border-bottom-1 m-0 p-0">
                 <div class="px-lg-5 px-4 mt-lg-5 pt-lg-5 mt-xl-5 pt-xl-5 m-4">
                     <div class="d-none d-lg-block d-md-block d-xl-block">
-                        <p class="fs-1 fw-bold text-uppercase d-none d-lg-block d-md-block d-xl-block">{{ product.name.strip() }}</p>
+                        <div class="h-100 d-flex justify-content-between align-items-center">
+                            <div class="fs-1 fw-bold text-uppercase">{{ product.name.strip() }}</div>
+                            <button class="btn fs-1 fw-bold text-uppercase border border-0 {% if not current_user.is_authenticated %}disabled{% endif %}" id="add-to-fav"><i class="bi bi-bookmark-heart"></i></button>
+                            
+                            {% if current_user.is_authenticated %}
+                                <script>
+                                    const addToFavUri = `{{ url_for("add_to_favourites", product_id=product.id) }}`;
+                                    const removeFromFavUri = `{{ url_for("remove_from_favourites", product_id=product.id) }}`;
+                                    const isFavUri = `{{ url_for("is_favourite", product_id=product.id) }}`;
+
+                                    const addToFavButton = document.getElementById('add-to-fav');
+
+                                    let isFav = false;
+
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        fetch(isFavUri, {
+                                            'X-CSRFToken': `{{ csrf_token() }}`,
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            isFav = data.is_favourite;
+                                            if (isFav) {
+                                                addToFavButton.innerHTML = '<i class="bi bi-bookmark-heart-fill"></i>';
+                                            }
+                                        });
+                                    });
+
+                                    addToFavButton.addEventListener('click', () => {
+                                        if (isFav) {
+                                            fetch(removeFromFavUri, {
+                                                'X-CSRFToken': `{{ csrf_token() }}`,
+                                            })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    addToFavButton.innerHTML = '<i class="bi bi-bookmark-heart"></i>';
+                                                    isFav = false;
+                                                }
+                                            });
+                                        } else {
+                                            fetch(addToFavUri, {
+                                                'X-CSRFToken': `{{ csrf_token() }}`,
+                                            })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    addToFavButton.innerHTML = '<i class="bi bi-bookmark-heart-fill"></i>';
+                                                    isFav = true;
+                                                }
+                                            });
+                                        }
+                                    });
+                                </script>
+                            {% endif %}
+                        </div>
                         <div class="mb-4 mt-4">
                             {% if product.discount > 0 %}
                                 <span class="text-danger fs-4">-{{ product.discount }}%</span>
@@ -229,12 +283,13 @@
                         <div class="row mt-2">
                             {% if current_user.is_authenticated %}
                                 <div class="col">
-                                    <div class="m-1">{{ form.submit(class="btn btn-outline-secondary rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-2-5 border border-2 border-dark", id="add-to-cart") }}</div>
+                                    <div class="m-1">{{ form.submit(class="btn btn-outline-dark rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-2-5 border border-2 border-dark", id="add-to-cart") }}</div>
                                 </div>
                                 <div class="col">
                                     <div class="m-1">
-                                        <a href="{{ url_for("checkout") }}" class="btn btn-outline-dark rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-2-5">Buy
-                                        Now</a>
+                                        <a href="{{ url_for("checkout") }}" class="btn btn-dark rounded rounded-5 w-100 fs-min text-uppercase fw-semibold p-2-5">
+                                            Buy Now
+                                        </a>
                                     </div>
                                 </div>
                             {% else %}

@@ -26,8 +26,8 @@ if TYPE_CHECKING:
 @sitemapper.include(lastmod=TODAY, changefreq="daily", priority=0.9)
 @app.route("/")
 def home():
-    products = Product.all(conn)
-    categories = Product.categorise_products(products)
+    products = Product.all(conn, limit=6)
+    categories = Product.categorise_products(products, limit=6)
 
     return render_template(
         "front.html",

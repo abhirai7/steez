@@ -14,8 +14,8 @@ from src.server import RAZORPAY_KEY, app, conn, razorpay_client, sitemapper
 from src.server.forms import (
     AddReviewForm,
     AddToCartForm,
-    SearchForm,
     LoginForm,
+    SearchForm,
     SubscribeNewsLetterForm,
 )
 from src.user import User
@@ -108,6 +108,14 @@ def add_review(product_id: int):
     return redirect(url_for("product", product_id=product_id))
 
 
+@app.route("/products/<int:product_id>/is-favourite", methods=["GET"])
+@app.route("/products/<int:product_id>/is-favourite/", methods=["GET"])
+@login_required
+def is_favourite(product_id: int):
+    product = Product.from_id(conn, product_id)
+    return {"is_favourite": Favourite.exists(conn, user=current_user, product=product)}
+
+
 @app.route("/products/<int:product_id>/add-to-favourites", methods=["GET"])
 @app.route("/products/<int:product_id>/add-to-favourites/", methods=["GET"])
 @login_required
@@ -117,17 +125,11 @@ def add_to_favourites(product_id: int):
     return redirect(url_for("product", product_id=product_id))
 
 
-@app.route(
-    "/products/<int:product_id>/remove-from-favourites/<int:favourite_id>",
-    methods=["GET"],
-)
-@app.route(
-    "/products/<int:product_id>/remove-from-favourites/<int:favourite_id>",
-    methods=["GET"],
-)
+@app.route("/products/<int:product_id>/remove-from-favourites", methods=["GET"])
+@app.route("/products/<int:product_id>/remove-from-favourites/", methods=["GET"])
 @login_required
-def remove_from_favourites(product_id: int, favourite_id: int):
-    current_user.remove_from_fav(fav=Favourite.from_id(conn, favourite_id))
+def remove_from_favourites(product_id: int):
+    current_user.remove_from_fav(product=Product.from_id(conn, product_id))
     return redirect(url_for("product", product_id=product_id))
 
 

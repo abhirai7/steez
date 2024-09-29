@@ -439,7 +439,7 @@ class Product:
     ) -> list[Product]:
         cursor = connection.cursor()
 
-        query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = ?"
+        query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = ? AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)"
         if size:
             query += " AND SIZE = ?"
             cursor.execute(query, (unique_id, size))
@@ -473,19 +473,15 @@ class Product:
         limit: int | None = None,
         offset: int = 0,
     ) -> list[Product]:
-        params = (limit, offset) if limit is not None else ()
-        if limit is None:
-            query = r"""
-                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) AND STOCK > 0
-            """
-        else:
-            query = r"""
-                SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) AND STOCK > 0 LIMIT ? OFFSET ?
-            """
+        params = ()
+        query = r"""
+            SELECT * FROM PRODUCTS WHERE ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) AND STOCK > 0
+        """
         if admin:
             if limit is None:
                 query = r"SELECT * FROM PRODUCTS"
             else:
+                params = (limit, offset) if limit is not None else ()
                 query = r"SELECT * FROM PRODUCTS LIMIT ? OFFSET ?"
 
         cursor = connection.cursor()
@@ -527,11 +523,16 @@ class Product:
         return f"<Product name={self.name} price={self.price} stock={self.stock} unique_id={self.unique_id} size={self.size_name}>"
 
     @staticmethod
-    def categorise_products(products: list[Product]) -> dict[Category, list[Product]]:
+    def categorise_products(products: list[Product], *, limit: int | None = None) -> dict[Category, list[Product]]:
         categories: dict[Category, list[Product]] = {}
+        limit = limit or float("inf")  # type: ignore
+
         for product in products:
             if product.category not in categories:
                 categories[product.category] = []
+
+            if len(categories[product.category]) >= limit:  # type: ignore
+                continue
 
             categories[product.category].append(product)
 

@@ -78,11 +78,7 @@
 {% endblock %}
 {% block bottom_scripts %}
     <script>
-        const settlements = {
-            {
-                settlements | tojson
-            }
-        };
+        const settlements = {{ settlements | tojson }};
 
         const labels = settlements.items.map(item => new Date(item.created_at * 1000).toLocaleDateString());
         const amounts = settlements.items.map(item => item.amount / 100);

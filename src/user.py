@@ -160,8 +160,12 @@ class User:
 
         return Favourite.add(self.__conn, user=self, product=product)
 
-    def remove_from_fav(self, *, fav: Favourite) -> None:
-        fav.delete()
+    def remove_from_fav(self, *, product: Product) -> None:
+        from .favourite import Favourite
+
+        fav = Favourite.from_user(self.__conn, user=self, product=product)
+        if fav:
+            fav[0].delete()
 
     def is_fav(self, *, product: Product) -> bool:
         return Favourite.exists(self.__conn, user=self, product=product)
