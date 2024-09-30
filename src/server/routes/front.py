@@ -102,6 +102,9 @@ def refund_policy():
 @login_required
 def order_history():
     orders = current_user.orders
+    if limit := request.args.get("limit", 10):
+        orders = orders[:int(limit)]
+
     return render_template(
         "order_history.html",
         orders=orders,

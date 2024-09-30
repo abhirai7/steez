@@ -17,6 +17,7 @@ from src.server.forms import (
     LoginForm,
     SearchForm,
     SubscribeNewsLetterForm,
+    PaymentMethod,
 )
 from src.user import User
 from src.utils import FAQ_DATA, format_number, get_product_pictures, size_chart
@@ -143,25 +144,33 @@ def checkout():
         newsletter_form=SubscribeNewsLetterForm(),
         search_form=SearchForm(),
         login_form=LoginForm(),
+        checkout_form=PaymentMethod(),
     )
 
 
-@app.route("/final-ckeckout")
+@app.route("/final-ckeckout", methods=["POST"])
+@app.route("/final-ckeckout/", methods=["POST"])
 @login_required
 def final_checkout():
-    args = request.args
-    gift_code = args.get("gift-code", "").replace(" ", "").upper()
+    form: PaymentMethod = PaymentMethod()
 
-    order = current_user.full_checkout(razorpay_client, gift_code=gift_code)
+    if form.validate_on_submit():
+        gift_code = (form.gift_card.data or "").replace(" ", "").upper()
+        if form.method.data == "razorpay":
+            order = current_user.full_checkout(razorpay_client, gift_code=gift_code)
 
-    variables = {
-        "razorpay_key": RAZORPAY_KEY,
-        "amount": order["amount"],
-        "order_id": order["id"],
-        "giftcard": False,
-    }
-    return render_template("payment.html", **variables)
+            variables = {
+                "razorpay_key": RAZORPAY_KEY,
+                "amount": order["amount"],
+                "order_id": order["id"],
+                "giftcard": False,
+            }
+            return render_template("payment.html", **variables)
+        else:
+            current_user.partial_checkout(gift_code=gift_code)
+            return redirect(url_for("order_history", limit=1))
 
+    return redirect(url_for("checkout"))
 
 @app.route("/razorpay-webhook/product", methods=["POST"])
 @app.route("/razorpay-webhook/product/", methods=["POST"])

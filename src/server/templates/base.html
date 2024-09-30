@@ -45,7 +45,7 @@
     </head>
     <body class="d-flex flex-column min-vh-100 p-0 m-0">
         {% if current_user.is_admin %}
-            <div class="alert alert-warning m-0 p-2 text-center" role="alert">
+            <div class="w-100 alert alert-warning m-0 p-2 text-center z-5" role="alert">
                 You are logged in as an Admin -
                 <a href="{{ url_for("logout") }}" class="alert-link">Logout</a>
             </div>

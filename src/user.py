@@ -163,16 +163,17 @@ class User:
     def remove_from_fav(self, *, product: Product) -> None:
         from .favourite import Favourite
 
-        fav = Favourite.from_user(self.__conn, user=self, product=product)
-        if fav:
+        if fav := Favourite.from_user(self.__conn, user=self, product=product):
             fav[0].delete()
 
     def is_fav(self, *, product: Product) -> bool:
         return Favourite.exists(self.__conn, user=self, product=product)
 
-    def partial_checkout(self, *, gift_card: GiftCard | None = None) -> list[Order]:
+    def partial_checkout(self, *, gift_code: str = "") -> list[Order]:
         from .order import Order
+        from .product import GiftCard
 
+        gift_card = GiftCard.from_code(self.__conn, code=gift_code)
         self.cart.update_to_database(gift_card=gift_card)
         self.clear_cart()
 
@@ -189,10 +190,7 @@ class User:
     def full_checkout(
         self, razorpay_client: RazorpayClient, *, gift_code: str = ""
     ) -> RazorPayOrderDict:
-        from .product import GiftCard
-
-        gift_card = GiftCard.from_code(self.__conn, code=gift_code)
-        orders: list[Order] = self.partial_checkout(gift_card=gift_card)
+        orders: list[Order] = self.partial_checkout(gift_code=gift_code)
 
         if not orders:
             error = "No orders found to checkout."

@@ -3,11 +3,13 @@ from __future__ import annotations
 import sqlite3
 
 from flask_wtf import FlaskForm
+from flask_wtf.form import _Auto
 from wtforms import (
     EmailField,
     Field,
     IntegerField,
     PasswordField,
+    SelectField,
     StringField,
     SubmitField,
     TelField,

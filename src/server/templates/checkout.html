@@ -5,119 +5,112 @@
 {% block body %}
     {{ navbar.navbar(current_user, search_form, login_form) }}
     <div class="container">
-        <hr>
-        <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
-            <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
-                <h2 class="fs-5 text-end">Address</h2>
-            </div>
-            <div class="col mb-4">
-                <p class="fs-4">{{ current_user.name }}</p>
-                <p class="text-muted fs-6">{{ current_user.email }}</p>
-                <p class="fs-6">{{ current_user.address }}</p>
-                <p class="fs-6">
-                    <span class="text-muted">+91</span> {{ current_user.phone }}
-                </p>
-            </div>
-        </div>
-        <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
-            <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
-                <h2 class="fs-5 text-end">Products</h2>
-            </div>
-            <div class="col mb-4">
-                {% set products = current_user.cart.products() %}
-                {% if products | length == 0 %}<h2 class="fs-5 text-muted fst-italic">No products in cart</h2>{% endif %}
-                {% for product in products %}
-                    <div class="card rounded rounded-0 shadow-sm p-3" style="max-width: 540px">
-                        <div class="row">
-                            <div class="col-4">
-                                <img src="{{ product.images[0] }}" class="img-fluid rounded-start" alt="{{ product.name }}">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        {{ product.name }} <span class="text-muted fs-6">{{ product.size_name }}</span>
-                                    </h5>
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td class="d-flex justify-content-end text-muted me-2">Price:</td>
-                                                <td>INR. {{ product.price }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="d-flex justify-content-end text-muted me-2">Quantity:</td>
-                                                <td>{{ product.stock }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="d-flex justify-content-end text-muted me-2">Total:</td>
-                                                <td>INR. {{ product.price * product.stock }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('remove_from_cart', product_id=product.id) }}" class="btn btn-outline-danger z-1 rounded rounded-0">Remove</a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
-            <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
-                <h2 class="fs-5 text-end">Apply Gift Card</h2>
-            </div>
-            <div class="col mb-4">
-                <input type="text" class="form-control rounded rounded-0" placeholder="Gift Card Code (if any)" name="code" style="max-width: 540px" id="gift-card-input">
-                <p class="text-muted mt-1 fs-6">* Gift card will be used and applied automatically on checkout.</p>
-            </div>
-        </div>
-        <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
-            <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
-                <h2 class="fs-5 text-end">Summary</h2>
-            </div>
-            <div class="col mb-4">
-                <div class="card rounded rounded-0 mb-2 p-3" style="max-width: 540px;">
-                    <div class="card-body">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td class="d-flex justify-content-end text-muted me-2">Subtotal:</td>
-                                    <td>INR. {{ current_user.cart.total() }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="d-flex justify-content-end text-muted me-2">ETA:</td>
-                                    <td class="fst-italic">Can not be determined</td>
-                                </tr>
-                                <tr>
-                                    <td class="d-flex justify-content-end text-muted me-2">Total:</td>
-                                    <td>INR. {{ current_user.cart.total() }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <form action="{{ url_for("final_checkout") }}" method="POST" id="checkout-form">
+            {{ checkout_form.csrf_token }}
+            <hr>
+            <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
+                <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
+                    <h2 class="fs-5 text-end">Address</h2>
                 </div>
-                {% if products | length > 0 %}
-                    <a class="btn btn-danger z-1 rounded rounded-0 w-100" id="final-checkout" style="max-width: 540px">Looks Good!</a>
-                {% else %}
-                    <a href="{{ url_for("home") }}" class="btn btn-danger z-1 disabled rounded rounded-0">Looks Good!</a>
-                {% endif %}
+                <div class="col mb-4">
+                    <p class="fs-4">{{ current_user.name }}</p>
+                    <p class="text-muted fs-6">{{ current_user.email }}</p>
+                    <p class="fs-6">{{ current_user.address }}</p>
+                    <p class="fs-6">
+                        <span class="text-muted">+91</span> {{ current_user.phone }}
+                    </p>
+                </div>
             </div>
-        </div>
-        <p class="fs-6 text-muted mt-5 text-center">
-            We are committed to providing quality products and a seamless shopping experience. If you are not entirely satisfied with your purchase, we're here to help.
-            Click <a href="{{ url_for("refund_policy") }}">here</a> for returns and refunds policy.
-        </p>
+            <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
+                <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
+                    <h2 class="fs-5 text-end">Products</h2>
+                </div>
+                <div class="col mb-4">
+                    {% set products = current_user.cart.products() %}
+                    {% if products | length == 0 %}<h2 class="fs-5 text-muted fst-italic">No products in cart</h2>{% endif %}
+                    {% for product in products %}
+                        <div class="card rounded rounded-0 shadow-sm p-3" style="max-width: 540px">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ product.images[0] }}" class="img-fluid rounded rounded-0" alt="{{ product.name }}">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {{ product.name }} <span class="text-muted fs-6">{{ product.size_name }}</span>
+                                        </h5>
+                                        <hr>
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="d-flex justify-content-end text-muted me-2">Price:</td>
+                                                    <td>INR. {{ product.price }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="d-flex justify-content-end text-muted me-2">Quantity:</td>
+                                                    <td>{{ product.stock }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="d-flex justify-content-end text-muted me-2">Total:</td>
+                                                    <td>INR. {{ product.price * product.stock }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('remove_from_cart', product_id=product.id) }}" class="btn btn-outline-danger z-1 rounded rounded-0 mt-1">Remove</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
+                <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
+                    <h2 class="fs-5 text-end">Apply Gift Card</h2>
+                </div>
+                <div class="col mb-4">
+                    {{ checkout_form.gift_card(class="form-control rounded rounded-0", placeholder="Gift Card Code (if any)", style="max-width: 540px", id="gift-card-input") }}
+                    <p class="text-muted mt-1 fs-6">* Gift card will be used and applied automatically on checkout.</p>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-lg-2 row-cols-md-2">
+                <div class="col-2 col-lg-2 col-md-2 mb-4 d-none d-lg-block d-md-block d-xl-block">
+                    <h2 class="fs-5 text-end">Summary</h2>
+                </div>
+                <div class="col mb-4">
+                    <div class="card rounded rounded-0 mb-2 p-3" style="max-width: 540px;">
+                        <div class="card-body">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td class="d-flex justify-content-end text-muted me-2">Subtotal:</td>
+                                        <td>INR. {{ current_user.cart.total() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="d-flex justify-content-end text-muted me-2">ETA:</td>
+                                        <td class="fst-italic">Can not be determined</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="d-flex justify-content-end text-muted me-2">Total:</td>
+                                        <td>INR. {{ current_user.cart.total() }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% if products | length > 0 %}
+                        {{ checkout_form.final_checkout(class="btn btn-danger z-1 rounded rounded-0 w-100", style="max-width: 540px") }}
+                    {% else %}
+                        <a href="{{ url_for("home") }}" class="btn btn-danger z-1 disabled rounded rounded-0">Looks Good!</a>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="fs-6 text-muted mt-5 text-center">
+                We are committed to providing quality products and a seamless shopping experience. If you are not entirely satisfied with your purchase, we're here to help.
+                Click <a href="{{ url_for("refund_policy") }}">here</a> for returns and refunds policy.
+            </p>
+        </form>
     </div>
     {{ footer.footer(newsletter_form) }}
-{% endblock %}
-{% block bottom_scripts %}
-    <script>
-        const finalCheckoutButton = document.getElementById('final-checkout');
-        const giftCardInput = document.getElementById('gift-card-input');
-
-        finalCheckoutButton.addEventListener('click', () => {
-            let uri = `{{ url_for('final_checkout') }}?gift-code=${giftCardInput.value}`;
-            window.location.href = uri;
-        });
-    </script>
 {% endblock %}

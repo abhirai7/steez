@@ -8,7 +8,7 @@ from src.server import app
 
 load_dotenv()
 
-PORT = os.getenv("PORT", 80)
+PORT = int(os.getenv("PORT", 80))
 
 if __name__ == "__main__":
-    app.run(port=int(5000), threaded=True, host="0.0.0.0")
+    app.run(port=PORT, threaded=True, host="0.0.0.0", debug=True)

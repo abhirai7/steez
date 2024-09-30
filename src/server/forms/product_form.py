@@ -99,4 +99,9 @@ class SubscribeNewsLetterForm(FlaskForm):
     email       = EmailField("Email")
     subscribe   = SubmitField("Subscribe")
 
+class PaymentMethod(FlaskForm):
+    gift_card = StringField("Gift Card")
+    method = SelectField("Select Payment Method", choices=[("cash", "Cash on Delivery"), ("razorpay", "Pay via Razorpay")], default="razorpay", validators=[DataRequired()])
+    final_checkout = SubmitField("Looks Good! Proceed to Checkout")
+
 # fmt: on
