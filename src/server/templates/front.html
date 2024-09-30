@@ -37,8 +37,8 @@
 {% block body %}
     {{ navbar.navbar(current_user, search_form, login_form, categories) }}
     {% if show_hero %}{{ hero.carousel(carousels) }}{% endif %}
-    <div class="position-fixed bottom-0 end-0 m-5 z-5 shadow bg-transparent" style="z-index: 10;">
-        <button class="btn btn-warning z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+    <div class="position-fixed bottom-0 end-0 m-5 z-5 rounded rounded-0 shadow bg-transparent" style="z-index: 10;">
+        <button class="btn btn-warning rounded rounded-0 z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
             <i class="bi bi-gift"></i> GIFTS
         </button>
     </div>

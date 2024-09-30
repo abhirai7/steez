@@ -10,44 +10,22 @@
             #search-input {
                 font-size: 1rem;
             }
-
-            #nav-head {
-                left: 50%;
-                z-index: 1;
-                position: relative;
-                transform: translateX(-50%);
-            }
-
-            #search-btn {
-                left: 0;
-                position: relative;
-                margin-left: 0;
-                z-index: 0;
-                transform: translateX(0%);
-            }
-
-            #hamburger-menu {
-                left: -54%;
-                position: relative;
-                margin-right: 0;
-                z-index: 0;
-            }
         }
     </style>
     <div class="border border-1 m-0 p-0">
         <nav class="navbar navbar-expand-xl bg-body-tertiary">
-            <div class="container-fluid d-flex align-items-start" id="navbar">
-                <a class="navbar-brand nav-link active horizon-font fs-4" id="nav-head" aria-current="page" href="{{ url_for("home") }}">STEEZ<sup>TM</sup></a>
+            <div class="container-fluid d-flex align-items-betwwen" id="navbar">
                 <button class="navbar-toggler" id="hamburger-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <ul class="navbar-nav" id="search-btn">
+                <a class="navbar-brand nav-link active horizon-font fs-4" id="nav-head" aria-current="page" href="{{ url_for("home") }}">STEEZ<sup>TM</sup></a>
+                <div class="navbar-nav d-block d-xl-none" id="search-btn">
                     <li class="nav-item mx-3">
                         <button class="nav-link">
-                            <i class="fa-solid fa-magnifying-glass" style="color: #504949;"></i>
+                            <i class="fa-solid fa-magnifying-glass text-secondary"></i>
                         </button>
                     </li>
-                </ul>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto text-center">
                         {% if categories %}
@@ -59,6 +37,13 @@
                         {% endif %}
                     </ul>
                     <ul class="navbar-nav ms-auto mx-3 mb-lg-0 d-flex">
+                        <div class="navbar-nav d-none d-xl-block" id="search-btn">
+                            <li class="nav-item mx-3">
+                                <button class="nav-link">
+                                    <i class="fa-solid fa-magnifying-glass text-secondary"></i>
+                                </button>
+                            </li>
+                        </div>
                         {% if current_user.is_authenticated %}
                             <li class="nav-item mx-1 searchNext">
                                 <a class="nav-link" href="{{ url_for("order_history") }}">Order History</a>
@@ -83,12 +68,11 @@
                 </div>
             </div>
             <div id="search-input-bar" class="container ">
-                <form action="{{ url_for("search") }}" method="POST" class="input-group input-group-lg">
+                <form action="{{ url_for("search") }}" method="POST" class="input-group">
                     {{ search_form.hidden_tag() }}
-                    {{ search_form.query(class="form-control", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products",
-                                        "aria-describedby": "button-addon2"}) }}
+                    {{ search_form.query(class="form-control shadow-none", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby": "button-addon2"}) }}
                     {{ search_form.submit(class="d-none") }}
-                    <button class="btn btn-outline-secondary" type="button" id="close-btn" aria-label="Close search">
+                    <button class="btn btn-outline-secondary rounded rounded-0" type="button" id="close-btn" aria-label="Close search">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </form>
@@ -118,12 +102,12 @@
         });
     </script>
     <div class="modal fade rounded rounded-0 bg-transparent w-100" id="search-modal" tabindex="-1" aria-labelledby="search-modal-label" aria-hidden="true">
-        <form action="{{ url_for("search") }}" method="POST" class="input-group input-group-lg">
+        <form action="{{ url_for("search") }}" method="POST" class="input-group">
             <div class="modal-dialog modal-dialog-centered w-100 bg-transparent border border-0">
                 <div class="modal-content bg-transparent border border-0">
                     <div class="modal-body">
                         {{ search_form.hidden_tag() }}
-                        {{ search_form.query(class="form-control-lg w-100 rounded rounded-0 focus-ring focus-ring-none ps-3 pe-3", placeholder="Search for products") }}
+                        {{ search_form.query(class="form-control w-100 rounded rounded-0 focus-ring focus-ring-none ps-3 pe-3", placeholder="Search for products") }}
                         {{ search_form.submit(class="d-none") }}
                     </div>
                 </div>
