@@ -7,11 +7,12 @@ import pathlib
 import random
 import secrets
 import string
+import base64
 from sqlite3 import Connection, Cursor, Row, sqlite_version_info
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from dotenv import load_dotenv
-from qrcode import QRCode
+import qrcode
 from qrcode.constants import ERROR_CORRECT_H
 
 if TYPE_CHECKING:
@@ -399,8 +400,9 @@ class OrderQR:
 
     def generate_qr_code(self, /) -> Image.Image:
         text = "QR_" + self.num_to_text(self.__order_id)
-        qr = QRCode(
-            version=1,
+        text = base64.b64encode(text.encode("utf-8")).decode("utf-8")
+        qr = qrcode.QRCode(
+            version=40,
             error_correction=ERROR_CORRECT_H,
             box_size=10,
             border=4,

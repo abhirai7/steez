@@ -1,0 +1,98 @@
+{% macro display_order(order, notes) %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    <h2 class="mb-0">Order Receipt</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="fw-bold">Order Details</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Order ID</th>
+                                <td>{{ order.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Date</th>
+                                <td>{{ order.created_at | timestamp_to_date }}</td>
+                            </tr>
+                            <tr>
+                                <th>Receipt</th>
+                                <td>{{ order.receipt }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>{{ order.status | capitalize }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total Amount</th>
+                                <td>{{ order.amount / 100 }} {{ order.currency }}</td>
+                            </tr>
+                            <tr>
+                                <th>Amount Paid</th>
+                                <td>{{ order.amount_paid / 100 }} {{ order.currency }}</td>
+                            </tr>
+                            <tr>
+                                <th>Amount Due</th>
+                                <td>{{ order.amount_due / 100 }} {{ order.currency }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">Products</h5>
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in notes.products %}
+                                <tr>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.quantity }}</td>
+                                    <td>{{ product.price / 100 }} {{ order.currency }}</td>
+                                    <td>{{ (product.quantity * product.price) / 100 }} {{ order.currency }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">User Details</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ notes.user.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>{{ notes.user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone</th>
+                                <td>{{ notes.user.phone }}</td>
+                            </tr>
+                            <tr>
+                                <th>User ID</th>
+                                <td>{{ notes.user.id }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="text-end">
+                        <h4 class="fw-bold">Total Due: {{ order.amount_due / 100 }} {{ order.currency }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
