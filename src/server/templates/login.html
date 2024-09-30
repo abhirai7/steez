@@ -1,41 +1,95 @@
-{% macro login(form, id) %}
-    <style>
-        .blur-background {
-            backdrop-filter: blur(5px);
+{% extends 'base.html' %}
+{% block scripts %}
+<script>
+    function glitchText() {
+        let heading = document.getElementById('heading');
+
+        function generateRandomText() {
+            let Es = ["é", "è", "ê", "ë", "ē", "ė", "ę"];
+            let Os = ["ó", "ò", "ô", "ö", "õ", "ō"];
+            let randomEs = Es[Math.floor(Math.random() * Es.length)] + Es[Math.floor(Math.random() * Es.length)];
+            let randomOs = Os[Math.floor(Math.random() * Os.length)];
+            return `ST${randomEs}Z<sup>TM</sup> - L${randomOs}GIN`;
         }
 
-        .blur-background-intense {
-            backdrop-filter: blur(25px);
+        let iterations = 9;
+        let interval = 80;
+
+        let randomHtmls = [];
+
+        for (let i = 0; i < iterations; i++) {
+            randomHtmls.push(generateRandomText());
         }
-    </style>
-    <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="login-modal-label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 700px;">
-            <div class="modal-content bg-transparent blur-background rounded rounded-0 p-lg-5 border border-1 border-light">
-                <div class="border bg-transparent blur-background-intense p-lg-5 m-lg-5">
-                    <div class="modal-header border border-0" data-bs-theme="dark">
-                        <div class="modal-title h5 text-light">Login</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ url_for("login_route") }}" method="POST">
-                            {{ form.csrf_token }}
-                            {% if error %}
-                                <div class="alert alert-danger mt-2" role="alert">
-                                    <i class="bi bi-exclamation-circle"></i> {{ error }}
-                                </div>
-                            {% endif %}
-                            <div class="input-group mb-3">{{ form.email(class="form-control rounded rounded-0 shadow-none", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}</div>
-                            <div class="input-group mb-2">{{ form.password(class="form-control rounded rounded-0 shadow-none", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}</div>
-                            <div class="text-center">
-                                <p class="fs-6 mt-3 text-light">
-                                    Don't have an account? <a href="{{ url_for("register") }}" class="link-light">Register here</a>
-                                </p>
-                                {{ form.submit(class="btn btn-primary rounded rounded-0") }}
-                            </div>
-                        </form>
-                    </div>
-                </div>
+
+        let reversedRandomHtmls = randomHtmls.slice().reverse();
+
+        var allRandomHtmls = randomHtmls.concat(reversedRandomHtmls);
+        allRandomHtmls.push('STEEZ<sup>TM</sup> - LOGIN');
+
+
+        allRandomHtmls.forEach((randomHtml, index) => {
+            setTimeout(() => {
+                heading.innerHTML = randomHtml;
+            }, index * interval);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            glitchText();
+        }, 14000);
+    });
+</script>
+{% endblock %}
+{% block styles %}
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .login-section {
+        max-width: 800px;
+        border: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="p-lg-5 p-3 login-section shadow w-100">
+    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - LOGIN</p>
+    <div class="container shadow-sm">
+        <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">
+            {{ form.csrf_token }}
+            {% if error %}
+            <div class="alert alert-danger mt-2" role="alert">
+                <i class="bi bi-exclamation-circle"></i> {{ error }}
             </div>
-        </div>
+            {% endif %}
+
+            <div class="input-group mb-3">
+                {{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}
+            </div>
+
+            <div class="input-group mb-2">
+                {{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
+            </div>
+
+            <div class="text-center">
+                <p class="fs-6 mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="link-secondary">Register here</a></p>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
     </div>
-{% endmacro %}
+</div>
+{% endblock %}

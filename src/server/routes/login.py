@@ -1,5 +1,5 @@
 from flask import redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user, current_user
 
 from src.server import app, conn, sitemapper
 from src.server.forms import LoginForm, RegisterForm
@@ -7,8 +7,8 @@ from src.user import User
 
 
 @sitemapper.include()
-@app.route("/login", methods=["POST"])
-@app.route("/login/", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
+@app.route("/login/", methods=["GET", "POST"])
 def login_route():
     login: LoginForm = LoginForm()
 
@@ -25,7 +25,7 @@ def login_route():
         login_user(user)
         return redirect(url_for("home"))
 
-    return redirect(url_for("home"))
+    return render_template("login.html", form=login, current_user=current_user)
 
 
 @app.route("/logout")
