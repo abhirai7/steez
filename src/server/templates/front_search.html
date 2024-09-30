@@ -36,7 +36,6 @@
 {% block body %}
     {{ navbar.navbar(current_user, search_form, login_form) }}
     {% if products %}
-        <hr />
         <div class="container-fluid mt-5">
             <div class="row row-cols-lg-5 row-cols-2 row-cols-md-3 m-0 p-0">
                 {% for product in products %}

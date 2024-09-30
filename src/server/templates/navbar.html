@@ -1,17 +1,5 @@
 {% import "login.html" as login %}
 {% macro navbar(current_user, search_form, login_form, categories=None) %}
-    <style>
-        #search-input-bar {
-            position: relative;
-            display: none;
-        }
-
-        @media (max-width: 1202px) {
-            #search-input {
-                font-size: 1rem;
-            }
-        }
-    </style>
     <div class="border border-1 m-0 p-0">
         <nav class="navbar navbar-expand-xl bg-body-tertiary">
             <div class="container-fluid d-flex align-items-betwwen" id="navbar">
@@ -19,7 +7,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <a class="navbar-brand nav-link active horizon-font fs-4" id="nav-head" aria-current="page" href="{{ url_for("home") }}">STEEZ<sup>TM</sup></a>
-                <div class="navbar-nav d-block d-xl-none" id="search-btn">
+                <div class="navbar-nav d-block d-xl-none search-btn">
                     <li class="nav-item mx-3">
                         <button class="nav-link">
                             <i class="fa-solid fa-magnifying-glass text-secondary"></i>
@@ -37,7 +25,7 @@
                         {% endif %}
                     </ul>
                     <ul class="navbar-nav ms-auto mx-3 mb-lg-0 d-flex">
-                        <div class="navbar-nav d-none d-xl-block" id="search-btn">
+                        <div class="navbar-nav d-none d-xl-block search-btn">
                             <li class="nav-item mx-3">
                                 <button class="nav-link">
                                     <i class="fa-solid fa-magnifying-glass text-secondary"></i>
@@ -67,52 +55,35 @@
                     </ul>
                 </div>
             </div>
-            <div id="search-input-bar" class="container ">
+            <div id="search-input-bar" class="container d-none" style="max-width: 540px;">
                 <form action="{{ url_for("search") }}" method="POST" class="input-group">
                     {{ search_form.hidden_tag() }}
-                    {{ search_form.query(class="form-control shadow-none", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products", "aria-describedby": "button-addon2"}) }}
+                    {{ search_form.query(class="form-control shadow-none", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products"}) }}
                     {{ search_form.submit(class="d-none") }}
                     <button class="btn btn-outline-secondary rounded rounded-0" type="button" id="close-btn" aria-label="Close search">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </form>
             </div>
+
+            <script>
+                let searchBtns = document.getElementsByClassName("search-btn");
+                const searchInputBar = document.querySelector("#search-input-bar");
+                const closeBtn = document.querySelector("#close-btn");
+                const searchInput = document.querySelector("#search-input");
+
+                for (let i = 0; i < searchBtns.length; i++) {
+                    searchBtns[i].addEventListener("click", () => {
+                        searchInputBar.classList.toggle("d-none");
+                        searchInput.focus();
+                    });
+                }
+
+                closeBtn.addEventListener("click", () => {
+                    searchInputBar.classList.add("d-none");
+                });
+            </script>
         </nav>
-    </div>
-    <script>
-        let previousWidth = window.innerWidth;
-        const searchBtn = document.getElementById("search-btn");
-        const searchInputBar = document.getElementById("search-input-bar");
-        const closeBtn = document.getElementById("close-btn");
-        const searchInput = document.getElementById("search-input");
-
-        searchBtn.addEventListener("click", () => {
-            searchInputBar.style.display = "flex";
-            searchInput.focus(); // Auto-focus on search input
-        });
-
-        closeBtn.addEventListener("click", () => {
-            searchInputBar.style.display = "none";
-        });
-        window.addEventListener('resize', function() {
-            searchBtn.style.left = searchBtn.style.left - window.innerWidth;
-        });
-        window.addEventListener('onload', function() {
-            searchBtn.style.left = searchBtn.style.left - window.innerWidth;
-        });
-    </script>
-    <div class="modal fade rounded rounded-0 bg-transparent w-100" id="search-modal" tabindex="-1" aria-labelledby="search-modal-label" aria-hidden="true">
-        <form action="{{ url_for("search") }}" method="POST" class="input-group">
-            <div class="modal-dialog modal-dialog-centered w-100 bg-transparent border border-0">
-                <div class="modal-content bg-transparent border border-0">
-                    <div class="modal-body">
-                        {{ search_form.hidden_tag() }}
-                        {{ search_form.query(class="form-control w-100 rounded rounded-0 focus-ring focus-ring-none ps-3 pe-3", placeholder="Search for products") }}
-                        {{ search_form.submit(class="d-none") }}
-                    </div>
-                </div>
-            </div>
-        </form>
     </div>
     {{ login.login(login_form, "login-modal") }}
 {% endmacro %}
