@@ -37,6 +37,11 @@
 {% block body %}
     {{ navbar.navbar(current_user, search_form, login_form, categories) }}
     {% if show_hero %}{{ hero.carousel(carousels) }}{% endif %}
+    <div class="position-fixed bottom-0 end-0 m-5 z-5 shadow bg-transparent" style="z-index: 10;">
+        <button class="btn btn-warning z-5" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+            <i class="bi bi-gift"></i> GIFTS
+        </button>
+    </div>
     {% if products %}
         <div class="container-fluid p-0">
             {% for category, products in categories.items() %}
@@ -77,95 +82,48 @@
             <div class="text-dark bg-dark">
                 <hr class="m-0 p-0">
             </div>
-            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
-                <div class="col border border-light rounded rounded-0">
-                    <div class="h-100 d-flex align-items-center justify-content-center">
-                        <div class="text-center p-5 m-5">
-                            <p class="fs-lg-2 fs-max horizon-font">Gift Cards</p>
-                            <p class="text-muted fs-6">Are the perfect gift for any occasion.</p>
-                        </div>
-                    </div>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title text-uppercase" id="offcanvasRightLabel">Gift Cards</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                <div class="col border border-light rounded rounded-0">
-                    <div class="p-lg-5 p-3 m-3 m-lg-5">
-                        <p class="text-muted">Available in any amount between INR. 50 to INR. 2000.</p>
-                        <div>
-                            <div class="d-flex">
-                                <button type="button" class="btn btn-outline-dark shadow-none border border-light rounded rounded-5 text-center me-1" onclick="setAmount(50)">
-                                    <span class="fs-7 fw-semibold px-4">INR. 100</span>
-                                </button>
-                                <button type="button" class="btn btn-outline-dark shadow-none border border-light rounded rounded-5 text-center mx-1" onclick="setAmount(500)">
-                                    <span class="fs-7 fw-semibold px-4">INR. 500</span>
-                                </button>
-                                <button type="button" class="btn btn-outline-dark shadow-none border border-light rounded rounded-5 text-center mx-1" onclick="setAmount(1000)">
-                                    <span class="fs-7 fw-semibold px-4">INR. 1,000</span>
-                                </button>
-                                <button type="button" class="btn btn-outline-dark shadow-none border border-light rounded rounded-5 text-center mx-1" onclick="setAmount(2000)">
-                                    <span class="fs-7 fw-semibold px-4">INR. 2,000</span>
-                                </button>
-                            </div>
-                            <script>
-                                function setAmount(amount) {
-                                    document.getElementById('amount').value = amount;
-                                }
-                            </script>
-                        </div>
-                        <form method="POST" action="{{ url_for("buy_gift_card") }}" class="mt-4">
-                            {{ gift_form.csrf_token }}
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-2">
-                                        <div class="input-group">
-                                            <span>
-                                                <button type="button" class="btn btn-outline-dark shadow-none border border-light rounded rounded-0 text-center p-2 decrement">
-                                                    <span class="fs-5 px-2">-</span>
-                                                </button>
-                                            </span>
-                                            {{ gift_form.amount(class="form-control rounded rounded-0 bg-transparent shadow-none text-center fw-semibold p-2", id="amount") }}
-                                            <span>
-                                                <button type="button" class="btn btn-outline-dark shadow-none border border-light rounded rounded-0 text-center p-2 increment">
-                                                    <span class="fs-5 px-2">+</span>
-                                                </button>
-                                            </span>
-                                            <script>
-                                                document.addEventListener('DOMContentLoaded', () => {
-                                                    const amount = document.getElementById('amount');
-                                                    const increment = document.querySelector('.increment');
-                                                    const decrement = document.querySelector('.decrement');
-
-                                                    increment.addEventListener('click', () => {
-                                                        amount.stepUp(50);
-
-                                                        if (amount.value > 50) {
-                                                            decrement.classList.remove('disabled');
-                                                        } else if (amount.value <= 50) {
-                                                            decrement.classList.add('disabled');
-                                                        }
-                                                    });
-
-                                                    decrement.addEventListener('click', () => {
-                                                        amount.stepDown(50);
-                                                    });
-                                                });
-                                            </script>
+                <div class="offcanvas-body bg-dark" data-bs-theme="dark">
+                    <div class="card bg-transparent border border-1 rounded rounded-0 p-5 mt-3">
+                        <div class="row">
+                            <div class="col">
+                                <p class="fs-6 text-white text-center">
+                                    Gift cards are the perfect gift for any occasion. They are available in
+                                    various denominations and can be used to purchase any product on our
+                                    website.
+                                </p>
+                                <hr>
+                                <form method="POST" action="{{ url_for('buy_gift_card') }}">
+                                    {{ gift_form.csrf_token }}
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-2">
+                                                {{ gift_form.amount.label(class="form-label") }}
+                                                {{ gift_form.amount(class="form-control p-2", id="amount") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="mb-1">
+                                                {% if current_user.is_authenticated %}
+                                                {{ gift_form.submit(class="btn btn-outline-warning w-100 p-2 ps-3 pe-3") }}
+                                                {% else %}
+                                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-warning w-100 p-2 ps-3 pe-3">Login to Buy</a>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-12 mt-2">
-                                    <div class="mb-1">
-                                        {% if current_user.is_authenticated %}
-                                            {{ gift_form.submit(class="btn btn-outline-dark border border-light w-100 rounded rounded-5 fw-semibold px-4") }}
-                                        {% else %}
-                                            <a href="{{ url_for("login_route") }}" class="btn btn-outline-dark border border-light w-100 rounded rounded-5 fw-semibold px-4">Login to Buy</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
+            
+                                    <p class="fs-6 text-muted text-small mt-3">
+                                        *Gift cards are non-refundable. For more information
+                                        <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a>
+                                    </p>
+                                </form>
                             </div>
-                            <p class="text-muted text-small mt-3">
-                                *Gift cards are non-refundable. For more information
-                                <a href="{{ url_for("refund_policy") }}" class="link-underlink-dark text-muted">Click Here</a>
-                            </p>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
