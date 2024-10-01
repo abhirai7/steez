@@ -2,7 +2,7 @@
 {% from 'navbar.html' import navbar %}
 {% set title = "STEEZ™ - Order History" %}
 {% block body %}
-    {{ navbar(current_user, search_form) }}
+    {{ navbar(current_user, search_form, login_form) }}
     {% if orders | length == 0 %}
         <div class="container mt-5">
             <p class="text-center fs-1">No orders found!</p>
