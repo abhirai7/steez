@@ -11,4 +11,4 @@ load_dotenv()
 PORT = int(os.getenv("PORT", 80))
 
 if __name__ == "__main__":
-    app.run(port=PORT, threaded=True, host="0.0.0.0", debug=True)
+    app.run(port=PORT, threaded=True, host="0.0.0.0")

@@ -70,7 +70,7 @@
                     <h2 class="fs-5 text-end">Apply Gift Card</h2>
                 </div>
                 <div class="col mb-4">
-                    {{ checkout_form.gift_card(class="form-control rounded rounded-0", placeholder="Gift Card Code (if any)", style="max-width: 540px", id="gift-card-input") }}
+                    {{ checkout_form.gift_card(class="form-control rounded rounded-0 shadow-none", placeholder="Gift Card Code (if any)", style="max-width: 540px", id="gift-card-input") }}
                     <p class="text-muted mt-1 fs-6">* Gift card will be used and applied automatically on checkout.</p>
                 </div>
             </div>
@@ -99,6 +99,7 @@
                             </table>
                         </div>
                     </div>
+                    {{ checkout_form.method(class="form-select rounded rounded-0 shadow-none mb-2", style="max-width: 540px") }}
                     {% if products | length > 0 %}
                         {{ checkout_form.final_checkout(class="btn btn-danger z-1 rounded rounded-0 w-100", style="max-width: 540px") }}
                     {% else %}
