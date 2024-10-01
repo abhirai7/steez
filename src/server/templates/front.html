@@ -32,6 +32,10 @@
         .fs-7 {
             font-size: 0.875rem;
         }
+
+        .fs-8 {
+            font-size: 0.80rem;
+        }
     </style>
 {% endblock %}
 {% block body %}
@@ -63,8 +67,8 @@
                                         <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-title code text-uppercase fw-semibold">{{ product.name }}</p>
-                                        <p class="text-dark text-uppercase fw-semibold">
+                                        <p class="card-title code fs-7 text-uppercase fw-semibold">{{ product.name }}</p>
+                                        <p class="text-dark text-uppercase fs-7 fw-semibold">
                                             {{ product.price | format_currency_direct }}
                                             {% if product.discount > 0 %}
                                                 <span class="text-decoration-line-through text-muted">{{ product.display_price | format_currency_direct }}</span>
@@ -76,6 +80,15 @@
                                 </div>
                             </div>
                         {% endfor %}
+                        <div class="col m-0 p-0 border border-light">
+                            <div class="h-100 d-flex align-items-center justify-content-center">
+                                <div class="text-center align-middle">
+                                    <a class="btn btn-dark fs-8 fw-semibold text-center text-uppercase rounded rounded-5 px-4 py-3" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">
+                                        View all Products
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
