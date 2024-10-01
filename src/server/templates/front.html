@@ -24,7 +24,8 @@
         .product-card:hover .main-image {
             opacity: 1;
         }
-
+    </style>
+    <style>
         .fs-max {
             font-size: 4rem;
         }
@@ -35,6 +36,12 @@
 
         .fs-8 {
             font-size: 0.80rem;
+        }
+    </style>
+    <style>
+        .add-to-cart:hover {
+            transform: scale(1.2);
+            transition: transform 0.1s ease-in-out;
         }
     </style>
 {% endblock %}
@@ -65,24 +72,28 @@
                                     <div class="d-flex justify-content-center position-relative">
                                         <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-fluid main-image" />
                                         <img src="{{ product.images[1] }}" alt="{{ product.name }}" class="img-fluid hover-image position-absolute top-0 start-50 translate-middle-x" />
+                                        <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-title code fs-7 text-uppercase fw-semibold">{{ product.name }}</p>
-                                        <p class="text-dark text-uppercase fs-7 fw-semibold">
-                                            {{ product.price | format_currency_direct }}
-                                            {% if product.discount > 0 %}
-                                                <span class="text-decoration-line-through text-muted">{{ product.display_price | format_currency_direct }}</span>
-                                                <span class="badge bg-danger rounded-pill align-middle">{{ product.discount }}% OFF</span>
-                                            {% endif %}
-                                        </p>
+                                        <div class="d-flex justify-content-between">
+                                            <div class="card-title">
+                                                <p class="code fs-7 text-uppercase fw-semibold">{{ product.name }}</p>
+                                                <p class="text-dark text-uppercase fs-7 fw-semibold">
+                                                    {{ product.price | format_currency_direct }}
+                                                    {% if product.discount > 0 %}
+                                                        <span class="text-decoration-line-through text-muted">{{ product.display_price | format_currency_direct }}</span>
+                                                        <span class="badge bg-danger rounded-pill align-middle">{{ product.discount }}% OFF</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <a href="{{ url_for('product', product_id=product.id) }}" class="stretched-link"></a>
                                 </div>
                             </div>
                         {% endfor %}
                         <div class="col m-0 p-0 border border-light">
                             <div class="h-100 d-flex align-items-center justify-content-center">
-                                <div class="text-center align-middle">
+                                <div class="text-center align-middle mx-1">
                                     <a class="btn btn-dark fs-8 fw-semibold text-center text-uppercase rounded rounded-5 px-4 py-3" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">
                                         View all Products
                                     </a>

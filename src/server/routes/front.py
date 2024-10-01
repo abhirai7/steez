@@ -14,6 +14,7 @@ from src.server.forms import (
     LoginForm,
     SearchForm,
     SubscribeNewsLetterForm,
+    AddToCartForm,
 )
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
@@ -35,6 +36,7 @@ def home():
         current_user=current_user,
         gift_form=GiftCardForm(),
         show_hero=True,
+        form=AddToCartForm(),
         categories=categories,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
