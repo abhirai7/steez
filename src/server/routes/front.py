@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+
 from typing import TYPE_CHECKING
 
 import arrow
-from flask import redirect, render_template, request, url_for
+from flask import jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.carousel import Carousel
@@ -85,6 +86,16 @@ def search():
         login_form=LoginForm(),
     )
 
+@app.route('/autocomplete')
+def autocomplete():
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify(suggestions=[])
+    
+    products = ["Black Tshirt", "Blue Tshirt", "Red Tshirt", "Green Tshirt","Oversized Tshirt","Hoodies", "Sweatshirt", "Polo Tshirt", "V Neck Tshirt", "Round Neck Tshirt"]
+    suggestions = [product for product in products if query.lower() in product.lower()]
+
+    return jsonify(suggestions=suggestions)
 
 @sitemapper.include(lastmod=TODAY, changefreq="monthly", priority=0.6)
 @app.route("/refund-policy/")
