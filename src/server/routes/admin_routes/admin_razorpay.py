@@ -18,9 +18,7 @@ def admin_manage_razorpay_order():
     response = razorpay_client.order.all({"count": limit, "skip": skip})
 
     total_order_amount = sum(item["amount"] for item in response["items"])
-    total_paid = sum(
-        item["amount_paid"] for item in response["items"] if item["amount_paid"]
-    )
+    total_paid = sum(item["amount_paid"] for item in response["items"] if item["amount_paid"])
     total_due = sum(item["amount_due"] for item in response["items"])
 
     return render_template(

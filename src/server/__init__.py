@@ -50,9 +50,7 @@ razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SE
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})
 
 if SQLITE_OLD:
-    app.logger.warning(
-        "**SQLITE VERSION IS TOO OLD. PLEASE USE 3.35.0 OR NEWER. FEW FEATURES MAY NOT WORK.**"
-    )
+    app.logger.warning("**SQLITE VERSION IS TOO OLD. PLEASE USE 3.35.0 OR NEWER. FEW FEATURES MAY NOT WORK.**")
 
 scheduler = BackgroundScheduler()
 

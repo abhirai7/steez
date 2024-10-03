@@ -10,9 +10,7 @@ from src.server.forms import CategoryAddForm
 def admin_manage_category():
     categories = Category.all(conn)
     addform: CategoryAddForm = CategoryAddForm()
-    return render_template(
-        "admin/admin_manage_category.html", categories=categories, form=addform
-    )
+    return render_template("admin/admin_manage_category.html", categories=categories, form=addform)
 
 
 @app.route("/admin/manage/category/add", methods=["POST"])
@@ -23,9 +21,7 @@ def admin_add_category():
     if addform.validate_on_submit() and request.method == "POST":
         assert addform.name.data and addform.description.data
 
-        Category.create(
-            conn, name=addform.name.data, description=addform.description.data
-        )
+        Category.create(conn, name=addform.name.data, description=addform.description.data)
 
         return redirect(url_for("admin_manage_category"))
     return render_template("admin/admin_manage_category.html", form=addform)

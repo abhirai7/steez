@@ -24,14 +24,8 @@ if TYPE_CHECKING:
 @login_required
 def buy_gift_card():
     gift_form: GiftCardForm = GiftCardForm()
-    if (
-        gift_form.validate_on_submit()
-        and gift_form.amount.data
-        and int(gift_form.amount.data) > 0
-    ):
-        order = current_user.full_checkout_giftcard(
-            razorpay_client=razorpay_client, amount=gift_form.amount.data
-        )
+    if gift_form.validate_on_submit() and gift_form.amount.data and int(gift_form.amount.data) > 0:
+        order = current_user.full_checkout_giftcard(razorpay_client=razorpay_client, amount=gift_form.amount.data)
 
         variables = {
             "razorpay_key": RAZORPAY_KEY,
@@ -53,9 +47,7 @@ def razorpay_webhook_giftcard():
 
     try:
         razorpay_client.utility.verify_payment_signature(data)
-        order: RazorPayOrderDict = razorpay_client.order.fetch(
-            data["razorpay_order_id"]
-        )
+        order: RazorPayOrderDict = razorpay_client.order.fetch(data["razorpay_order_id"])
         amount = int(order["amount"])
 
         gift = current_user._buy_gift_card(amount=amount // 100)
@@ -77,7 +69,5 @@ def show_gift_card():
 
     with contextlib.suppress(ValueError):
         if gift_card := GiftCard.exists(conn, code=code):
-            return render_template(
-                "show_gift_card.html", gift_card=gift_card, arrow=arrow
-            )
+            return render_template("show_gift_card.html", gift_card=gift_card, arrow=arrow)
     return redirect(url_for("home"))

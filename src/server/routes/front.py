@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import arrow
@@ -11,11 +11,11 @@ from src.carousel import Carousel
 from src.product import Category, Product
 from src.server import TODAY, app, conn, sitemapper
 from src.server.forms import (
+    AddToCartForm,
     GiftCardForm,
     LoginForm,
     SearchForm,
     SubscribeNewsLetterForm,
-    AddToCartForm,
 )
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
@@ -86,16 +86,23 @@ def search():
         login_form=LoginForm(),
     )
 
-@app.route('/autocomplete')
-def autocomplete():
-    query = request.args.get('q', '')
-    if not query:
-        return jsonify(suggestions=[])
-    
-    products = ["Black Tshirt", "Blue Tshirt", "Red Tshirt", "Green Tshirt","Oversized Tshirt","Hoodies", "Sweatshirt", "Polo Tshirt", "V Neck Tshirt", "Round Neck Tshirt"]
-    suggestions = [product for product in products if query.lower() in product.lower()]
 
+@lru_cache(maxsize=2**6)
+def _autocomplete(*, query: str = "") -> list[Product]:
+    if not query:
+        return []
+    print("cache didnt hit")
+    return Product.search(conn, query=query)
+
+
+@app.route("/autocomplete")
+def autocomplete():
+    query = request.args.get("q", "")
+    products = _autocomplete(query=query)
+
+    suggestions = [product.name.lower() for product in products]
     return jsonify(suggestions=suggestions)
+
 
 @sitemapper.include(lastmod=TODAY, changefreq="monthly", priority=0.6)
 @app.route("/refund-policy/")
@@ -116,7 +123,7 @@ def refund_policy():
 def order_history():
     orders = current_user.orders
     if limit := request.args.get("limit", 10):
-        orders = orders[:int(limit)]
+        orders = orders[: int(limit)]
 
     return render_template(
         "order_history.html",

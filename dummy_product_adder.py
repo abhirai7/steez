@@ -1,13 +1,15 @@
+import os
 import random
 import sqlite3
 import string
-import os
-from PIL import Image
-import first  # noqa
 
-from src.product import Category, Product
+from PIL import Image
+
+import first  # noqa
 from src.carousel import Carousel
+from src.product import Category, Product
 from src.utils import size_names, sqlite_row_factory
+
 first
 
 cmd = "rm database*.sqlite*"
@@ -24,7 +26,18 @@ conn.commit()
 UPLOAD_FOLDER = "src/server/static/product_pictures"
 PRICES = [1800, 1900, 1799, 1500, 2500, 3000]
 DISPLAY_PRICE = [2000, 2100, 1999, 1600, 2700, 3600]
-KEYWORDS = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10"]
+KEYWORDS = [
+    "tag1",
+    "tag2",
+    "tag3",
+    "tag4",
+    "tag5",
+    "tag6",
+    "tag7",
+    "tag8",
+    "tag9",
+    "tag10",
+]
 
 
 def generate_unique_identifier():
@@ -69,7 +82,12 @@ if not os.path.exists(f"{UPLOAD_FOLDER}/{sub_folder}"):
 caro_image.save(f"{UPLOAD_FOLDER}/{sub_folder}/{generate_unique_identifier()}.png")
 
 for i in range(1, 4):
-    Carousel.create(conn, image=sub_folder, heading="Carousel Heading", description="Carousel Description")
+    Carousel.create(
+        conn,
+        image=sub_folder,
+        heading="Carousel Heading",
+        description="Carousel Description",
+    )
 
 conn.commit()
 conn.close()

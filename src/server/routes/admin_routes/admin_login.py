@@ -14,11 +14,7 @@ from src.user import Admin, User
 def todays_settlement(response: dict):
     today = arrow.now().format("YYYY-MM-DD")
 
-    todays_settlements = [
-        item
-        for item in response["items"]
-        if arrow.get(item["created_at"]).format("YYYY-MM-DD") == today
-    ]
+    todays_settlements = [item for item in response["items"] if arrow.get(item["created_at"]).format("YYYY-MM-DD") == today]
 
     return sum(item["amount"] for item in todays_settlements)
 
@@ -34,9 +30,7 @@ def admin_login():
         login_user(admin)
         return redirect(url_for("admin_dashboard"))
 
-    return render_template(
-        "admin/admin_login.html", form=form, current_user=current_user
-    )
+    return render_template("admin/admin_login.html", form=form, current_user=current_user)
 
 
 @app.route("/admin/logout")

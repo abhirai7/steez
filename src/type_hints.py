@@ -94,13 +94,7 @@ class RazorPayOrderDict(TypedDict):
     currency: Literal["INR"]
     receipt: None
     offer_id: None
-    status: (
-        Literal["created"]
-        | Literal["paid"]
-        | Literal["fulfilled"]
-        | Literal["expired"]
-        | Literal["cancelled"]
-    )
+    status: Literal["created"] | Literal["paid"] | Literal["fulfilled"] | Literal["expired"] | Literal["cancelled"]
     attempts: int
     notes: dict[str, Any]
     created_at: int

@@ -72,14 +72,10 @@ class User:
         return Cart(self.__conn, user_id=self.id)
 
     def __str__(self) -> str:
-        return (
-            f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
-        )
+        return f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
 
     @classmethod
-    def from_email(
-        cls, connection: sqlite3.Connection, *, email: str, password: str
-    ) -> User:
+    def from_email(cls, connection: sqlite3.Connection, *, email: str, password: str) -> User:
         cursor = connection.cursor()
         query = r"""
             SELECT * FROM USERS WHERE EMAIL = ? AND PASSWORD = ? AND ROLE = 'USER'
@@ -132,9 +128,7 @@ class User:
 
         hashed_password = Password(password)
 
-        result = cursor.execute(
-            query, (email, hashed_password.hex, name, address, phone)
-        )
+        result = cursor.execute(query, (email, hashed_password.hex, name, address, phone))
         data = result.fetchone()
         connection.commit()
 
@@ -187,9 +181,7 @@ class User:
 
         return orders
 
-    def full_checkout(
-        self, razorpay_client: RazorpayClient, *, gift_code: str = ""
-    ) -> RazorPayOrderDict:
+    def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
         orders: list[Order] = self.partial_checkout(gift_code=gift_code)
 
         if not orders:
@@ -244,15 +236,11 @@ class User:
 
         self.__conn.commit()
 
-        assert self.__check_api_response(
-            full_paylaod=final_payload, api_response=api_response
-        )
+        assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
 
         return api_response  # type: ignore
 
-    def __check_api_response(
-        self, *, full_paylaod: dict, api_response: RazorPayOrderDict
-    ) -> bool:
+    def __check_api_response(self, *, full_paylaod: dict, api_response: RazorPayOrderDict) -> bool:
         amount_correct = full_paylaod["amount"] == api_response["amount"]
         currency_correct = full_paylaod["currency"] == api_response["currency"]
         notes_correct = full_paylaod["notes"] == api_response["notes"]
@@ -299,9 +287,7 @@ class User:
         cursor.execute(query)
         return cursor.fetchone()[0]
 
-    def full_checkout_giftcard(
-        self, razorpay_client: RazorpayClient, amount: int
-    ) -> RazorPayOrderDict:
+    def full_checkout_giftcard(self, razorpay_client: RazorpayClient, amount: int) -> RazorPayOrderDict:
         final_payload = {
             "amount": int(amount * 100),
             "currency": "INR",
@@ -318,9 +304,7 @@ class User:
 
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
 
-        assert self.__check_api_response(
-            full_paylaod=final_payload, api_response=api_response
-        )
+        assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
 
         return api_response
 
@@ -335,9 +319,7 @@ class Admin(User):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def from_email(
-        cls, connection: sqlite3.Connection, *, email: str = "", password: str
-    ) -> Admin:
+    def from_email(cls, connection: sqlite3.Connection, *, email: str = "", password: str) -> Admin:
         cursor = connection.cursor()
         query = r"""
             SELECT * FROM USERS WHERE EMAIL = "" AND PASSWORD = ? AND ROLE = 'ADMIN'

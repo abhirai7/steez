@@ -20,9 +20,7 @@ if TYPE_CHECKING:
 def admin_giftcards():
     gift_cards = GiftCard.all(conn)
     form = GiftCardForm()
-    return render_template(
-        "admin/admin_manage_giftcard.html", gift_cards=gift_cards, form=form
-    )
+    return render_template("admin/admin_manage_giftcard.html", gift_cards=gift_cards, form=form)
 
 
 @app.route("/admin/giftcards/add", methods=["POST"])

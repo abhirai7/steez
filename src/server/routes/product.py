@@ -15,9 +15,9 @@ from src.server.forms import (
     AddReviewForm,
     AddToCartForm,
     LoginForm,
+    PaymentMethod,
     SearchForm,
     SubscribeNewsLetterForm,
-    PaymentMethod,
 )
 from src.user import User
 from src.utils import FAQ_DATA, format_number, get_product_pictures, size_chart
@@ -49,9 +49,7 @@ def product(product_id: int):
         "product.html",
         product=product,
         pictures=pictures,
-        size_chart=[
-            (size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()
-        ],
+        size_chart=[(size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()],
         current_user=current_user,
         form=cart_form,
         review_form=review_form,
@@ -97,14 +95,8 @@ def add_review(product_id: int):
     product = Product.from_id(conn, product_id)
     review_form: AddReviewForm = AddReviewForm()
 
-    if (
-        review_form.validate_on_submit()
-        and request.method == "POST"
-        and review_form.review.data
-    ):
-        current_user.add_review(
-            product=product, review=review_form.review.data, stars=5
-        )
+    if review_form.validate_on_submit() and request.method == "POST" and review_form.review.data:
+        current_user.add_review(product=product, review=review_form.review.data, stars=5)
         return redirect(url_for("product", product_id=product_id))
     return redirect(url_for("product", product_id=product_id))
 
@@ -172,6 +164,7 @@ def final_checkout():
 
     return redirect(url_for("checkout"))
 
+
 @app.route("/razorpay-webhook/product", methods=["POST"])
 @app.route("/razorpay-webhook/product/", methods=["POST"])
 def razorpay_webhook():
@@ -183,9 +176,7 @@ def razorpay_webhook():
 
         assert order.user.id == current_user.id
 
-        order.update_order_status(
-            status="PAID", razorpay_order_id=data["razorpay_order_id"]
-        )
+        order.update_order_status(status="PAID", razorpay_order_id=data["razorpay_order_id"])
     except SignatureVerificationError:
         return {"status": "error"}, 400
 

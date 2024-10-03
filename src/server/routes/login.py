@@ -1,5 +1,5 @@
 from flask import redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user, current_user
+from flask_login import current_user, login_required, login_user, logout_user
 
 from src.server import app, conn, sitemapper
 from src.server.forms import LoginForm, RegisterForm
@@ -16,9 +16,7 @@ def login_route():
         assert login.email.data and login.password.data
 
         try:
-            user = User.from_email(
-                conn, email=login.email.data, password=login.password.data
-            )
+            user = User.from_email(conn, email=login.email.data, password=login.password.data)
         except ValueError:
             redirect(url_for("home"))
 
@@ -44,17 +42,10 @@ def register():
     register: RegisterForm = RegisterForm(conn)
 
     if register.validate_on_submit() and request.method == "POST":
-        assert (
-            register.email.data
-            and register.password.data
-            and register.name.data
-            and register.phone.data
-        )
+        assert register.email.data and register.password.data and register.name.data and register.phone.data
 
         address = f"{register.address_line1.data}".strip()
-        address += (
-            f", {register.city.data}, {register.state.data}, {register.pincode.data}"
-        )
+        address += f", {register.city.data}, {register.state.data}, {register.pincode.data}"
 
         User.create(
             conn,

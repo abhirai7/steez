@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import hashlib
 import locale
 import os
@@ -7,12 +8,11 @@ import pathlib
 import random
 import secrets
 import string
-import base64
 from sqlite3 import Connection, Cursor, Row, sqlite_version_info
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from dotenv import load_dotenv
 import qrcode
+from dotenv import load_dotenv
 from qrcode.constants import ERROR_CORRECT_H
 
 if TYPE_CHECKING:
@@ -382,9 +382,7 @@ def newsletter_email_add_to_db(conn: Connection, /, *, email: str) -> None:
     conn.commit()
 
 
-def backup_sqlite_database(
-    conn: Connection, /, *, path: str = "database-bak.sqlite"
-) -> None:
+def backup_sqlite_database(conn: Connection, /, *, path: str = "database-bak.sqlite") -> None:
     backup_path_connection = Connection(path)
     with backup_path_connection:
         conn.backup(backup_path_connection)

@@ -28,9 +28,7 @@ def admin_manage_product():
     skip = (page - 1) * limit
     products = Product.all(conn, admin=True, limit=limit, offset=skip)
 
-    product_edit_forms: list[ProductUpdateForm] = [
-        ProductUpdateForm(conn, product=product) for product in products
-    ]
+    product_edit_forms: list[ProductUpdateForm] = [ProductUpdateForm(conn, product=product) for product in products]
     addform: ProductAddForm = ProductAddForm(conn)
     return render_template(
         "admin/admin_manage_product.html",
@@ -50,13 +48,7 @@ def admin_add_product():
     addform: ProductAddForm = ProductAddForm(conn)
 
     if addform.validate_on_submit() and request.method == "POST":
-        assert (
-            addform.name.data
-            and addform.price.data
-            and addform.stock.data
-            and addform.description.data
-            and addform.sizes.data
-        )
+        assert addform.name.data and addform.price.data and addform.stock.data and addform.description.data and addform.sizes.data
 
         _id = generate_unique_identifier()
 
@@ -80,9 +72,7 @@ def admin_add_product():
             if not os.path.exists(f"{UPLOAD_FOLDER}/{product.unique_id}/"):
                 os.makedirs(f"{UPLOAD_FOLDER}/{product.unique_id}/")
 
-            with open(
-                f"{UPLOAD_FOLDER}/{product.unique_id}/{image.filename}", "wb+"
-            ) as f:
+            with open(f"{UPLOAD_FOLDER}/{product.unique_id}/{image.filename}", "wb+") as f:
                 f.write(image.read())
 
     return redirect(url_for("admin_manage_product"))
@@ -99,23 +89,13 @@ def admin_edit_product(id: int):
         product.price = product_update_form.price.data or product.price
         product.stock = product_update_form.stock.data or product.stock
         product.description = (
-            markdown.markdown(product_update_form.description.data)
-            if product_update_form.description.data
-            else product.description
+            markdown.markdown(product_update_form.description.data) if product_update_form.description.data else product.description
         )
         product.category = (
-            Category.from_id(conn, int(product_update_form.category.data))
-            if product_update_form.category.data
-            else product.category
+            Category.from_id(conn, int(product_update_form.category.data)) if product_update_form.category.data else product.category
         )
-        product.display_price = (
-            product_update_form.display_price.data or product.display_price
-        )
-        product.keywords = (
-            product_update_form.keywords.data.split(";")
-            if product_update_form.keywords.data
-            else product.keywords
-        )
+        product.display_price = product_update_form.display_price.data or product.display_price
+        product.keywords = product_update_form.keywords.data.split(";") if product_update_form.keywords.data else product.keywords
         product.size = product.size
 
         product.update()

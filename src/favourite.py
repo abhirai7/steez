@@ -10,9 +10,7 @@ import sqlite3
 
 
 class Favourite:
-    def __init__(
-        self, conn: sqlite3.Connection, *, id: int, user_id: int, product_unique_id: str
-    ) -> None:
+    def __init__(self, conn: sqlite3.Connection, *, id: int, user_id: int, product_unique_id: str) -> None:
         self.__conn = conn
         self.id = id
         self.user_id = user_id
@@ -61,12 +59,8 @@ class Favourite:
         return cls(conn, **row)
 
     @classmethod
-    def add(
-        cls, conn: sqlite3.Connection, *, user: User, product: Product
-    ) -> Favourite:
-        query = (
-            r"INSERT INTO FAVOURITES (USER_ID, PRODUCT_UNIQUE_ID) VALUES (?, ?) RETURNING *"
-        )
+    def add(cls, conn: sqlite3.Connection, *, user: User, product: Product) -> Favourite:
+        query = r"INSERT INTO FAVOURITES (USER_ID, PRODUCT_UNIQUE_ID) VALUES (?, ?) RETURNING *"
 
         cursor = conn.cursor()
         cursor.execute(query, (user.id, product.unique_id))

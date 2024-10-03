@@ -64,9 +64,7 @@ class Review:
         result = cursor.execute(query, (user_id, product_id, stars, review))
 
         if SQLITE_OLD:
-            result = cursor.execute(
-                r"SELECT * FROM REVIEWS WHERE ROWID = ?", (cursor.lastrowid,)
-            )
+            result = cursor.execute(r"SELECT * FROM REVIEWS WHERE ROWID = ?", (cursor.lastrowid,))
 
         data = result.fetchone()
         connection.commit()
@@ -83,9 +81,7 @@ class Review:
         return [cls(connection, **row) for row in rows]
 
     @classmethod
-    def from_product(
-        cls, connection: sqlite3.Connection, *, product_id: int
-    ) -> list[Review]:
+    def from_product(cls, connection: sqlite3.Connection, *, product_id: int) -> list[Review]:
         query = r"SELECT * FROM REVIEWS WHERE PRODUCT_ID = ?"
         cursor = connection.cursor()
         cursor.execute(query, (product_id,))
@@ -101,9 +97,7 @@ class Review:
 
 
 class Category:
-    def __init__(
-        self, connection: sqlite3.Connection, *, id: int, name: str, description: str
-    ):
+    def __init__(self, connection: sqlite3.Connection, *, id: int, name: str, description: str):
         self.__conn = connection
         self.id = id
         self.name = name
@@ -122,21 +116,15 @@ class Category:
         self.__conn.commit()
 
     @classmethod
-    def create(
-        cls, connection: sqlite3.Connection, *, name: str, description: str
-    ) -> Category:
+    def create(cls, connection: sqlite3.Connection, *, name: str, description: str) -> Category:
         cursor = connection.cursor()
 
         if SQLITE_OLD:
             query = r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?)"
             cursor.execute(query, (name, description))
-            result = cursor.execute(
-                r"SELECT * FROM CATEGORIES WHERE ROWID = ?", (cursor.lastrowid,)
-            )
+            result = cursor.execute(r"SELECT * FROM CATEGORIES WHERE ROWID = ?", (cursor.lastrowid,))
         else:
-            query = (
-                r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?) RETURNING *"
-            )
+            query = r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?) RETURNING *"
             result = cursor.execute(query, (name, description))
 
         data = result.fetchone()
@@ -250,9 +238,7 @@ class Product:
         )
 
     def similar_products(self) -> list[Product]:
-        keywords_query = " OR ".join(
-            [f"KEYWORDS LIKE '%{keyword}%'" for keyword in self.keywords]
-        )
+        keywords_query = " OR ".join([f"KEYWORDS LIKE '%{keyword}%'" for keyword in self.keywords])
 
         query = f"SELECT * FROM PRODUCTS WHERE ID != ? AND ({keywords_query}) AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) ORDER BY CREATED_AT DESC LIMIT 3"
         cursor = self.__conn.cursor()
@@ -288,9 +274,7 @@ class Product:
     @property
     def categorised_reviews(self) -> dict[VALID_STARS, list[Review]]:
         reviews = self.reviews
-        return {
-            i: [review for review in reviews if review.stars == i] for i in range(1, 6)
-        }  # type: ignore
+        return {i: [review for review in reviews if review.stars == i] for i in range(1, 6)}  # type: ignore
 
     @property
     def average_rating(self) -> float:
@@ -308,9 +292,7 @@ class Product:
         return int((abs(self.price - self.display_price) / self.price) * 100)
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
-        return Review.create(
-            self.__conn, user_id=user_id, product_id=self.id, stars=stars, review=review
-        )
+        return Review.create(self.__conn, user_id=user_id, product_id=self.id, stars=stars, review=review)
 
     def delete_review(self, *, user_id: int) -> None:
         query = r"DELETE FROM REVIEWS WHERE `USER_ID` = ? AND `PRODUCT_ID` = ?"
@@ -394,9 +376,7 @@ class Product:
                     keywords,
                 ),
             )
-            result = cursor.execute(
-                r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,)
-            )
+            result = cursor.execute(r"SELECT * FROM PRODUCTS WHERE ROWID = ?", (cursor.lastrowid,))
         else:
             query = r"""
                 INSERT INTO PRODUCTS (UNIQUE_ID, NAME, PRICE, DESCRIPTION, STOCK, SIZE, DISPLAY_PRICE, CATEGORY, KEYWORDS)
@@ -434,9 +414,7 @@ class Product:
         return cls(connection, **row)
 
     @classmethod
-    def from_unique_id(
-        cls, connection: sqlite3.Connection, unique_id: str, *, size: str = ""
-    ) -> list[Product]:
+    def from_unique_id(cls, connection: sqlite3.Connection, unique_id: str, *, size: str = "") -> list[Product]:
         cursor = connection.cursor()
 
         query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = ? AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)"
@@ -539,9 +517,7 @@ class Product:
         return categories
 
     @classmethod
-    def get_by_category(
-        cls, conn: sqlite3.Connection, category: Category
-    ) -> list[Product]:
+    def get_by_category(cls, conn: sqlite3.Connection, category: Category) -> list[Product]:
         query = r"SELECT * FROM PRODUCTS WHERE CATEGORY = ? AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)"
         cursor = conn.cursor()
         cursor.execute(query, (category.id,))
@@ -581,9 +557,7 @@ class Cart:
         product.use(quantity)
 
     def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
-        query = (
-            r"DELETE FROM CARTS WHERE USER_ID = ? AND PRODUCT_ID = ? RETURNING QUANTITY"
-        )
+        query = r"DELETE FROM CARTS WHERE USER_ID = ? AND PRODUCT_ID = ? RETURNING QUANTITY"
         cursor = self.__conn.cursor()
         cursor.execute(query, (self.user_id, product.id))
         row = cursor.fetchone()
@@ -730,9 +704,7 @@ class GiftCard:
             error = "Gift card is already used."
             raise ValueError(error)
 
-        query = (
-            r"UPDATE GIFT_CARDS SET USED = 1, USED_AT = CURRENT_TIMESTAMP WHERE ID = ?"
-        )
+        query = r"UPDATE GIFT_CARDS SET USED = 1, USED_AT = CURRENT_TIMESTAMP WHERE ID = ?"
         cursor = self.conn.cursor()
         cursor.execute(query, (self.id,))
         self.conn.commit()
