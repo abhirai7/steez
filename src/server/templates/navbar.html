@@ -63,56 +63,54 @@
                     <button class="btn btn-outline-secondary rounded rounded-0" type="button" id="close-btn" aria-label="Close search">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <!-- Suggestions dropdown -->
                     <ul id="suggestions-list" class="list-group position-absolute w-100 shadow-sm bg-white rounded border" style="z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 10%;">
                     </ul>
                 </form>
             </div>
             <script>
-                let currentFocus = -1; // To keep track of the currently focused item
+                let currentFocus = -1;
 
                 document.getElementById('search-input').addEventListener('keyup', function(e) {
                     let suggestionsList = document.getElementById('suggestions-list');
                     let items = suggestionsList.getElementsByClassName('list-group-item');
                     
                     if (e.key === 'ArrowDown') {
-                        // Move the focus down
                         currentFocus++;
                         addActive(items);
                     } else if (e.key === 'ArrowUp') {
-                        // Move the focus up
                         currentFocus--;
                         addActive(items);
                     } else if (e.key === 'Enter') {
-                        // If enter is pressed, select the item
                         if (currentFocus > -1 && items[currentFocus]) {
-                            items[currentFocus].click(); // Simulate a click on the focused item
+                            items[currentFocus].click();
                         }
                     } else {
-                        // Fetch live suggestions
                         let query = this.value;
                         if (query.length === 0) {
-                            suggestionsList.innerHTML = ''; // Clear suggestions when input is empty
+                            suggestionsList.innerHTML = '';
                             return;
                         }
 
-                        // Make an AJAX call to fetch suggestions
-                        fetch(`/autocomplete?q=${query}`)
+                        fetch(`{{ url_for("autocomplete") }}?q=${query}`, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Accept": "application/json",
+                            },
+                        })
                             .then(response => response.json())
                             .then(data => {
-                                suggestionsList.innerHTML = ''; // Clear previous suggestions
-                                currentFocus = -1; // Reset focus
+                                suggestionsList.innerHTML = '';
+                                currentFocus = -1;
 
-                                // Populate the suggestions dropdown
                                 data.suggestions.forEach(suggestion => {
                                     let listItem = document.createElement('li');
                                     listItem.className = 'list-group-item list-group-item-action';
                                     listItem.textContent = suggestion;
 
-                                    // When a suggestion is clicked, fill the search input
                                     listItem.onclick = function() {
                                         document.getElementById('search-input').value = suggestion;
-                                        suggestionsList.innerHTML = ''; // Clear suggestions once a suggestion is selected
+                                        suggestionsList.innerHTML = '';
                                     };
 
                                     suggestionsList.appendChild(listItem);
@@ -122,7 +120,6 @@
                     }
                 });
 
-                // Function to add 'active' class to the current suggestion item
                 function addActive(items) {
                     if (!items) return false;
 

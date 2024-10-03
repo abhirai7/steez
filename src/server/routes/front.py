@@ -96,6 +96,7 @@ def _autocomplete(*, query: str = "") -> list[Product]:
 
 
 @app.route("/autocomplete")
+@app.route("/autocomplete/")
 def autocomplete():
     query = request.args.get("q", "")
     products = _autocomplete(query=query)
