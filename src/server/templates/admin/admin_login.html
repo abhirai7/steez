@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% set title = "STEEZ™ - Admin Login" %}
-
 {% block styles %}
     <style>
         .fs {
@@ -16,9 +15,7 @@
         <div class="container">
             <form action="{{ url_for("admin_login") }}" method="POST" class="mt-5">
                 {{ form.csrf_token }}
-                <div class="input-group mb-2">
-                    {{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
-                </div>
+                <div class="input-group mb-2">{{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}</div>
                 {% if form.password.errors %}
                     <div class="alert alert-danger mt-2" role="alert">
                         {% for error in form.password.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}

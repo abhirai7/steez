@@ -94,9 +94,7 @@
                         <div class="col m-0 p-0 border border-light">
                             <div class="h-100 d-flex align-items-center justify-content-center">
                                 <div class="text-center align-middle mx-1">
-                                    <a class="btn btn-dark fs-8 fw-semibold text-center text-uppercase rounded rounded-5 px-4 py-3" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">
-                                        View all Products
-                                    </a>
+                                    <a class="btn btn-dark fs-8 fw-semibold text-center text-uppercase rounded rounded-5 px-4 py-3" href="{{ url_for('category_' + category.name.lower().replace(' ', '_')) }}">View all Products</a>
                                 </div>
                             </div>
                         </div>
@@ -121,7 +119,7 @@
                                     website.
                                 </p>
                                 <hr>
-                                <form method="POST" action="{{ url_for('buy_gift_card') }}">
+                                <form method="POST" action="{{ url_for("buy_gift_card") }}">
                                     {{ gift_form.csrf_token }}
                                     <div class="row">
                                         <div class="col-12">
@@ -133,17 +131,16 @@
                                         <div class="col-12">
                                             <div class="mb-1">
                                                 {% if current_user.is_authenticated %}
-                                                {{ gift_form.submit(class="btn btn-outline-warning w-100 p-2 ps-3 pe-3") }}
+                                                    {{ gift_form.submit(class="btn btn-outline-warning w-100 p-2 ps-3 pe-3") }}
                                                 {% else %}
-                                                <a href="{{ url_for('login_route') }}" class="btn btn-outline-warning w-100 p-2 ps-3 pe-3">Login to Buy</a>
+                                                    <a href="{{ url_for("login_route") }}" class="btn btn-outline-warning w-100 p-2 ps-3 pe-3">Login to Buy</a>
                                                 {% endif %}
                                             </div>
                                         </div>
                                     </div>
-            
                                     <p class="fs-6 text-muted text-small mt-3">
                                         *Gift cards are non-refundable. For more information
-                                        <a href="{{ url_for('refund_policy') }}" class="link-underlink-dark text-muted">Click Here</a>
+                                        <a href="{{ url_for("refund_policy") }}" class="link-underlink-dark text-muted">Click Here</a>
                                     </p>
                                 </form>
                             </div>

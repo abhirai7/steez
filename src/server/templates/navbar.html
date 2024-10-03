@@ -1,6 +1,5 @@
 {% import "login_form.html" as login %}
 {% macro navbar(current_user, search_form, login_form, categories=None) %}
-
     <div class="border border-1 m-0 p-0">
         <nav class="navbar navbar-expand-xl bg-body-tertiary ms-1">
             <div class="container-fluid d-flex align-items-betwwen m-0 p-0" id="navbar">
@@ -57,22 +56,18 @@
                 </div>
             </div>
             <div id="search-input-bar" class="container d-none" style="max-width: 540px;">
-                <form action="{{ url_for('search') }}" method="POST" class="input-group">
+                <form action="{{ url_for("search") }}" method="POST" class="input-group">
                     {{ search_form.hidden_tag() }}
                     {{ search_form.query(class="form-control shadow-none", id="search-input", placeholder="Search for products", **{"aria-label": "Search for products"}) }}
                     {{ search_form.submit(class="d-none") }}
-                
                     <button class="btn btn-outline-secondary rounded rounded-0" type="button" id="close-btn" aria-label="Close search">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                
                     <!-- Suggestions dropdown -->
-                    <ul id="suggestions-list" class="list-group position-absolute w-100 shadow-sm bg-white rounded border" 
-                        style="z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 10%;">
+                    <ul id="suggestions-list" class="list-group position-absolute w-100 shadow-sm bg-white rounded border" style="z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 10%;">
                     </ul>
                 </form>
             </div>
-
             <script>
                 let currentFocus = -1; // To keep track of the currently focused item
 

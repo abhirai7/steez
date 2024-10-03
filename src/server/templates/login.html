@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block scripts %}
-<script>
+    <script>
     function glitchText() {
         let heading = document.getElementById('heading');
 
@@ -39,10 +39,10 @@
             glitchText();
         }, 14000);
     });
-</script>
+    </script>
 {% endblock %}
 {% block styles %}
-<style>
+    <style>
     * {
         box-sizing: border-box;
     }
@@ -63,33 +63,30 @@
         max-width: 800px;
         border: 1px solid #ddd;
     }
-</style>
+    </style>
 {% endblock %}
 {% block body %}
-<div class="p-lg-5 p-3 login-section shadow w-100">
-    <p class="text-center horizon-font fs-1" id="heading">STEEZ<sup>TM</sup> - LOGIN</p>
-    <div class="container shadow-sm">
-        <form action="{{ url_for('login_route') }}" method="POST" class="mt-5">
-            {{ form.csrf_token }}
-            {% if error %}
-            <div class="alert alert-danger mt-2" role="alert">
-                <i class="bi bi-exclamation-circle"></i> {{ error }}
-            </div>
-            {% endif %}
-
-            <div class="input-group mb-3">
-                {{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}
-            </div>
-
-            <div class="input-group mb-2">
-                {{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
-            </div>
-
-            <div class="text-center">
-                <p class="fs-6 mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="link-secondary">Register here</a></p>
-                {{ form.submit(class="btn btn-primary") }}
-            </div>
-        </form>
+    <div class="p-lg-5 p-3 login-section shadow w-100">
+        <p class="text-center horizon-font fs-1" id="heading">
+            STEEZ<sup>TM</sup> - LOGIN
+        </p>
+        <div class="container shadow-sm">
+            <form action="{{ url_for("login_route") }}" method="POST" class="mt-5">
+                {{ form.csrf_token }}
+                {% if error %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    </div>
+                {% endif %}
+                <div class="input-group mb-3">{{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}</div>
+                <div class="input-group mb-2">{{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}</div>
+                <div class="text-center">
+                    <p class="fs-6 mt-3">
+                        Don't have an account? <a href="{{ url_for("register") }}" class="link-secondary">Register here</a>
+                    </p>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}
