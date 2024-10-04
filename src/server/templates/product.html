@@ -346,8 +346,8 @@
                         <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
                             {{ review_form.hidden_tag() }}
                             <div class="mb-3">
-                                <label for="rating" class="form-label">Rate this product:</label>
                                 <div class="star-rating d-flex justify-content-start">
+                                    <span class="text-muted me-2 star-count">0</span>
                                     {% for i in range(1, 6) %}
                                         <input type="radio" name="stars" value="{{ i }}" id="star{{ i }}" class="d-none">
                                         <label for="star{{ i }}" class="me-1 star-label" onclick="updateStars({{ i }})">
@@ -357,7 +357,7 @@
                                 </div>
                             </div>
                             <div class="mb-3">{{ review_form.review(class="form-control rounded-0 shadow-none", rows="5", placeholder="Write your review here...") }}</div>
-                            <button type="submit" class="btn btn-outline-primary rounded-0 shadow-sm">Submit Review</button>
+                            <button type="submit" class="btn btn-outline-primary rounded-0">Submit Review</button>
                         </form>
                     </div>
                     {% if product.reviews %}
@@ -393,19 +393,40 @@
 {% endblock %}
 {% block bottom_scripts %}
     <script>
+        var stars = document.querySelectorAll('.star-label i');
+        var starCount = document.querySelector('.star-count');
+        var rating = 0;
+
         function updateStars(rating) {
-        let stars = document.querySelectorAll('.star-label i');
+
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('text-muted');
+                    star.classList.add('text-warning'); 
+                } else {
+                    star.classList.remove('text-warning');
+                    star.classList.add('text-muted'); 
+                }
+            });
+
+            starCount.textContent = rating;
+        }
 
         stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.remove('text-muted');
-                star.classList.add('text-warning'); 
-            } else {
-                star.classList.remove('text-warning');
-                star.classList.add('text-muted'); 
-            }
+            star.addEventListener('mouseover', () => {
+                updateStars(index + 1);
+            });
+            star.addEventListener('mouseout', () => {
+                updateStars(rating);
+            });
+
+            star.addEventListener('click', () => {
+                rating = index + 1;
+            });
+
         });
-    }
+    </script>
+    <script>
         document.getElementById('zoomModal').addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
 
