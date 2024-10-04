@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
+{% import 'navbar.html' as navbar %}
+{% import 'footer.html' as footer %}
+
 {% set title = "About Us" %}
 
 {% block body %}
+{{ navbar.navbar(current_user, search_form, login_form) }}
 <section class="py-3 py-md-5 py-xl-8">
     <div class="container">
         <div class="row justify-content-md-center">
@@ -56,4 +60,5 @@
         </div>
     </div>
 </section>
+{{ footer.footer(newsletter_form) }}
 {% endblock %}

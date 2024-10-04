@@ -141,12 +141,26 @@ def order_history():
 @app.route("/contact-us/")
 @app.route("/contact-us")
 def contact_us():
-    return render_template("contact_us.html")
+    return render_template(
+        "contact_us.html",
+        current_user=current_user,
+        newsletter_form=SubscribeNewsLetterForm(),
+        login_form=LoginForm(),
+        search_form=SearchForm(),
+    )
+
 
 @app.route("/about-us/")
 @app.route("/about-us")
 def about_us():
-    return render_template("about_us.html")
+    return render_template(
+        "about_us.html",
+        current_user=current_user,
+        newsletter_form=SubscribeNewsLetterForm(),
+        login_form=LoginForm(),
+        search_form=SearchForm(),
+    )
+
 
 @app.route("/subscribe", methods=["POST"])
 @app.route("/subscribe/", methods=["POST"])
