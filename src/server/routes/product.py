@@ -96,7 +96,7 @@ def add_review(product_id: int):
     review_form: AddReviewForm = AddReviewForm()
 
     if review_form.validate_on_submit() and request.method == "POST" and review_form.review.data:
-        current_user.add_review(product=product, review=review_form.review.data, stars=5)
+        current_user.add_review(product=product, review=review_form.review.data, stars=review_form.stars.data)
         return redirect(url_for("product", product_id=product_id))
     return redirect(url_for("product", product_id=product_id))
 

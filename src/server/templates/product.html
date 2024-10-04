@@ -321,18 +321,20 @@
                     </div>
                     <div>
                         {% for star_count, star_class, label in [
-                            (5, "bg-warning", "5"),
-                            (4, "bg-warning", "4"),
-                            (3, "bg-warning", "3"),
-                            (2, "bg-info", "2"),
-                            (1, "bg-danger", "1")
+                                (5, "bg-warning", "5"),
+                                (4, "bg-warning", "4"),
+                                (3, "bg-warning", "3"),
+                                (2, "bg-info", "2"),
+                                (1, "bg-danger", "1")
                             ] %}
                             <div class="d-flex align-items-center mb-3">
-                                <div>
+                                <div class="font-monospace">
                                     <span class="fs-6 me-2">{{ label }} <i class="text-warning bi bi-star-fill"></i> </span>
                                 </div>
-                                <div class="progress w-100">
-                                    <div class="progress-bar text-dark {{ star_class }}" role="progressbar" style="width: {{ reviews[star_count] | length * 100 / (product.total_reviews or 1) }}%" aria-valuenow="{{ reviews[star_count] | length }}" aria-valuemin="0" aria-valuemax="100">{{ reviews[star_count] | length or '0' }}</div>
+                                <div class="progress rounded rounded-3 w-100">
+                                    <div class="progress-bar rounded rounded-3 text-dark {{ star_class }}" role="progressbar" style="width: {{ reviews[star_count] | length * 100 / (product.total_reviews or 1) }}%" aria-valuenow="{{ reviews[star_count] | length }}" aria-valuemin="0" aria-valuemax="100">
+                                        <span class="d-none">-</span>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -341,28 +343,33 @@
             </div>
             <div class="col-lg-9 col-md-8 m-0 p-0">
                 <div class="card border border-0 mb-5 rounded rounded-0 p-4">
-                    <div class="border border-1 p-lg-5 p-3 shadow-sm">
+                    <div class="border border-light p-lg-5 p-3">
                         <h5 class="card-title">Leave Your Review</h5>
+                        {% if not current_user.is_authenticated %}
+                            {% set disabled = 'disabled' %}
+                        {% else %}
+                            {% set disabled = '' %}
+                        {% endif %}
+
                         <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
                             {{ review_form.hidden_tag() }}
                             <div class="mb-3">
                                 <div class="star-rating d-flex justify-content-start">
-                                    <span class="text-muted me-2 star-count">0</span>
-                                    {% for i in range(1, 6) %}
-                                        <input type="radio" name="stars" value="{{ i }}" id="star{{ i }}" class="d-none">
-                                        <label for="star{{ i }}" class="me-1 star-label" onclick="updateStars({{ i }})">
+                                    {% for subfield in review_form.stars %}
+                                        <input type="radio" name="{{ subfield.name }}" value="{{ subfield.data }}" id="star{{ subfield.data }}" class="d-none" {{ subfield.checked }} {{ disabled }}>
+                                        <label for="star{{ subfield.data }}" class="me-1 star-label" onclick="updateStars({{ subfield.data }})">
                                             <i class="bi bi-star-fill text-muted"></i>
                                         </label>
                                     {% endfor %}
                                 </div>
                             </div>
-                            <div class="mb-3">{{ review_form.review(class="form-control rounded-0 shadow-none", rows="5", placeholder="Write your review here...") }}</div>
-                            <button type="submit" class="btn btn-outline-primary rounded-0">Submit Review</button>
+                            <div class="mb-3">{{ review_form.review(class="form-control rounded-0 shadow-none ", rows="5", placeholder="Write your review here...") }}</div>
+                            <button type="submit" class="btn btn-outline-primary rounded-0 {{ disabled }}">Submit Review</button>
                         </form>
                     </div>
                     {% if product.reviews %}
                         {% for review in product.reviews %}
-                            <div class="row p-4 shadow-sm m-0 mt-3">
+                            <div class="row p-4 border border-light m-0 mt-3">
                                 <div class="col-2 col-lg-1 col-sm-2 col-md-3 text-center m-0 p-0">
                                     {% set placeholder = "https://ui-avatars.com/api/?name=" + review.user.name + "&background=random&rounded=true" %}
                                     <img src="{{ placeholder }}" alt="{{ review.user.name }}" class="img-thumbnail bg-transparent rounded rounded-0 border border-0">
@@ -394,7 +401,6 @@
 {% block bottom_scripts %}
     <script>
         var stars = document.querySelectorAll('.star-label i');
-        var starCount = document.querySelector('.star-count');
         var rating = 0;
 
         function updateStars(rating) {
@@ -408,8 +414,6 @@
                     star.classList.add('text-muted'); 
                 }
             });
-
-            starCount.textContent = rating;
         }
 
         stars.forEach((star, index) => {

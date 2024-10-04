@@ -279,7 +279,8 @@ class Product:
     @property
     def average_rating(self) -> float:
         if reviews := self.reviews:
-            return sum(review.stars for review in reviews) / self.total_reviews
+            avg = sum(review.stars for review in reviews) / self.total_reviews
+            return round(avg, 2)
 
         return 0.0
 
