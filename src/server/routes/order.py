@@ -8,12 +8,7 @@ from razorpay.errors import SignatureVerificationError
 
 from src.order import Order
 from src.server import RAZORPAY_KEY, app, conn, razorpay_client
-from src.server.forms import (
-    LoginForm,
-    PaymentMethod,
-    SearchForm,
-    SubscribeNewsLetterForm,
-)
+from src.server.forms import LoginForm, PaymentMethod, SearchForm, SubscribeNewsLetterForm
 from src.user import User
 from src.utils import format_number
 
@@ -71,9 +66,7 @@ def razorpay_webhook():
 
         assert order.user.id == current_user.id
 
-        order.update_order_status(
-            status="PAID", razorpay_order_id=data["razorpay_order_id"]
-        )
+        order.update_order_status(status="PAID", razorpay_order_id=data["razorpay_order_id"])
     except SignatureVerificationError:
         return {"status": "error"}, 400
 

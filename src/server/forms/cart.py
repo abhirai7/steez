@@ -31,11 +31,7 @@ class AddToCartForm(FlaskForm):
             self.size.default = "select"
 
         if product and product.stock > 1:
-            self.quantity.validators = (
-                [NumberRange(min=1, max=product.stock - 1)]
-                if product
-                else [NumberRange(min=1)]
-            )
+            self.quantity.validators = [NumberRange(min=1, max=product.stock - 1)] if product else [NumberRange(min=1)]
 
     def validate_size(self, size: SelectField) -> bool:
         if size.data == "select":
@@ -45,9 +41,9 @@ class AddToCartForm(FlaskForm):
 
 class AddReviewForm(FlaskForm):
     review = TextAreaField("Review")
-    stars  = RadioField(
+    stars = RadioField(
         "",
         choices=[(str(i), str(i)) for i in range(1, 6)],
-        default='5',
+        default="5",
     )
     submit = SubmitField("Add Review")
