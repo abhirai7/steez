@@ -16,6 +16,7 @@ from src.server.forms import (
     LoginForm,
     SearchForm,
     SubscribeNewsLetterForm,
+    TicketForm,
 )
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
@@ -137,7 +138,7 @@ def order_history():
         login_form=LoginForm(),
     )
 
-
+@sitemapper.include(lastmod=TODAY)
 @app.route("/contact-us/")
 @app.route("/contact-us")
 def contact_us():
@@ -147,9 +148,10 @@ def contact_us():
         newsletter_form=SubscribeNewsLetterForm(),
         login_form=LoginForm(),
         search_form=SearchForm(),
+        ticket_form=TicketForm(),
     )
 
-
+@sitemapper.include(lastmod=TODAY)
 @app.route("/about-us/")
 @app.route("/about-us")
 def about_us():
