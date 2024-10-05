@@ -6,3 +6,4 @@ from .login import *  # noqa
 from .meta import *  # noqa
 from .product import *  # noqa
 from .support import *  # noqa
+from .order import *  # noqa

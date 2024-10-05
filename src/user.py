@@ -163,18 +163,22 @@ class User:
     def is_fav(self, *, product: Product) -> bool:
         return Favourite.exists(self.__conn, user=self, product=product)
 
-    def partial_checkout(self, *, gift_code: str = "") -> list[Order]:
-        from .order import Order
+    def partial_checkout(self, *, gift_code: str = "", status: str | None = None) -> list[Order]:
         from .product import GiftCard
 
         gift_card = GiftCard.from_code(self.__conn, code=gift_code)
-        self.cart.update_to_database(gift_card=gift_card)
+        self.cart.update_to_database(gift_card=gift_card, status=status or "PEND")
         self.clear_cart()
 
+        return self.__fetch_orders("PEND")
+
+    def __fetch_orders(self, status: str | None = None) -> list[Order]:
+        from .order import Order
+
         orders: list[Order] = []
-        query = r"SELECT * FROM ORDERS WHERE USER_ID = ? AND STATUS = 'PEND'"
+        query = r"SELECT * FROM ORDERS WHERE USER_ID = ? AND STATUS = ?"
         cursor = self.__conn.cursor()
-        cursor.execute(query, (self.id,))
+        cursor.execute(query, (self.id, status or "PEND"))
 
         while row := cursor.fetchone():
             orders.append(Order(self.__conn, **row))

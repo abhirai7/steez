@@ -585,11 +585,11 @@ class Cart:
         count = cursor.fetchone()
         return int(count[0] or 0)
 
-    def update_to_database(self, *, gift_card: GiftCard | None = None) -> None:
+    def update_to_database(self, *, gift_card: GiftCard | None = None, status: str = "PEND") -> None:
         query = r"""
-            INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE)
+            INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE, STATUS) 
                 SELECT 
-                    USER_ID, PRODUCT_ID, QUANTITY, MAX(((QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)) - ?), 1)
+                    USER_ID, PRODUCT_ID, QUANTITY, MAX(((QUANTITY * (SELECT PRICE FROM PRODUCTS WHERE ID = PRODUCT_ID)) - ?), 1), ?
                 FROM CARTS
                 WHERE USER_ID = ?
         """
@@ -601,6 +601,7 @@ class Cart:
                 query,
                 (
                     gift_card.price if (gift_card and gift_card.is_valid) else 0,
+                    status.upper(),
                     self.user_id,
                 ),
             )
