@@ -9,13 +9,7 @@ from flask_login import current_user, login_required
 from src.favourite import Favourite
 from src.product import Product
 from src.server import app, conn, sitemapper
-from src.server.forms import (
-    AddReviewForm,
-    AddToCartForm,
-    LoginForm,
-    SearchForm,
-    SubscribeNewsLetterForm,
-)
+from src.server.forms import AddReviewForm, AddToCartForm, LoginForm, SearchForm, SubscribeNewsLetterForm
 from src.user import User
 from src.utils import FAQ_DATA, get_product_pictures, size_chart
 
@@ -46,9 +40,7 @@ def product(product_id: int):
         "product.html",
         product=product,
         pictures=pictures,
-        size_chart=[
-            (size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()
-        ],
+        size_chart=[(size, data["CHEST"], data["LENGTH"]) for size, data in size_chart.items()],
         current_user=current_user,
         form=cart_form,
         review_form=review_form,
@@ -94,11 +86,7 @@ def add_review(product_id: int):
     product = Product.from_id(conn, product_id)
     review_form: AddReviewForm = AddReviewForm()
 
-    if (
-        review_form.validate_on_submit()
-        and request.method == "POST"
-        and review_form.review.data
-    ):
+    if review_form.validate_on_submit() and request.method == "POST" and review_form.review.data:
         current_user.add_review(
             product=product,
             review=review_form.review.data,

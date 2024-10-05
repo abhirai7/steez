@@ -10,14 +10,7 @@ from flask_login import current_user, login_required
 from src.carousel import Carousel
 from src.product import Category, Product
 from src.server import TODAY, app, conn, sitemapper
-from src.server.forms import (
-    AddToCartForm,
-    GiftCardForm,
-    LoginForm,
-    SearchForm,
-    SubscribeNewsLetterForm,
-    TicketForm,
-)
+from src.server.forms import AddToCartForm, GiftCardForm, LoginForm, SearchForm, SubscribeNewsLetterForm, TicketForm
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
 if TYPE_CHECKING:
@@ -138,6 +131,7 @@ def order_history():
         login_form=LoginForm(),
     )
 
+
 @sitemapper.include(lastmod=TODAY)
 @app.route("/contact-us/")
 @app.route("/contact-us")
@@ -150,6 +144,7 @@ def contact_us():
         search_form=SearchForm(),
         ticket_form=TicketForm(),
     )
+
 
 @sitemapper.include(lastmod=TODAY)
 @app.route("/about-us/")

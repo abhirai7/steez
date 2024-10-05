@@ -18,6 +18,7 @@ VALID_STATUS = Literal["PEND", "CONF", "PAID", "COD"]
 # PAID - Paid
 # COD - Cash on Delivery
 
+
 class Order:
     def __init__(
         self,
@@ -60,9 +61,7 @@ class Order:
                 "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?)",
                 (user_id, product_id, quantity, total_price),
             )
-            result = cursor.execute(
-                "SELECT * FROM ORDERS WHERE ROWID = ?", (cursor.lastrowid,)
-            )
+            result = cursor.execute("SELECT * FROM ORDERS WHERE ROWID = ?", (cursor.lastrowid,))
         else:
             result = cursor.execute(
                 "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?) RETURNING *",
@@ -84,13 +83,9 @@ class Order:
         return cls(connection, **row)
 
     @classmethod
-    def from_razorpay_order_id(
-        cls, connection: sqlite3.Connection, razorpay_order_id: str
-    ) -> Order:
+    def from_razorpay_order_id(cls, connection: sqlite3.Connection, razorpay_order_id: str) -> Order:
         cursor = connection.cursor()
-        cursor.execute(
-            "SELECT * FROM ORDERS WHERE RAZORPAY_ORDER_ID = ?", (razorpay_order_id,)
-        )
+        cursor.execute("SELECT * FROM ORDERS WHERE RAZORPAY_ORDER_ID = ?", (razorpay_order_id,))
         row = cursor.fetchone()
         if row is None:
             error = "Order not found."
@@ -135,9 +130,7 @@ class Order:
         cursor.execute("SELECT COUNT(*) FROM ORDERS")
         return cursor.fetchone()[0]
 
-    def update_order_status(
-        self, *, status: VALID_STATUS, razorpay_order_id: str
-    ) -> None:
+    def update_order_status(self, *, status: VALID_STATUS, razorpay_order_id: str) -> None:
         cursor = self.connection.cursor()
         assert razorpay_order_id == self.razorpay_order_id
 
@@ -150,9 +143,7 @@ class Order:
         self.razorpay_order_id = razorpay_order_id
 
     @classmethod
-    def delete(
-        cls, connection: sqlite3.Connection, *, order_id: int, user_id: int
-    ) -> None:
+    def delete(cls, connection: sqlite3.Connection, *, order_id: int, user_id: int) -> None:
         cursor = connection.cursor()
         cursor.execute(
             "DELETE FROM ORDERS WHERE ID = ? AND STATUS != 'PAID' AND USER_ID = ?",

@@ -46,9 +46,7 @@ class ProductAddForm(FlaskForm):
         super().__init__(*args, **kwargs)
 
         self.conn = connection
-        self.category.choices = [
-            (int(category.id), category.name) for category in Category.all(connection)
-        ]
+        self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
 
 
 class ProductUpdateForm(FlaskForm):
@@ -57,9 +55,7 @@ class ProductUpdateForm(FlaskForm):
     price = FloatField("Actual Price")
     description = TextAreaField("Description")
     stock = IntegerField("Stock")
-    sizes = SelectField(
-        "Size", choices=[(data["CODE"], size) for size, data in size_chart.items()]
-    )
+    sizes = SelectField("Size", choices=[(data["CODE"], size) for size, data in size_chart.items()])
     category = SelectField("Category", choices=[], validators=[DataRequired()])
     keywords = StringField("Keywords")
 
@@ -68,15 +64,11 @@ class ProductUpdateForm(FlaskForm):
     def validate_on_submit(self, extra_validators=None):
         return True
 
-    def __init__(
-        self, connection: sqlite3.Connection, *args, product: Product, **kwargs
-    ):
+    def __init__(self, connection: sqlite3.Connection, *args, product: Product, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.conn = connection
-        self.category.choices = [
-            (int(category.id), category.name) for category in Category.all(connection)
-        ]
+        self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
         self.product = product
 
         self.category.data = product.category.id
