@@ -9,7 +9,13 @@ from flask_login import current_user, login_required
 from src.favourite import Favourite
 from src.product import Product
 from src.server import app, conn, sitemapper
-from src.server.forms import AddReviewForm, AddToCartForm, LoginForm, SearchForm, SubscribeNewsLetterForm
+from src.server.forms import (
+    AddReviewForm,
+    AddToCartForm,
+    LoginForm,
+    SearchForm,
+    SubscribeNewsLetterForm,
+)
 from src.user import User
 from src.utils import FAQ_DATA, get_product_pictures, size_chart
 

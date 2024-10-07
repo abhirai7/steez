@@ -1,55 +1,72 @@
 from __future__ import annotations
 
-import sqlite3
+from typing import TYPE_CHECKING
+
+from sqlalchemy import text
 
 from .utils import get_product_pictures
+
+if TYPE_CHECKING:
+    from flask_sqlalchemy import SQLAlchemy
+    from typing_extensions import Self
 
 
 class Carousel:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         image: str,
         heading: str,
         description: str,
     ):
-        self.conn = connection
+        self.db = db
         self.id = id
         self.image = get_product_pictures(image)[0]
         self.heading = heading
         self.description = description
 
     @classmethod
-    def all(cls, connection: sqlite3.Connection) -> list[Carousel]:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM carousel")
-        return [cls(connection, **carousel) for carousel in cursor.fetchall()]
+    def all(cls, db: SQLAlchemy) -> list[Self]:
+        with db.session() as conn:
+            result = conn.execute(text("SELECT * FROM CAROUSELS"))
+            return [cls(db, **carousel) for carousel in result.mappings()]
 
     @classmethod
-    def get(cls, connection: sqlite3.Connection, id: int) -> Carousel:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM carousel WHERE id = ?", (id,))
-        return cls(connection, **cursor.fetchone())
+    def get(cls, db: SQLAlchemy, id: int) -> Carousel:
+        with db.session() as conn:
+            result = conn.execute(
+                text("SELECT * FROM CAROUSELS WHERE ID = :id"), {"id": id}
+            )
+            for carousel in result.mappings():
+                return cls(db, **carousel)
+
+        raise ValueError(f"Carousel with ID {id} not found")
 
     @classmethod
     def create(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         image: str,
         heading: str,
         description: str,
     ) -> Carousel:
-        cursor = connection.cursor()
-        query = r"INSERT INTO CAROUSEL (IMAGE, HEADING, DESCRIPTION) VALUES (?, ?, ?) RETURNING *"
-        row = cursor.execute(query, (image, heading, description))
-        data = row.fetchone()
-        connection.commit()
-        return cls(connection, **data)
+        with db.session() as conn:
+            result = conn.execute(
+                text(
+                    "INSERT INTO CAROUSELS (IMAGE, HEADING, DESCRIPTION) VALUES (:image, :heading, :description) RETURNING *"
+                ),
+                {"image": image, "heading": heading, "description": description},
+            )
+            carousel = result.mappings().fetchone()
+            if carousel is None:
+                raise ValueError("Carousel not created")
+
+            return cls(db, **carousel)
 
     def delete(self):
-        cursor = self.conn.cursor()
-        cursor.execute("DELETE FROM CAROUSEL WHERE ID = ?", (self.id,))
-        self.conn.commit()
+        from src.server.models import Carousels
+
+        Carousels.query.filter_by(ID=self.id).delete()

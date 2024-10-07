@@ -10,7 +10,14 @@ from flask_login import current_user, login_required
 from src.carousel import Carousel
 from src.product import Category, Product
 from src.server import TODAY, app, conn, sitemapper
-from src.server.forms import AddToCartForm, GiftCardForm, LoginForm, SearchForm, SubscribeNewsLetterForm, TicketForm
+from src.server.forms import (
+    AddToCartForm,
+    GiftCardForm,
+    LoginForm,
+    SearchForm,
+    SubscribeNewsLetterForm,
+    TicketForm,
+)
 from src.utils import FAQ_DATA, newsletter_email_add_to_db
 
 if TYPE_CHECKING:

@@ -3,7 +3,15 @@ from __future__ import annotations
 import sqlite3
 
 from flask_wtf import FlaskForm
-from wtforms import EmailField, Field, IntegerField, PasswordField, StringField, SubmitField, TelField
+from wtforms import (
+    EmailField,
+    Field,
+    IntegerField,
+    PasswordField,
+    StringField,
+    SubmitField,
+    TelField,
+)
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from src.user import User
