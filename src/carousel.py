@@ -29,20 +29,20 @@ class Carousel:
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Self]:
-        with db.session() as conn:
-            result = conn.execute(text("SELECT * FROM CAROUSELS"))
-            return [cls(db, **carousel) for carousel in result.mappings()]
+        from src.server.models import Carousels
+
+        caros = db.session.query(Carousels).all()
+        return [
+            cls(db, id=caro.ID, image=caro.IMAGE, heading=caro.HEADING, description=caro.DESCRIPTION)
+            for caro in caros
+        ]
 
     @classmethod
     def get(cls, db: SQLAlchemy, id: int) -> Carousel:
-        with db.session() as conn:
-            result = conn.execute(
-                text("SELECT * FROM CAROUSELS WHERE ID = :id"), {"id": id}
-            )
-            for carousel in result.mappings():
-                return cls(db, **carousel)
+        from src.server.models import Carousels
 
-        raise ValueError(f"Carousel with ID {id} not found")
+        caro = db.session.query(Carousels).filter_by(ID=id).first()
+        return cls(db, id=caro.ID, image=caro.IMAGE, heading=caro.HEADING, description=caro.DESCRIPTION)
 
     @classmethod
     def create(
@@ -53,18 +53,16 @@ class Carousel:
         heading: str,
         description: str,
     ) -> Carousel:
-        with db.session() as conn:
-            result = conn.execute(
-                text(
-                    "INSERT INTO CAROUSELS (IMAGE, HEADING, DESCRIPTION) VALUES (:image, :heading, :description) RETURNING *"
-                ),
-                {"image": image, "heading": heading, "description": description},
-            )
-            carousel = result.mappings().fetchone()
-            if carousel is None:
-                raise ValueError("Carousel not created")
+        from src.server.models import Carousels
 
-            return cls(db, **carousel)
+        carousel = Carousels()
+        carousel.IMAGE = image
+        carousel.HEADING = heading
+        carousel.DESCRIPTION = description
+        db.session.add(carousel)
+        db.session.commit()
+
+        return cls(db, image=image, heading=heading, description=description)
 
     def delete(self):
         from src.server.models import Carousels

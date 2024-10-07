@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-import sqlite3
 from typing import TYPE_CHECKING, Literal
 
 import arrow
-
-from .utils import SQLITE_OLD
 
 if TYPE_CHECKING:
     from .product import Product
     from .user import User
 
+from flask_sqlalchemy import SQLAlchemy
 
 VALID_STATUS = Literal["PEND", "CONF", "PAID", "COD"]
 # PEND - Pending
@@ -22,7 +20,7 @@ VALID_STATUS = Literal["PEND", "CONF", "PAID", "COD"]
 class Order:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         user_id: int,
@@ -33,7 +31,7 @@ class Order:
         status: str = "PEND",
         razorpay_order_id: str | None = None,
     ) -> None:
-        self.connection = connection
+        self.__db = db
         self.id = id
         self.user_id = user_id
         self.product_id = product_id
@@ -49,48 +47,60 @@ class Order:
     @classmethod
     def create(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         user_id: int,
         product_id: int,
         quantity: int,
         total_price: float,
     ) -> Order:
-        cursor = connection.cursor()
-        if SQLITE_OLD:
-            cursor.execute(
-                "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?)",
-                (user_id, product_id, quantity, total_price),
-            )
-            result = cursor.execute("SELECT * FROM ORDERS WHERE ROWID = ?", (cursor.lastrowid,))
-        else:
-            result = cursor.execute(
-                "INSERT INTO ORDERS (USER_ID, PRODUCT_ID, QUANTITY, TOTAL_PRICE) VALUES (?, ?, ?, ?) RETURNING *",
-                (user_id, product_id, quantity, total_price),
-            )
+        from src.server.models import Orders
 
-        row = result.fetchone()
-        connection.commit()
-        return cls(connection, **row)
+        order = Orders(USER_ID=user_id, PRODUCT_ID=product_id, QUANTITY=quantity, TOTAL_PRICE=total_price)
+        db.session.add(order)
+        db.session.commit()
+        
 
     @classmethod
-    def from_id(cls, connection: sqlite3.Connection, order_id: int) -> Order:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM ORDERS WHERE ID = ?", (order_id,))
-        row = cursor.fetchone()
-        if row is None:
+    def from_id(cls, db: SQLAlchemy, order_id: int) -> Order:
+        from src.server.models import Orders
+
+        order = Orders.query.filter_by(ID=order_id).first()
+        if order is None:
             error = "Order not found."
             raise ValueError(error) from None
-        return cls(connection, **row)
+
+        return cls(
+            db,
+            id=order.ID,
+            user_id=order.USER_ID,
+            product_id=order.PRODUCT_ID,
+            quantity=order.QUANTITY,
+            total_price=order.TOTAL_PRICE,
+            created_at=order.CREATED_AT,
+            status=order.STATUS,
+            razorpay_order_id=order.RAZORPAY_ORDER_ID,
+        )
 
     @classmethod
-    def from_razorpay_order_id(cls, connection: sqlite3.Connection, razorpay_order_id: str) -> Order:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM ORDERS WHERE RAZORPAY_ORDER_ID = ?", (razorpay_order_id,))
-        row = cursor.fetchone()
-        if row is None:
+    def from_razorpay_order_id(cls, db: SQLAlchemy, razorpay_order_id: str) -> Order:
+        from src.server.models import Orders
+
+        order = Orders.query.filter_by(RAZORPAY_ORDER_ID=razorpay_order_id).first()
+        if order is None:
             error = "Order not found."
             raise ValueError(error) from None
-        return cls(connection, **row)
+
+        return cls(
+            db,
+            id=order.ID,
+            user_id=order.USER_ID,
+            product_id=order.PRODUCT_ID,
+            quantity=order.QUANTITY,
+            total_price=order.TOTAL_PRICE,
+            created_at=order.CREATED_AT,
+            status=order.STATUS,
+            razorpay_order_id=order.RAZORPAY_ORDER_ID,
+        )
 
     @property
     def user(self) -> User:
@@ -107,46 +117,61 @@ class Order:
     @classmethod
     def all(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         limit: int | None = None,
         offset: int = 0,
     ) -> list[Order]:
-        cursor = connection.cursor()
+        from src.server.models import Orders
 
-        if limit is None:
-            query = r"SELECT * FROM ORDERS"
-            cursor.execute(query)
-        else:
-            query = r"SELECT * FROM ORDERS LIMIT ? OFFSET ?"
-            cursor.execute(query, (limit, offset))
+        orders = Orders.query.limit(limit).offset(offset).all()
+        ls = []
 
-        rows = cursor.fetchall()
-        return [cls(connection, **row) for row in rows]
+        for order in orders:
+            ls.append(
+                cls(
+                    db,
+                    id=order.ID,
+                    user_id=order.USER_ID,
+                    product_id=order.PRODUCT_ID,
+                    quantity=order.QUANTITY,
+                    total_price=order.TOTAL_PRICE,
+                    created_at=order.CREATED_AT,
+                    status=order.STATUS,
+                    razorpay_order_id=order.RAZORPAY_ORDER_ID,
+                )
+            )
 
     @classmethod
-    def total_count(cls, connection: sqlite3.Connection) -> int:
-        cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*) FROM ORDERS")
-        return cursor.fetchone()[0]
+    def total_count(cls, db: SQLAlchemy) -> int:
+        from src.server.models import Orders
+
+        return Orders.query.count()
 
     def update_order_status(self, *, status: VALID_STATUS, razorpay_order_id: str) -> None:
-        cursor = self.connection.cursor()
+        from src.server.models import Orders
+
         assert razorpay_order_id == self.razorpay_order_id
 
-        cursor.execute(
-            r"UPDATE ORDERS SET STATUS = ? WHERE RAZORPAY_ORDER_ID = ? AND ID = ? AND STATUS = 'CONF' AND USER_ID = ?",
-            (status, razorpay_order_id, self.id, self.user_id),
-        )
-        self.connection.commit()
+        order_query = Orders.query.filter_by(ID=self.id, STATUS="CONF", USER_ID=self.user_id)
+        orders = order_query.all()
+
+        if not orders:
+            error = "Order not found."
+            raise ValueError(error) from None
+        
+        for order in orders:
+            order.STATUS = status
+            order.RAZORPAY_ORDER_ID = razorpay_order_id
+
+            self.__db.session.commit()
+
         self.status = status
         self.razorpay_order_id = razorpay_order_id
 
     @classmethod
-    def delete(cls, connection: sqlite3.Connection, *, order_id: int, user_id: int) -> None:
-        cursor = connection.cursor()
-        cursor.execute(
-            "DELETE FROM ORDERS WHERE ID = ? AND STATUS != 'PAID' AND USER_ID = ?",
-            (order_id, user_id),
-        )
-        connection.commit()
+    def delete(cls, db: SQLAlchemy, *, order_id: int, user_id: int) -> None:
+        from src.server.models import Orders
+
+        db.session.delete(Orders.query.filter_by(ID=order_id, USER_ID=user_id).first())
+        db.session.commit()

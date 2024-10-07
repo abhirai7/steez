@@ -6,12 +6,12 @@ if TYPE_CHECKING:
     from .product import Product
     from .user import User
 
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 
 
 class Favourite:
-    def __init__(self, conn: sqlite3.Connection, *, id: int, user_id: int, product_unique_id: str) -> None:
-        self.__conn = conn
+    def __init__(self, db: SQLAlchemy, *, id: int, user_id: int, product_unique_id: str) -> None:
+        self.__db = db
         self.id = id
         self.user_id = user_id
         self.product_unique_id = product_unique_id
@@ -37,62 +37,45 @@ class Favourite:
         return self.__product
 
     def delete(self) -> None:
-        query = r"DELETE FROM FAVOURITES WHERE ID = ?"
+        from src.server.models import Favourites
 
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (self.id,))
-
-        self.__conn.commit()
+        self.__db.session.delete(Favourites.query.get(self.id))
 
     @classmethod
-    def from_id(cls, conn: sqlite3.Connection, id: int) -> Favourite:
-        query = r"SELECT ID, USER_ID, PRODUCT_UNIQUE_ID FROM FAVOURITES WHERE ID = ?"
+    def from_id(cls, db: SQLAlchemy, id: int) -> Favourite:
+        from src.server.models import Favourites
 
-        cursor = conn.cursor()
-        cursor.execute(query, (id,))
-
-        row = cursor.fetchone()
-        if row is None:
-            error = "Favourite does not exist"
-            raise ValueError(error)
-
-        return cls(conn, **row)
+        favourite = Favourites.query.get(id)
+        return cls(db, id=favourite.ID, user_id=favourite.USER_ID, product_unique_id=favourite.PRODUCT_UNIQUE_ID)
 
     @classmethod
-    def add(cls, conn: sqlite3.Connection, *, user: User, product: Product) -> Favourite:
-        query = r"INSERT INTO FAVOURITES (USER_ID, PRODUCT_UNIQUE_ID) VALUES (?, ?) RETURNING *"
+    def add(cls, db: SQLAlchemy, *, user: User, product: Product) -> Favourite:
+        from src.server.models import Favourites
 
-        cursor = conn.cursor()
-        cursor.execute(query, (user.id, product.unique_id))
-        data = cursor.fetchone()
-        conn.commit()
+        favourite = Favourites(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id)
+        db.session.add(favourite)
+        db.session.commit()
 
-        return cls(conn, **data)
-
-    @classmethod
-    def all(cls, conn: sqlite3.Connection) -> list[Favourite]:
-        query = r"SELECT * FROM FAVOURITES ORDER BY USER_ID"
-
-        cursor = conn.cursor()
-        cursor.execute(query)
-
-        return [cls(conn, **row) for row in cursor.fetchall()]
+        return cls(db, id=favourite.ID, user_id=favourite.USER_ID, product_unique_id=favourite.PRODUCT_UNIQUE_ID)
 
     @classmethod
-    def from_user(cls, conn: sqlite3.Connection, *, user: User, product: Product) -> list[Favourite]:
-        query = r"""
-            SELECT * FROM FAVOURITES WHERE USER_ID = ? AND PRODUCT_UNIQUE_ID = ?
-        """
-        cursor = conn.cursor()
-        cursor.execute(query, (user.id, product.unique_id))
+    def all(cls, db: SQLAlchemy) -> list[Favourite]:
+        from src.server.models import Favourites
 
-        return [cls(conn, **row) for row in cursor.fetchall()]
+        all_favourites = Favourites.query.all()
+        return [cls(db, id=fav.ID, user_id=fav.USER_ID, product_unique_id=fav.PRODUCT_UNIQUE_ID) for fav in all_favourites]
 
     @classmethod
-    def exists(cls, conn: sqlite3.Connection, *, user: User, product: Product) -> bool:
-        query = r"SELECT * FROM FAVOURITES WHERE USER_ID = ? AND PRODUCT_UNIQUE_ID = ?"
+    def from_user(cls, db: SQLAlchemy, *, user: User, product: Product) -> list[Favourite]:
+        from src.server.models import Favourites
 
-        cursor = conn.cursor()
-        cursor.execute(query, (user.id, product.id))
+        return [
+            cls(db, id=fav.ID, user_id=fav.USER_ID, product_unique_id=fav.PRODUCT_UNIQUE_ID)
+            for fav in Favourites.query.filter_by(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id)
+        ]
 
-        return cursor.fetchone() is not None
+    @classmethod
+    def exists(cls, db: SQLAlchemy, *, user: User, product: Product) -> bool:
+        from src.server.models import Favourites
+
+        return Favourites.query.filter_by(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id).first() is not None
