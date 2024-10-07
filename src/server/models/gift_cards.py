@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from sqlalchemy import (
@@ -12,6 +14,7 @@ from sqlalchemy import (
 
 from src.server import db
 
+from typing import cast
 
 class GiftCards(db.Model):
     """

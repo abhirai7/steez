@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
 
 from src.server import db
 
+from typing import cast
 
 class Carts(db.Model):
     """
@@ -20,9 +23,12 @@ class Carts(db.Model):
 
     __tablename__ = "CARTS"
 
-    ID = Column(Integer, primary_key=True)
-    USER_ID = Column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False)
-    PRODUCT_ID = Column(Integer, ForeignKey("PRODUCTS.ID", ondelete="CASCADE"), nullable=False)
-    QUANTITY = Column(Integer, nullable=False)
+    ID: int = cast(int, Column(Integer, primary_key=True))
+    USER_ID: int = cast(int, Column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False))
+    PRODUCT_ID: int = cast(int, Column(Integer, ForeignKey("PRODUCTS.ID", ondelete="CASCADE"), nullable=False))
+    QUANTITY: int = cast(int, Column(Integer, nullable=False))
 
     __table_args__ = (UniqueConstraint("USER_ID", "PRODUCT_ID", name="UNIQUE_CART"),)
+
+    def __repr__(self) -> str:
+        return f"<Cart {self.ID}>"

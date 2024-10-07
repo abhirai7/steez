@@ -23,7 +23,7 @@ class Favourite:
         if self.__user is None:
             from .user import User
 
-            self.__user = User.from_id(self.__conn, self.user_id)
+            self.__user = User.from_id(self.__db, self.user_id)
 
         return self.__user
 
@@ -32,7 +32,7 @@ class Favourite:
         if self.__product is None:
             from .product import Product
 
-            self.__product = Product.from_unique_id(self.__conn, self.product_unique_id)[0]
+            self.__product = Product.from_unique_id(self.__db, self.product_unique_id)[0]
 
         return self.__product
 
@@ -46,6 +46,9 @@ class Favourite:
         from src.server.models import Favourites
 
         favourite = Favourites.query.get(id)
+        if favourite is None:
+            raise ValueError(f"Favourite with id {id} does not exist.")
+
         return cls(db, id=favourite.ID, user_id=favourite.USER_ID, product_unique_id=favourite.PRODUCT_UNIQUE_ID)
 
     @classmethod

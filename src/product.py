@@ -11,6 +11,7 @@ from .utils import SQLITE_OLD, generate_gift_card_code, get_product_pictures, si
 VALID_STARS = Literal[1, 2, 3, 4, 5]
 PRODUCT_ID = int
 QUANTITY = int
+from flask_sqlalchemy import SQLAlchemy
 
 if TYPE_CHECKING:
     from .user import User
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 class Review:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         user_id: int,
@@ -28,7 +29,7 @@ class Review:
         stars: VALID_STARS,
         created_at: str | None = None,
     ):
-        self.__conn = connection
+        self.__db = db
         self.id = id
         self.user_id = user_id
         self.product_id = product_id
@@ -40,65 +41,56 @@ class Review:
     def user(self) -> User:
         from .user import User
 
-        return User.from_id(self.__conn, self.user_id)
+        return User.from_id(self.__db, self.user_id)
 
     @property
     def product(self) -> Product:
-        return Product.from_id(self.__conn, self.product_id)
+        return Product.from_id(self.__db, self.product_id)
 
     @classmethod
     def create(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         user_id: int,
         product_id: int,
         review: str,
         stars: VALID_STARS,
     ) -> Review:
-        if SQLITE_OLD:
-            query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?)"
-        else:
-            query = r"INSERT INTO REVIEWS (`USER_ID`, `PRODUCT_ID`, `STARS`, `REVIEW`) VALUES (?, ?, ?, ?) RETURNING *"
-        cursor = connection.cursor()
-        result = cursor.execute(query, (user_id, product_id, stars, review))
+        from src.server.models import Reviews
 
-        if SQLITE_OLD:
-            result = cursor.execute(r"SELECT * FROM REVIEWS WHERE ROWID = ?", (cursor.lastrowid,))
+        r = Reviews(USER_ID=user_id, PRODUCT_ID=product_id, REVIEW=review, STARS=stars)
+        db.session.add(r)
+        db.session.commit()
 
-        data = result.fetchone()
-        connection.commit()
-
-        return cls(connection, **data)
+        return cls(db, **r.__dict__)
 
     @classmethod
-    def from_user(cls, connection: sqlite3.Connection, *, user_id: int) -> list[Review]:
-        query = r"SELECT * FROM REVIEWS WHERE USER_ID = ?"
-        cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
-        rows = cursor.fetchall()
+    def from_user(cls, db: SQLAlchemy, *, user_id: int) -> list[Review]:
+        from src.server.models import Reviews
 
-        return [cls(connection, **row) for row in rows]
+        reviews = Reviews.query.filter_by(USER_ID=user_id).all()
+
+        return [cls(db, **review.__dict__) for review in reviews]
 
     @classmethod
-    def from_product(cls, connection: sqlite3.Connection, *, product_id: int) -> list[Review]:
-        query = r"SELECT * FROM REVIEWS WHERE PRODUCT_ID = ?"
-        cursor = connection.cursor()
-        cursor.execute(query, (product_id,))
-        rows = cursor.fetchall()
+    def from_product(cls, db: SQLAlchemy, *, product_id: int) -> list[Review]:
+        from src.server.models import Reviews
 
-        return [cls(connection, **row) for row in rows]
+        reviews = Reviews.query.filter_by(PRODUCT_ID=product_id).all()
+
+        return [cls(db, **review.__dict__) for review in reviews]
 
     def delete(self) -> None:
-        query = r"DELETE FROM REVIEWS WHERE `USER_ID` = ? AND `PRODUCT_ID` = ?"
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (self.user_id, self.product_id))
-        self.__conn.commit()
+        from src.server.models import Reviews
+
+        self.__db.session.delete(Reviews.query.get(self.id))
+        self.__db.session.commit()
 
 
 class Category:
-    def __init__(self, connection: sqlite3.Connection, *, id: int, name: str, description: str):
-        self.__conn = connection
+    def __init__(self, db: SQLAlchemy, *, id: int, name: str, description: str):
+        self.__db = db
         self.id = id
         self.name = name
         self.description = description
@@ -110,65 +102,56 @@ class Category:
         return self.id == other.id
 
     def delete(self) -> None:
-        query = r"DELETE FROM CATEGORIES WHERE ID = ?"
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (self.id,))
-        self.__conn.commit()
+        from src.server.models import Categories
+
+        self.__db.session.delete(Categories.query.get(self.id))
+        self.__db.session.commit()
 
     @classmethod
-    def create(cls, connection: sqlite3.Connection, *, name: str, description: str) -> Category:
-        cursor = connection.cursor()
+    def create(cls, db: SQLAlchemy, *, name: str, description: str) -> Category:
+        from src.server.models import Categories
 
-        if SQLITE_OLD:
-            query = r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?)"
-            cursor.execute(query, (name, description))
-            result = cursor.execute(r"SELECT * FROM CATEGORIES WHERE ROWID = ?", (cursor.lastrowid,))
-        else:
-            query = r"INSERT INTO CATEGORIES (NAME, DESCRIPTION) VALUES (?, ?) RETURNING *"
-            result = cursor.execute(query, (name, description))
+        category = Categories(NAME=name, DESCRIPTION=description)
+        db.session.add(category)
+        db.session.commit()
 
-        data = result.fetchone()
-        connection.commit()
-
-        return cls(connection, **data)
+        return cls(db, **category.__dict__)
 
     @classmethod
-    def from_id(cls, connection: sqlite3.Connection, category_id: int) -> Category:
-        query = r"SELECT * FROM CATEGORIES WHERE ID = ?"
-        cursor = connection.cursor()
-        cursor.execute(query, (category_id,))
-        row = cursor.fetchone()
-        if row is None:
+    def from_id(cls, db: SQLAlchemy, category_id: int) -> Category:
+        from src.server.models import Categories
+
+        category = Categories.query.get(category_id)
+        if category is None:
             error = "Category not found."
             raise ValueError(error) from None
-        return cls(connection, **row)
+        
+        return cls(db, **category.__dict__)
 
     @classmethod
-    def from_name(cls, connection: sqlite3.Connection, name: str) -> Category:
-        query = r"SELECT * FROM CATEGORIES WHERE NAME = ?"
-        cursor = connection.cursor()
-        cursor.execute(query, (name,))
-        row = cursor.fetchone()
-        if row is None:
+    def from_name(cls, db: SQLAlchemy, name: str) -> Category:
+        from src.server.models import Categories
+
+        category = Categories.query.filter_by(NAME=name).first()
+
+        if category is None:
             error = "Category not found."
             raise ValueError(error) from None
-        return cls(connection, **row)
+        
+        return cls(db, **category.__dict__)
 
     @classmethod
-    def all(cls, connection: sqlite3.Connection) -> list[Category]:
-        query = r"SELECT * FROM CATEGORIES"
-        cursor = connection.cursor()
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        return [cls(connection, **row) for row in rows]
+    def all(cls, db: SQLAlchemy) -> list[Category]:
+        from src.server.models import Categories
+
+        all_categories = Categories.query.all()
+        return [cls(db, **category.__dict__) for category in all_categories]
 
     @staticmethod
-    def total_count(connection: sqlite3.Connection) -> int:
-        query = r"SELECT COUNT(*) FROM CATEGORIES"
-        cursor = connection.cursor()
-        cursor.execute(query)
-        count = cursor.fetchone()
-        return int(count[0])
+    def total_count(_: SQLAlchemy) -> int:
+        from src.server.models import Categories
+
+        return Categories.query.count()
 
     def json(self) -> dict:
         return {
@@ -184,7 +167,7 @@ class Category:
 class Product:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         unique_id: str,
@@ -198,7 +181,7 @@ class Product:
         keywords: str = "",
         created_at: str = "",
     ):
-        self.__conn = connection
+        self.__db = db
         self.id = id
         self.unique_id = unique_id
         self.name = name
@@ -209,45 +192,38 @@ class Product:
         self.stock = stock
         self.size = size
         self.size_name = size_names[size]
-        self.category = Category.from_id(connection, category)
+        self.category = Category.from_id(db, category)
         self.keywords = [keyword.strip() for keyword in keywords.split(";")]
 
         self._available_sizes = []
         self.created_at = arrow.get(created_at)
 
     def update(self) -> None:
-        query = r"""
-            UPDATE PRODUCTS
-            SET NAME = ?, PRICE = ?, DISPLAY_PRICE = ?, DESCRIPTION = ?, STOCK = ?, SIZE = ?, CATEGORY = ?, KEYWORDS = ?
-            WHERE ID = ?
-        """
-        cursor = self.__conn.cursor()
-        cursor.execute(
-            query,
-            (
-                self.name,
-                self.price,
-                self.display_price,
-                self.description,
-                self.stock,
-                self.size,
-                self.category.id,
-                ";".join(self.keywords),
-                self.id,
-            ),
-        )
+        from src.server.models import Products
+
+        product = Products.query.get(self.id)
+        product.NAME = self.name
+        product.PRICE = self.price
+        product.DISPLAY_PRICE = self.display_price
+        product.DESCRIPTION = self.description
+        product.STOCK = self.stock
+        product.SIZE = self.size
+        product.CATEGORY = self.category.id
+        product.KEYWORDS = ";".join(self.keywords)
+        
+        self.__db.session.commit()
 
     def similar_products(self) -> list[Product]:
         keywords_query = " OR ".join([f"KEYWORDS LIKE '%{keyword}%'" for keyword in self.keywords])
 
         query = f"SELECT * FROM PRODUCTS WHERE ID != ? AND ({keywords_query}) AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID) ORDER BY CREATED_AT DESC LIMIT 3"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.id,))
 
         products = []
 
         while row := cursor.fetchone():
-            products.append(Product(self.__conn, **row))
+            products.append(Product(self.__db, **row))
 
         return products
 
@@ -257,7 +233,7 @@ class Product:
             return self._available_sizes
 
         query = r"SELECT SIZE FROM PRODUCTS WHERE UNIQUE_ID = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.unique_id,))
         ls = []
 
@@ -269,7 +245,7 @@ class Product:
 
     @property
     def reviews(self) -> list[Review]:
-        return Review.from_product(self.__conn, product_id=self.id)
+        return Review.from_product(self.__db, product_id=self.id)
 
     @property
     def categorised_reviews(self) -> dict[VALID_STARS, list[Review]]:
@@ -293,20 +269,20 @@ class Product:
         return int((abs(self.price - self.display_price) / self.price) * 100)
 
     def add_review(self, *, user_id: int, stars: VALID_STARS, review: str):
-        return Review.create(self.__conn, user_id=user_id, product_id=self.id, stars=stars, review=review)
+        return Review.create(self.__db, user_id=user_id, product_id=self.id, stars=stars, review=review)
 
     def delete_review(self, *, user_id: int) -> None:
         query = r"DELETE FROM REVIEWS WHERE `USER_ID` = ? AND `PRODUCT_ID` = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (user_id, self.id))
-        self.__conn.commit()
+        self.__db.commit()
 
     def is_available(self, count: QUANTITY = 1) -> bool:
         if self.stock == -1:
             return True
 
         query = r"SELECT STOCK FROM PRODUCTS WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.unique_id, count, self.size))
         stock = cursor.fetchone()
 
@@ -321,7 +297,7 @@ class Product:
             return
 
         query = r"UPDATE PRODUCTS SET STOCK = STOCK - ? WHERE UNIQUE_ID = ? AND STOCK >= ? AND SIZE = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
 
         cursor.execute(query, (count, self.unique_id, count, self.size))
         updated = cursor.rowcount
@@ -330,21 +306,21 @@ class Product:
             error = "Product is not available."
             raise ValueError(error)
 
-        self.__conn.commit()
+        self.__db.commit()
 
     def release(self, count: QUANTITY = 1) -> None:
         if self.stock == -1:
             return
 
         query = r"UPDATE PRODUCTS SET STOCK = STOCK + ? WHERE ID = ? AND SIZE = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (count, self.id, self.size))
-        self.__conn.commit()
+        self.__db.commit()
 
     @classmethod
     def create(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         unique_id: str,
         name: str,
@@ -404,7 +380,7 @@ class Product:
         return cls(connection, **data)
 
     @classmethod
-    def from_id(cls, connection: sqlite3.Connection, product_id: PRODUCT_ID) -> Product:
+    def from_id(cls, db: SQLAlchemy, product_id: PRODUCT_ID) -> Product:
         query = r"SELECT * FROM PRODUCTS WHERE ID = ?"
         cursor = connection.cursor()
         cursor.execute(query, (product_id,))
@@ -415,7 +391,7 @@ class Product:
         return cls(connection, **row)
 
     @classmethod
-    def from_unique_id(cls, connection: sqlite3.Connection, unique_id: str, *, size: str = "") -> list[Product]:
+    def from_unique_id(cls, db: SQLAlchemy, unique_id: str, *, size: str = "") -> list[Product]:
         cursor = connection.cursor()
 
         query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = ? AND ROWID IN (SELECT MIN(ROWID) FROM PRODUCTS GROUP BY UNIQUE_ID)"
@@ -433,7 +409,7 @@ class Product:
         return ls
 
     @classmethod
-    def from_size(cls, connection: sqlite3.Connection, *, id: int, size: str):
+    def from_size(cls, db: SQLAlchemy, *, id: int, size: str):
         query = r"SELECT * FROM PRODUCTS WHERE UNIQUE_ID = (SELECT UNIQUE_ID FROM PRODUCTS WHERE ID = ?) AND SIZE = ?"
         cursor = connection.cursor()
         cursor.execute(query, (id, size))
@@ -446,7 +422,7 @@ class Product:
     @classmethod
     def all(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         admin: bool = False,
         limit: int | None = None,
@@ -469,7 +445,7 @@ class Product:
         return [cls(connection, **row) for row in rows]
 
     @staticmethod
-    def total_count(connection: sqlite3.Connection) -> int:
+    def total_count(db: SQLAlchemy) -> int:
         query = r"SELECT COUNT(*) FROM PRODUCTS"
         cursor = connection.cursor()
         cursor.execute(query)
@@ -477,7 +453,7 @@ class Product:
         return int(count[0])
 
     @classmethod
-    def search(cls, connection: sqlite3.Connection, query: str) -> list[Product]:
+    def search(cls, db: SQLAlchemy, query: str) -> list[Product]:
         all_products = cls.all(connection)
 
         return sorted(
@@ -534,15 +510,15 @@ class Product:
 class Cart:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         user_id: int,
     ):
-        self.__conn = connection
+        self.__db = db
         self.user_id = user_id
 
     def get_product(self, product_id: PRODUCT_ID) -> Product:
-        return Product.from_id(self.__conn, product_id)
+        return Product.from_id(self.__db, product_id)
 
     def add_product(self, *, product: Product, quantity: QUANTITY | None = 1) -> None:
         quantity = quantity or 1
@@ -551,18 +527,18 @@ class Cart:
             raise ValueError(error)
 
         query = r"INSERT INTO CARTS (USER_ID, PRODUCT_ID, QUANTITY) VALUES (?, ?, ?) ON CONFLICT(USER_ID, PRODUCT_ID) DO UPDATE SET QUANTITY = QUANTITY + ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.user_id, product.id, quantity, quantity))
-        self.__conn.commit()
+        self.__db.commit()
 
         product.use(quantity)
 
     def remove_product(self, *, product: Product, _: QUANTITY = 1) -> None:
         query = r"DELETE FROM CARTS WHERE USER_ID = ? AND PRODUCT_ID = ? RETURNING QUANTITY"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.user_id, product.id))
         row = cursor.fetchone()
-        self.__conn.commit()
+        self.__db.commit()
 
         product.release(int(row[0]))
 
@@ -572,7 +548,7 @@ class Cart:
             FROM CARTS
             WHERE USER_ID = ?
         """
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.user_id,))
         total = cursor.fetchone()
         return float(total[0] or 0.0)
@@ -580,7 +556,7 @@ class Cart:
     @property
     def count(self) -> int:
         query = r"SELECT SUM(QUANTITY) FROM CARTS WHERE USER_ID = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.user_id,))
         count = cursor.fetchone()
         return int(count[0] or 0)
@@ -594,7 +570,7 @@ class Cart:
                 WHERE USER_ID = ?
         """
 
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
 
         try:
             cursor.execute(
@@ -609,9 +585,9 @@ class Cart:
                 gift_card.use()
 
             cursor.execute(r"DELETE FROM CARTS WHERE USER_ID = ?", (self.user_id,))
-            self.__conn.commit()
+            self.__db.commit()
         except sqlite3.Error as e:
-            self.__conn.commit()
+            self.__db.commit()
             raise e
 
     def clear(self, *, product: Product | None = None) -> None:
@@ -622,19 +598,19 @@ class Cart:
             query += " AND PRODUCT_ID = ?"
             args += (product.id,)
 
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, args)
-        self.__conn.commit()
+        self.__db.commit()
 
     def products(self) -> list[Product]:
         query = r"SELECT PRODUCT_ID, QUANTITY FROM CARTS WHERE USER_ID = ?"
-        cursor = self.__conn.cursor()
+        cursor = self.__db.cursor()
         cursor.execute(query, (self.user_id,))
 
         products = []
 
         while row := cursor.fetchone():
-            product = Product.from_id(self.__conn, row[0])
+            product = Product.from_id(self.__db, row[0])
             product.stock = row[1]
             products.append(product)
 
@@ -644,7 +620,7 @@ class Cart:
 class GiftCard:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         price: float,

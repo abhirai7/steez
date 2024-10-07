@@ -59,6 +59,17 @@ class Order:
         db.session.add(order)
         db.session.commit()
         
+        return cls(
+            db,
+            id=order.ID,
+            user_id=order.USER_ID,
+            product_id=order.PRODUCT_ID,
+            quantity=order.QUANTITY,
+            total_price=order.TOTAL_PRICE,
+            created_at=order.CREATED_AT,
+            status=order.STATUS,
+            razorpay_order_id=order.RAZORPAY_ORDER_ID,
+        )
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, order_id: int) -> Order:
@@ -106,13 +117,13 @@ class Order:
     def user(self) -> User:
         from .user import User
 
-        return User.from_id(self.connection, self.user_id)
+        return User.from_id(self.__db, self.user_id)
 
     @property
     def product(self) -> Product:
         from .product import Product
 
-        return Product.from_id(self.connection, self.product_id)
+        return Product.from_id(self.__db, self.product_id)
 
     @classmethod
     def all(
@@ -141,6 +152,8 @@ class Order:
                     razorpay_order_id=order.RAZORPAY_ORDER_ID,
                 )
             )
+
+        return ls
 
     @classmethod
     def total_count(cls, db: SQLAlchemy) -> int:
