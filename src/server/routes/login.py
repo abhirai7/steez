@@ -1,7 +1,7 @@
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from src.server import app, conn, sitemapper
+from src.server import app, db, sitemapper
 from src.server.forms import LoginForm, RegisterForm
 from src.user import User
 
@@ -16,7 +16,7 @@ def login_route():
         assert login.email.data and login.password.data
 
         try:
-            user = User.from_email(conn, email=login.email.data, password=login.password.data)
+            user = User.from_email(db, email=login.email.data, password=login.password.data)
         except ValueError:
             redirect(url_for("home"))
 
@@ -39,7 +39,7 @@ def logout():
 @app.route("/register", methods=["GET", "POST"])
 @app.route("/register/", methods=["GET", "POST"])
 def register():
-    register: RegisterForm = RegisterForm(conn)
+    register: RegisterForm = RegisterForm(db)
 
     if register.validate_on_submit() and request.method == "POST":
         assert register.email.data and register.password.data and register.name.data and register.phone.data
@@ -48,7 +48,7 @@ def register():
         address += f", {register.city.data}, {register.state.data}, {register.pincode.data}"
 
         User.create(
-            conn,
+            db,
             name=register.name.data,
             email=register.email.data,
             password=register.password.data,

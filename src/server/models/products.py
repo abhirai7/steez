@@ -1,7 +1,9 @@
-from datetime import datetime
-from typing import TYPE_CHECKING
+from __future__ import annotations
 
-from sqlalchemy import DECIMAL, TEXT, TIMESTAMP, VARCHAR, Column, ForeignKey, Integer
+from datetime import datetime
+
+from sqlalchemy import DECIMAL, TEXT, TIMESTAMP, VARCHAR, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 
 from src.server import db
 
@@ -28,14 +30,14 @@ class Products(db.Model):
 
     __tablename__ = "PRODUCTS"
 
-    ID = Column(Integer, primary_key=True)
-    UNIQUE_ID = Column(VARCHAR(16), nullable=False)
-    NAME = Column(VARCHAR(255), nullable=False)
-    PRICE = Column(DECIMAL(10, 2), nullable=False)
-    DISPLAY_PRICE = Column(DECIMAL(10, 2))
-    DESCRIPTION = Column(TEXT, nullable=False)
-    STOCK = Column(Integer, default=-1)
-    SIZE = Column(TEXT, default=None)
-    CATEGORY = Column(Integer, ForeignKey("CATEGORIES.ID", ondelete="CASCADE"), nullable=False)
-    KEYWORDS = Column(TEXT, default="")
-    CREATED_AT = Column(TIMESTAMP, default=datetime.now)
+    ID: Mapped[int] = mapped_column(Integer, primary_key=True)
+    UNIQUE_ID: Mapped[str] = mapped_column(VARCHAR(16), nullable=False)
+    NAME: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
+    PRICE: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
+    DISPLAY_PRICE: Mapped[float | None] = mapped_column(DECIMAL(10, 2))
+    DESCRIPTION: Mapped[str] = mapped_column(TEXT, nullable=False)
+    STOCK: Mapped[int] = mapped_column(Integer, default=-1)
+    SIZE: Mapped[str] = mapped_column(TEXT, default=None)
+    CATEGORY: Mapped[int] = mapped_column(Integer, ForeignKey("CATEGORIES.ID", ondelete="CASCADE"), nullable=False)
+    KEYWORDS: Mapped[str] = mapped_column(TEXT, default="")
+    CREATED_AT: Mapped[int] = mapped_column(TIMESTAMP, default=datetime.now)

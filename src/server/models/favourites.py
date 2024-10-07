@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import VARCHAR, Column, ForeignKey, Integer, UniqueConstraint
-
+from sqlalchemy.orm import Mapped, mapped_column
 from src.server import db
 
 
@@ -20,8 +20,8 @@ class Favourites(db.Model):
 
     __tablename__ = "FAVOURITES"
 
-    ID = Column(Integer, primary_key=True)
-    USER_ID = Column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False)
-    PRODUCT_UNIQUE_ID = Column(VARCHAR(16), nullable=False)
+    ID: Mapped[int] = mapped_column(Integer, primary_key=True)
+    USER_ID: Mapped[int] = mapped_column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False)
+    PRODUCT_UNIQUE_ID: Mapped[int] = mapped_column(VARCHAR(16), nullable=False)
 
     __table_args__ = (UniqueConstraint("USER_ID", "PRODUCT_UNIQUE_ID", name="UNIQUE_FAVORITE"),)

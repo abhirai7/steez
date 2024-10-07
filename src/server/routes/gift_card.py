@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 from razorpay.errors import SignatureVerificationError
 
 from src.product import GiftCard
-from src.server import RAZORPAY_KEY, app, conn, razorpay_client
+from src.server import RAZORPAY_KEY, app, db, razorpay_client
 from src.server.forms import GiftCardForm
 
 if TYPE_CHECKING:
@@ -68,6 +68,6 @@ def show_gift_card():
         return redirect(url_for("home"))
 
     with contextlib.suppress(ValueError):
-        if gift_card := GiftCard.exists(conn, code=code):
+        if gift_card := GiftCard.exists(db, code=code):
             return render_template("show_gift_card.html", gift_card=gift_card, arrow=arrow)
     return redirect(url_for("home"))

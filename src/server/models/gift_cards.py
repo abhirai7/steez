@@ -13,7 +13,7 @@ from sqlalchemy import (
 )
 
 from src.server import db
-
+from sqlalchemy.orm import Mapped, mapped_column
 
 class GiftCards(db.Model):
     """
@@ -34,12 +34,12 @@ class GiftCards(db.Model):
 
     __tablename__ = "GIFT_CARDS"
 
-    ID = Column(Integer, primary_key=True)
-    PRICE = Column(Integer, nullable=False)
-    USER_ID = Column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False)
-    CODE = Column(TEXT, nullable=False)
-    USED = Column(Boolean, default=False)
-    CREATED_AT = Column(TIMESTAMP, default=datetime.now)
-    USED_AT = Column(TIMESTAMP, default=None)
+    ID: Mapped[int] = mapped_column(Integer, primary_key=True)
+    PRICE: Mapped[int] = mapped_column(Integer, nullable=False)
+    USER_ID: Mapped[int] = mapped_column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False)
+    CODE: Mapped[str] = mapped_column(TEXT, nullable=False)
+    USED: Mapped[bool] = mapped_column(Boolean, default=False)
+    CREATED_AT: Mapped[int] = mapped_column(TIMESTAMP, default=datetime.now)
+    USED_AT: Mapped[int] = mapped_column(TIMESTAMP, default=None)
 
     __table_args__ = (UniqueConstraint("CODE", name="UNIQUE_CODES"),)

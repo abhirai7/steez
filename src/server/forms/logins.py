@@ -1,7 +1,5 @@
 from __future__ import annotations
-
-import sqlite3
-
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import (
     EmailField,
@@ -26,9 +24,9 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    def __init__(self, connection: sqlite3.Connection, *args, **kwargs):
+    def __init__(self, db: SQLAlchemy, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.conn = connection
+        self.db = db
 
     name         = StringField("Person Details", validators=[DataRequired()], render_kw={"autocomplete": "off"})
     email        = EmailField("", validators=[DataRequired(), Email()], render_kw={"autocomplete": "off"})
@@ -49,7 +47,7 @@ class RegisterForm(FlaskForm):
 
         str_email = email.data.lower()
 
-        if User.exists(self.conn, email=str_email):
+        if User.exists(self.db, email=str_email):
             raise ValidationError("Email already registered")
 
         return True
@@ -70,9 +68,9 @@ class RegisterForm(FlaskForm):
 
 
 class AdminForm(FlaskForm):
-    def __init__(self, connection: sqlite3.Connection, *args, **kwargs):
+    def __init__(self, db: SQLAlchemy, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.conn = connection
+        self.db = db
 
     password    = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     submit      = SubmitField("Login")

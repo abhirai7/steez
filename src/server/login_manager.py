@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING
 from flask import Request, render_template
 from flask_login import current_user
 
-from src.server import conn, login_manager
+from src.server import db, login_manager
+from src.server.models import Users
 from src.user import Admin, User
 
 if TYPE_CHECKING:
     assert isinstance(current_user, User)
 
-ADMIN_ID = 1
 HTTP_UNAUTHORIZED = 403
 
 
@@ -20,13 +20,13 @@ HTTP_UNAUTHORIZED = 403
 def load_user(user_id: str | int) -> User | None:
     user_id = int(user_id)
 
-    try:
-        if user_id == ADMIN_ID:
-            return Admin.from_id(conn, user_id)
+    user = Users.query.get(user_id)
+    if user:
+        if user.ROLE == "ADMIN":
+            admin = Admin(db, **{k.lower(): v for k, v in user.__dict__.items()})
+            return admin
 
-        return User.from_id(conn, user_id)
-    except ValueError:
-        return None
+        return User(db, **{k.lower(): v for k, v in user.__dict__.items()})
 
 
 @login_manager.request_loader
@@ -36,7 +36,7 @@ def load_user_from_request(request: Request) -> User | None:
 
     if email and password:
         try:
-            return User.from_email(conn, email=email, password=password)
+            return User.from_email(db, email=email, password=password)
         except ValueError:
             return None
 

@@ -9,7 +9,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import current_user
 
 from src.product import Category, Product
-from src.server import admin_login_required, app, conn
+from src.server import admin_login_required, app, db
 from src.server.forms import ProductAddForm, ProductUpdateForm
 from src.utils import size_names
 
@@ -26,10 +26,10 @@ def admin_manage_product():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
     skip = (page - 1) * limit
-    products = Product.all(conn, admin=True, limit=limit, offset=skip)
+    products = Product.all(db, admin=True, limit=limit, offset=skip)
 
-    product_edit_forms: list[ProductUpdateForm] = [ProductUpdateForm(conn, product=product) for product in products]
-    addform: ProductAddForm = ProductAddForm(conn)
+    product_edit_forms: list[ProductUpdateForm] = [ProductUpdateForm(db, product=product) for product in products]
+    addform: ProductAddForm = ProductAddForm(db)
     return render_template(
         "admin/admin_manage_product.html",
         products=products,
@@ -45,7 +45,7 @@ def admin_manage_product():
 @app.route("/admin/manage/product/add", methods=["POST"])
 @admin_login_required
 def admin_add_product():
-    addform: ProductAddForm = ProductAddForm(conn)
+    addform: ProductAddForm = ProductAddForm(db)
 
     if addform.validate_on_submit() and request.method == "POST":
         assert addform.name.data and addform.price.data and addform.stock.data and addform.description.data and addform.sizes.data
@@ -54,7 +54,7 @@ def admin_add_product():
 
         for size in addform.sizes.data:
             product = Product.create(
-                conn,
+                db,
                 name=addform.name.data,
                 unique_id=_id,
                 price=float(addform.price.data),
@@ -81,8 +81,8 @@ def admin_add_product():
 @app.route("/admin/manage/product/edit/<int:id>", methods=["POST"])
 @admin_login_required
 def admin_edit_product(id: int):
-    product = Product.from_id(conn, id)
-    product_update_form: ProductUpdateForm = ProductUpdateForm(conn, product=product)
+    product = Product.from_id(db, id)
+    product_update_form: ProductUpdateForm = ProductUpdateForm(db, product=product)
 
     if product_update_form.validate_on_submit():
         product.name = product_update_form.name.data or product.name
@@ -92,7 +92,7 @@ def admin_edit_product(id: int):
             markdown.markdown(product_update_form.description.data) if product_update_form.description.data else product.description
         )
         product.category = (
-            Category.from_id(conn, int(product_update_form.category.data)) if product_update_form.category.data else product.category
+            Category.from_id(db, int(product_update_form.category.data)) if product_update_form.category.data else product.category
         )
         product.display_price = product_update_form.display_price.data or product.display_price
         product.keywords = product_update_form.keywords.data.split(";") if product_update_form.keywords.data else product.keywords
@@ -106,6 +106,6 @@ def admin_edit_product(id: int):
 @app.route("/admin/manage/product/delete/<int:id>")
 @admin_login_required
 def admin_delete_product(id: int):
-    current_user.delete_product(conn, id)
+    current_user.delete_product(db, id)
 
     return redirect(url_for("admin_manage_product"))

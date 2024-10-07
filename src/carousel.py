@@ -18,6 +18,7 @@ class Carousel:
         image: str,
         heading: str,
         description: str,
+        **_,
     ):
         self.db = db
         self.id = id

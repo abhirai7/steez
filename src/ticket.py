@@ -21,6 +21,7 @@ class Ticket:
         message: str,
         status: str,
         created_at: str,
+        **_,
     ):
         self.conn = conn
         self.id = id

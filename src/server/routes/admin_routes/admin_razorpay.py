@@ -5,7 +5,7 @@ import json
 from flask import render_template, request
 
 from src.order import Order
-from src.server import admin_login_required, app, conn, razorpay_client
+from src.server import admin_login_required, app, db, razorpay_client
 
 
 @app.route("/admin/manage/razorpay-orders", methods=["GET"])
@@ -41,7 +41,7 @@ def admin_manage_order():
     limit = int(request.args.get("limit", 15))
     skip = (page - 1) * limit
 
-    orders = Order.all(conn, limit=limit, offset=skip)
+    orders = Order.all(db, limit=limit, offset=skip)
 
     return render_template(
         "admin/admin_manage_partial_order.html",

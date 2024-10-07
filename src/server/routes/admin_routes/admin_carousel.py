@@ -7,7 +7,7 @@ import string
 from flask import redirect, render_template, url_for
 
 from src.carousel import Carousel
-from src.server import admin_login_required, app, conn
+from src.server import admin_login_required, app, db
 from src.server.forms import CarouselForm
 
 UPLOAD_FOLDER = "src/server/static/product_pictures"
@@ -21,14 +21,14 @@ def generate_unique_identifier():
 @admin_login_required
 def admin_manage_carousel():
     form = CarouselForm()
-    carousels = Carousel.all(conn)
+    carousels = Carousel.all(db)
     return render_template("admin/admin_manage_carousel.html", form=form, carousels=carousels)
 
 
 @app.route("/admin/delete/carousel/<int:id>")
 @admin_login_required
 def admin_delete_carousel(id):
-    carousel = Carousel.get(conn, id)
+    carousel = Carousel.get(db, id)
     carousel.delete()
     return redirect(url_for("admin_manage_carousel"))
 
@@ -52,7 +52,7 @@ def admin_add_carousel():
             f.write(image.read())
 
         Carousel.create(
-            conn,
+            db,
             image=_id,
             heading=form.heading.data,
             description=form.description.data,

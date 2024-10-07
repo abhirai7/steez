@@ -30,6 +30,7 @@ class Review:
         review: str | None = None,
         stars: VALID_STARS,
         created_at: str | None = None,
+        **_,
     ):
         self.__db = db
         self.id = id
@@ -65,7 +66,7 @@ class Review:
         db.session.add(r)
         db.session.commit()
 
-        return cls(db, **r.__dict__)
+        return cls(db, **{k.lower(): v for k, v in r.__dict__.items()})
 
     @classmethod
     def from_user(cls, db: SQLAlchemy, *, user_id: int) -> list[Review]:
@@ -73,7 +74,7 @@ class Review:
 
         reviews = Reviews.query.filter_by(USER_ID=user_id).all()
 
-        return [cls(db, **review.__dict__) for review in reviews]
+        return [cls(db, **{k.lower(): v for k, v in review.__dict__.items()}) for review in reviews]
 
     @classmethod
     def from_product(cls, db: SQLAlchemy, *, product_id: int) -> list[Review]:
@@ -81,7 +82,7 @@ class Review:
 
         reviews = Reviews.query.filter_by(PRODUCT_ID=product_id).all()
 
-        return [cls(db, **review.__dict__) for review in reviews]
+        return [cls(db, **{k.lower(): v for k, v in review.__dict__.items()}) for review in reviews]
 
     def delete(self) -> None:
         from src.server.models import Reviews
@@ -117,7 +118,7 @@ class Category:
         db.session.add(category)
         db.session.commit()
 
-        return cls(db, **category.__dict__)
+        return cls(db, **{k.lower(): v for k, v in category.__dict__.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, category_id: int) -> Category:
@@ -128,7 +129,7 @@ class Category:
             error = "Category not found."
             raise ValueError(error) from None
 
-        return cls(db, **category.__dict__)
+        return cls(db, **{k.lower(): v for k, v in category.__dict__.items()})
 
     @classmethod
     def from_name(cls, db: SQLAlchemy, name: str) -> Category:
@@ -140,7 +141,7 @@ class Category:
             error = "Category not found."
             raise ValueError(error) from None
 
-        return cls(db, **category.__dict__)
+        return cls(db, **{k.lower(): v for k, v in category.__dict__.items()})
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Category]:
@@ -149,7 +150,7 @@ class Category:
         with db.session() as conn:
             all_categories = conn.query(Categories).all()
 
-        return [cls(db, **category.__dict__) for category in all_categories]
+        return [cls(db, **{k.lower(): v for k, v in category.__dict__.items()}) for category in all_categories]
 
     @staticmethod
     def total_count(_: SQLAlchemy) -> int:
@@ -184,6 +185,7 @@ class Product:
         category: int,
         keywords: str = "",
         created_at: str = "",
+        **_,
     ):
         self.__db: SQLAlchemy = db
         self.id = id
@@ -206,6 +208,9 @@ class Product:
         from src.server.models import Products
 
         product = Products.query.get(self.id)
+
+        assert product, "Product not found."
+
         product.NAME = self.name
         product.PRICE = self.price
         product.DISPLAY_PRICE = self.display_price
@@ -366,7 +371,7 @@ class Product:
         db.session.add(product)
         db.session.commit()
 
-        return cls(db, **product.__dict__)
+        return cls(db, **{k.lower(): v for k, v in product.__dict__.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, product_id: PRODUCT_ID) -> Product:
@@ -377,7 +382,7 @@ class Product:
             error = "Product not found."
             raise ValueError(error) from None
 
-        return cls(db, **product.__dict__)
+        return cls(db, **{k.lower(): v for k, v in product.__dict__.items()})
 
     @classmethod
     def from_unique_id(cls, db: SQLAlchemy, unique_id: str, *, size: str = "") -> list[Product]:
@@ -390,7 +395,7 @@ class Product:
 
         products = query.all()
 
-        return [cls(db, **product.__dict__) for product in products]
+        return [cls(db, **{k.lower(): v for k, v in product.__dict__.items()}) for product in products]
 
     @classmethod
     def from_size(cls, db: SQLAlchemy, *, id: int, size: str):
@@ -405,7 +410,7 @@ class Product:
             error = "Product not found."
             raise ValueError(error) from None
 
-        return cls(db, **product.__dict__)
+        return cls(db, **{k.lower(): v for k, v in product.__dict__.items()})
 
     @classmethod
     def all(
@@ -426,7 +431,7 @@ class Product:
         query = query.order_by(Products.CREATED_AT.desc()).limit(limit).offset(offset)
         products = query.all()
 
-        return [cls(db, **product.__dict__) for product in products]
+        return [cls(db, **{k.lower(): v for k, v in product.__dict__.items()}) for product in products]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
@@ -481,7 +486,7 @@ class Product:
 
         products = Products.query.filter(Products.CATEGORY == category.id).distinct(Products.UNIQUE_ID).all()
 
-        return [cls(db, **product.__dict__) for product in products]
+        return [cls(db, **{k.lower(): v for k, v in product.__dict__.items()}) for product in products]
 
 
 class Cart:
@@ -613,6 +618,7 @@ class GiftCard:
         used: int | str,
         created_at: str | None,
         used_at: str | None,
+        **_,
     ):
         self.__db = db
         self.id = id
@@ -643,7 +649,7 @@ class GiftCard:
         db.session.add(giftcard)
         db.session.commit()
 
-        return GiftCard(db, **giftcard.__dict__)
+        return GiftCard(db, **{k.lower(): v for k, v in giftcard.__dict__.items()})
 
     @classmethod
     def create(cls, db: SQLAlchemy, *, user: User, amount: int) -> GiftCard:
@@ -653,7 +659,7 @@ class GiftCard:
         db.session.add(giftcard)
         db.session.commit()
 
-        return cls(db, **giftcard.__dict__)
+        return cls(db, **{k.lower(): v for k, v in giftcard.__dict__.items()})
 
     def use(self) -> None:
         from src.server.models import GiftCards
@@ -680,7 +686,7 @@ class GiftCard:
         giftcard = GiftCards.query.filter_by(CODE=code).first()
 
         if giftcard:
-            return cls(db, **giftcard.__dict__)
+            return cls(db, **{k.lower(): v for k, v in giftcard.__dict__.items()})
 
         error = "Gift card not found."
         raise ValueError(error) from None
@@ -698,4 +704,4 @@ class GiftCard:
 
         giftcards = GiftCards.query.all()
 
-        return [cls(db, **giftcard.__dict__) for giftcard in giftcards]
+        return [cls(db, **{k.lower(): v for k, v in giftcard.__dict__.items()}) for giftcard in giftcards]

@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 from razorpay.errors import SignatureVerificationError
 
 from src.order import Order
-from src.server import RAZORPAY_KEY, app, conn, razorpay_client
+from src.server import RAZORPAY_KEY, app, db, razorpay_client
 from src.server.forms import (
     LoginForm,
     PaymentMethod,
@@ -67,7 +67,7 @@ def razorpay_webhook():
 
     try:
         razorpay_client.utility.verify_payment_signature(data)
-        order = Order.from_razorpay_order_id(conn, data["razorpay_order_id"])
+        order = Order.from_razorpay_order_id(db, data["razorpay_order_id"])
 
         assert order.user.id == current_user.id
 
@@ -81,7 +81,7 @@ def razorpay_webhook():
 @app.route("/order-history/delete-order/<int:order_id>")
 @login_required
 def delete_order(order_id: int):
-    Order.delete(conn, order_id=order_id, user_id=current_user.id)
+    Order.delete(db, order_id=order_id, user_id=current_user.id)
     return redirect(url_for("order_history"))
 
 

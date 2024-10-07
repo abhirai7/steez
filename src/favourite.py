@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 class Favourite:
-    def __init__(self, db: SQLAlchemy, *, id: int, user_id: int, product_unique_id: str) -> None:
+    def __init__(self, db: SQLAlchemy, *, id: int, user_id: int, product_unique_id: str, **_) -> None:
         self.__db = db
         self.id = id
         self.user_id = user_id

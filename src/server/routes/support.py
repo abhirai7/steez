@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from flask import redirect, url_for
 from flask_login import current_user, login_required
 
-from src.server import app, conn
+from src.server import app, db
 from src.server.forms import TicketForm
 from src.ticket import Ticket
 
@@ -22,7 +22,7 @@ def create_ticket():
     form: TicketForm = TicketForm()
     if form.validate_on_submit() and form.subject.data and form.message.data:
         Ticket.create(
-            conn,
+            db,
             user=current_user,
             replied_to=None,
             subject=form.subject.data,

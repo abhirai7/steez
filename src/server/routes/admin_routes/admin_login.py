@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user
 
 from src.order import Order
 from src.product import Product
-from src.server import admin_login_required, app, conn, razorpay_client
+from src.server import admin_login_required, app, db, razorpay_client
 from src.server.forms import AdminForm
 from src.user import Admin, User
 
@@ -21,12 +21,12 @@ def todays_settlement(response: dict):
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
-    form: AdminForm = AdminForm(conn)
+    form: AdminForm = AdminForm(db)
 
     if form.validate_on_submit() and request.method == "POST":
         assert form.password.data
 
-        admin = Admin.from_email(conn, password=form.password.data)
+        admin = Admin.from_email(db, password=form.password.data)
         login_user(admin)
         return redirect(url_for("admin_dashboard"))
 
@@ -46,9 +46,9 @@ def admin_logout():
 def admin_dashboard():
     assert current_user.is_admin
 
-    product_count = Product.total_count(conn)
-    user_count = User.total_count(conn)
-    order_count = Order.total_count(conn)
+    product_count = Product.total_count(db)
+    user_count = User.total_count(db)
+    order_count = Order.total_count(db)
 
     settlements = razorpay_client.settlement.all({"count": 100})
 

@@ -30,6 +30,7 @@ class Order:
         created_at: str,
         status: str = "PEND",
         razorpay_order_id: str | None = None,
+        **_,
     ) -> None:
         self.__db = db
         self.id = id

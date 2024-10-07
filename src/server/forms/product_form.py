@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import sqlite3
 from typing import TYPE_CHECKING
-
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import (
     EmailField,
@@ -42,11 +41,11 @@ class ProductAddForm(FlaskForm):
     keywords = StringField("Keywords")
     submit = SubmitField("Add Product")
 
-    def __init__(self, connection: sqlite3.Connection, *args, **kwargs):
+    def __init__(self, db: SQLAlchemy, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.conn = connection
-        self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
+        self.db = db
+        self.category.choices = [(int(category.id), category.name) for category in Category.all(db)]
 
 
 class ProductUpdateForm(FlaskForm):
@@ -64,11 +63,11 @@ class ProductUpdateForm(FlaskForm):
     def validate_on_submit(self, extra_validators=None):
         return True
 
-    def __init__(self, connection: sqlite3.Connection, *args, product: Product, **kwargs):
+    def __init__(self, db: SQLAlchemy, *args, product: Product, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.conn = connection
-        self.category.choices = [(int(category.id), category.name) for category in Category.all(connection)]
+        self.db = db
+        self.category.choices = [(int(category.id), category.name) for category in Category.all(db)]
         self.product = product
 
         self.category.data = product.category.id

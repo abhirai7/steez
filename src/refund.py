@@ -18,6 +18,7 @@ class Refund:
         order_id: int,
         reason: str,
         created_at: str,
+        **_,
     ):
         self.conn = conn
         self.id = id

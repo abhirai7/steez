@@ -3,5 +3,5 @@ __pycache__/
 *.pyc
 .vscode
 .db
-.env
+*.env*
 *.sqlite*

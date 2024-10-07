@@ -29,6 +29,7 @@ class User:
         role: str = "USER",
         address: str,
         phone: str,
+        **_,
     ):
         self.__db = db
         self.id = id
@@ -54,7 +55,7 @@ class User:
 
         orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.CREATED_AT.desc()).all()
 
-        return [Order(self.__db, **row.__dict__) for row in orders]
+        return [Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
 
     @property
     def is_admin(self):
@@ -83,7 +84,7 @@ class User:
             error = "User not found. Either email or password is incorrect."
             raise ValueError(error) from None
 
-        return cls(db, **user.__dict__)
+        return cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, user_id: int):
@@ -94,7 +95,7 @@ class User:
             error = "User not found."
             raise ValueError(error) from None
 
-        return cls(db, **user.__dict__)
+        return cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
 
     @classmethod
     def create(
@@ -121,7 +122,7 @@ class User:
         db.session.add(user)
         db.session.commit()
 
-        return cls(db, **user.__dict__)
+        return cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
 
     def add_review(self, *, product: Product, stars: VALID_STARS, review: str):
         product.add_review(user_id=self.id, stars=stars, review=review)
@@ -172,7 +173,7 @@ class User:
             .all()
         )
 
-        return [Order(self.__db, **order.__dict__) for order in orders]
+        return [Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()}) for order in orders]
 
     def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
         from .server.models import Orders
@@ -267,7 +268,7 @@ class User:
         from .server.models import Users
 
         users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
-        return [cls(db, **user.__dict__) for user in users]
+        return [cls(db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
@@ -307,16 +308,16 @@ class Admin(User):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def from_email(cls, db: SQLAlchemy, *, email: str = "", password: str) -> Admin:
+    def from_email(cls, db: SQLAlchemy, *, password: str) -> Admin:
         from .server.models import Users
 
-        user = Users.query.filter_by(EMAIL=email, PASSWORD=Password(password).hex, ROLE="ADMIN").first()
+        user = Users.query.filter_by(PASSWORD=Password(password).hex, ROLE="ADMIN").first()
 
         if user is None:
             error = "Admin not found. Either email or password is incorrect."
             raise ValueError(error) from None
 
-        return cls(db, **user.__dict__)
+        return cls(db, **{k.lower(): v for k, v in {k.lower(): v for k, v in user.__dict__.items()}.items()})
 
     @classmethod
     def delete_user(cls, db: SQLAlchemy, user_id: int) -> None:
