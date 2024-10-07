@@ -14,7 +14,6 @@ from sqlalchemy import (
 
 from src.server import db
 
-from typing import cast
 
 class GiftCards(db.Model):
     """

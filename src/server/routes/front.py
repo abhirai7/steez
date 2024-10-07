@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 
 from src.carousel import Carousel
 from src.product import Category, Product
-from src.server import TODAY, app, conn, sitemapper
+from src.server import TODAY, app, db, sitemapper
 from src.server.forms import (
     AddToCartForm,
     GiftCardForm,
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 @sitemapper.include(lastmod=TODAY, changefreq="daily", priority=0.9)
 @app.route("/")
 def home():
-    products = Product.all(conn, limit=6)
+    products = Product.all(db, limit=6)
     categories = Product.categorise_products(products, limit=6)
 
     return render_template(
@@ -42,7 +42,7 @@ def home():
         categories=categories,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
-        carousels=Carousel.all(conn),
+        carousels=Carousel.all(db),
         login_form=LoginForm(),
     )
 
@@ -56,7 +56,7 @@ def faq():
         current_user=current_user,
         FAQ=FAQ_DATA,
         search_form=SearchForm(),
-        categories=Category.all(conn),
+        categories=Category.all(db),
         newsletter_form=SubscribeNewsLetterForm(),
         login_form=LoginForm(),
     )
@@ -75,14 +75,14 @@ def search():
     if not query:
         return redirect(url_for("home"))
 
-    products = Product.search(conn, query)
+    products = Product.search(db, query)
 
     return render_template(
         "front_search.html",
         products=products,
         current_user=current_user,
         search_form=form,
-        categories=Category.all(conn),
+        categories=Category.all(db),
         newsletter_form=SubscribeNewsLetterForm(),
         login_form=LoginForm(),
     )
@@ -93,7 +93,7 @@ def _autocomplete(*, query: str = "") -> list[Product]:
     if not query:
         return []
     print("cache didnt hit")
-    return Product.search(conn, query=query)
+    return Product.search(db, query=query)
 
 
 @app.route("/autocomplete")
@@ -114,7 +114,7 @@ def refund_policy():
         "refund_policy.html",
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
-        categories=Category.all(conn),
+        categories=Category.all(db),
         login_form=LoginForm(),
     )
 
@@ -134,7 +134,7 @@ def order_history():
         arrow=arrow,
         search_form=SearchForm(),
         newsletter_form=SubscribeNewsLetterForm(),
-        categories=Category.all(conn),
+        categories=Category.all(db),
         login_form=LoginForm(),
     )
 
@@ -173,28 +173,29 @@ def subscribe():
 
     if form.validate_on_submit() and form.email.data:
         email = form.email.data
-        newsletter_email_add_to_db(conn, email=email)
+        newsletter_email_add_to_db(db, email=email)
 
     return redirect(url_for("home"))
 
 
-for category in Category.all(conn):
+with app.app_context():
+    for category in Category.all(db):
 
-    def category_page(category=category):
-        products = Product.get_by_category(conn, category=category)
-        return render_template(
-            "front_search.html",
-            products=products,
-            category=category,
-            current_user=current_user,
-            search_form=SearchForm(),
-            newsletter_form=SubscribeNewsLetterForm(),
-            categories=Category.all(conn),
-            login_form=LoginForm(),
+        def category_page(category=category):
+            products = Product.get_by_category(db, category=category)
+            return render_template(
+                "front_search.html",
+                products=products,
+                category=category,
+                current_user=current_user,
+                search_form=SearchForm(),
+                newsletter_form=SubscribeNewsLetterForm(),
+                categories=Category.all(db),
+                login_form=LoginForm(),
+            )
+
+        app.add_url_rule(
+            f"/category/{category.name.lower().replace(' ', '-')}",
+            f"category_{category.name.lower().replace(' ', '_')}",
+            category_page,
         )
-
-    app.add_url_rule(
-        f"/category/{category.name.lower().replace(' ', '-')}",
-        f"category_{category.name.lower().replace(' ', '_')}",
-        category_page,
-    )

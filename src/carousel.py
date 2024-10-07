@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import text
-
 from .utils import get_product_pictures
 
 if TYPE_CHECKING:
@@ -33,7 +31,13 @@ class Carousel:
 
         caros = db.session.query(Carousels).all()
         return [
-            cls(db, id=caro.ID, image=caro.IMAGE, heading=caro.HEADING, description=caro.DESCRIPTION)
+            cls(
+                db,
+                id=caro.ID,
+                image=caro.IMAGE,
+                heading=caro.HEADING,
+                description=caro.DESCRIPTION,
+            )
             for caro in caros
         ]
 
@@ -42,7 +46,16 @@ class Carousel:
         from src.server.models import Carousels
 
         caro = db.session.query(Carousels).filter_by(ID=id).first()
-        return cls(db, id=caro.ID, image=caro.IMAGE, heading=caro.HEADING, description=caro.DESCRIPTION)
+        if not caro:
+            raise ValueError("Carousel not found")
+
+        return cls(
+            db,
+            id=caro.ID,
+            image=caro.IMAGE,
+            heading=caro.HEADING,
+            description=caro.DESCRIPTION,
+        )
 
     @classmethod
     def create(
@@ -62,7 +75,13 @@ class Carousel:
         db.session.add(carousel)
         db.session.commit()
 
-        return cls(db, image=image, heading=heading, description=description)
+        return cls(
+            db,
+            id=carousel.ID,
+            image=carousel.IMAGE,
+            heading=carousel.HEADING,
+            description=carousel.DESCRIPTION,
+        )
 
     def delete(self):
         from src.server.models import Carousels

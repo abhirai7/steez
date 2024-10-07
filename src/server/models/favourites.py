@@ -4,7 +4,6 @@ from sqlalchemy import VARCHAR, Column, ForeignKey, Integer, UniqueConstraint
 
 from src.server import db
 
-from typing import cast
 
 class Favourites(db.Model):
     """
@@ -21,8 +20,8 @@ class Favourites(db.Model):
 
     __tablename__ = "FAVOURITES"
 
-    ID: int = cast(int, Column(Integer, primary_key=True))
-    USER_ID: int = cast(int, Column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False))
-    PRODUCT_UNIQUE_ID: str = cast(str, Column(VARCHAR(16), nullable=False))
+    ID = Column(Integer, primary_key=True)
+    USER_ID = Column(Integer, ForeignKey("USERS.ID", ondelete="CASCADE"), nullable=False)
+    PRODUCT_UNIQUE_ID = Column(VARCHAR(16), nullable=False)
 
     __table_args__ = (UniqueConstraint("USER_ID", "PRODUCT_UNIQUE_ID", name="UNIQUE_FAVORITE"),)

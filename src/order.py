@@ -58,7 +58,7 @@ class Order:
         order = Orders(USER_ID=user_id, PRODUCT_ID=product_id, QUANTITY=quantity, TOTAL_PRICE=total_price)
         db.session.add(order)
         db.session.commit()
-        
+
         return cls(
             db,
             id=order.ID,
@@ -172,7 +172,7 @@ class Order:
         if not orders:
             error = "Order not found."
             raise ValueError(error) from None
-        
+
         for order in orders:
             order.STATUS = status
             order.RAZORPAY_ORDER_ID = razorpay_order_id

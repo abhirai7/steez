@@ -42,6 +42,8 @@ sitemapper.init_app(app)
 db.init_app(app)
 csrf.init_app(app)
 
+conn = db
+
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})
 

@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 
 from src.favourite import Favourite
 from src.product import Product
-from src.server import app, conn, sitemapper
+from src.server import app, db, sitemapper
 from src.server.forms import (
     AddReviewForm,
     AddToCartForm,
@@ -24,7 +24,8 @@ if TYPE_CHECKING:
 
 
 def product_ids():
-    return [product.id for product in Product.all(conn)]
+    with app.app_context():
+        return [product.id for product in Product.all(db)]
 
 
 @sitemapper.include(
@@ -35,7 +36,7 @@ def product_ids():
 @app.route("/products/<int:product_id>", methods=["GET"])
 @app.route("/products/<int:product_id>/", methods=["GET"])
 def product(product_id: int):
-    product = Product.from_id(conn, product_id)
+    product = Product.from_id(db, product_id)
     pictures = get_product_pictures(product.unique_id)
     reviews = product.categorised_reviews
 
@@ -63,10 +64,10 @@ def product(product_id: int):
 @app.route("/products/<int:product_id>/add-to-cart", methods=["POST"])
 @login_required
 def add_to_cart(product_id: int):
-    product = Product.from_id(conn, product_id)
+    product = Product.from_id(db, product_id)
     form: AddToCartForm = AddToCartForm()
     if form.validate_on_submit() and form.quantity.data:
-        product = Product.from_size(conn, id=product.id, size=form.size.data)
+        product = Product.from_size(db, id=product.id, size=form.size.data)
 
         current_user.add_to_cart(product=product, quantity=int(form.quantity.data))
 
@@ -77,7 +78,7 @@ def add_to_cart(product_id: int):
 @app.route("/products/<int:product_id>/remove-from-cart", methods=["GET"])
 @login_required
 def remove_from_cart(product_id: int):
-    product = Product.from_id(conn, product_id)
+    product = Product.from_id(db, product_id)
     current_user.remove_from_cart(product=product)
 
     return redirect(url_for("checkout"))
@@ -89,7 +90,7 @@ def remove_from_cart(product_id: int):
 )
 @login_required
 def add_review(product_id: int):
-    product = Product.from_id(conn, product_id)
+    product = Product.from_id(db, product_id)
     review_form: AddReviewForm = AddReviewForm()
 
     if review_form.validate_on_submit() and request.method == "POST" and review_form.review.data:
@@ -106,15 +107,15 @@ def add_review(product_id: int):
 @app.route("/products/<int:product_id>/is-favourite/", methods=["GET"])
 @login_required
 def is_favourite(product_id: int):
-    product = Product.from_id(conn, product_id)
-    return {"is_favourite": Favourite.exists(conn, user=current_user, product=product)}
+    product = Product.from_id(db, product_id)
+    return {"is_favourite": Favourite.exists(db, user=current_user, product=product)}
 
 
 @app.route("/products/<int:product_id>/add-to-favourites", methods=["GET"])
 @app.route("/products/<int:product_id>/add-to-favourites/", methods=["GET"])
 @login_required
 def add_to_favourites(product_id: int):
-    product = Product.from_id(conn, product_id)
+    product = Product.from_id(db, product_id)
     current_user.add_to_fav(product=product)
     return redirect(url_for("product", product_id=product_id))
 
@@ -123,5 +124,5 @@ def add_to_favourites(product_id: int):
 @app.route("/products/<int:product_id>/remove-from-favourites/", methods=["GET"])
 @login_required
 def remove_from_favourites(product_id: int):
-    current_user.remove_from_fav(product=Product.from_id(conn, product_id))
+    current_user.remove_from_fav(product=Product.from_id(db, product_id))
     return redirect(url_for("product", product_id=product_id))

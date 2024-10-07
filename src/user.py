@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sqlite3
 from typing import TYPE_CHECKING
 
 import arrow
@@ -12,13 +11,15 @@ if TYPE_CHECKING:
     from .type_hints import Client as RazorpayClient
     from .type_hints import RazorPayOrderDict
 
+from flask_sqlalchemy import SQLAlchemy
+
 from .utils import Password
 
 
 class User:
     def __init__(
         self,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         email: str,
@@ -29,7 +30,7 @@ class User:
         address: str,
         phone: str,
     ):
-        self.__conn = connection
+        self.__db = db
         self.id = id
         self.email = email
         self.password = password
@@ -49,13 +50,11 @@ class User:
     @property
     def orders(self) -> list[Order]:
         from .order import Order
+        from .server.models import Orders
 
-        cursor = self.__conn.cursor()
-        query = r"""
-            SELECT * FROM ORDERS WHERE USER_ID = ? ORDER BY CREATED_AT DESC
-        """
-        cursor.execute(query, (self.id,))
-        return [Order(self.__conn, **row) for row in cursor.fetchall()]
+        orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.CREATED_AT.desc()).all()
+
+        return [Order(self.__db, **row.__dict__) for row in orders]
 
     @property
     def is_admin(self):
@@ -69,48 +68,38 @@ class User:
     def cart(self) -> Cart:
         from .product import Cart
 
-        return Cart(self.__conn, user_id=self.id)
+        return Cart(self.__db, user_id=self.id)
 
     def __str__(self) -> str:
         return f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
 
     @classmethod
-    def from_email(cls, connection: sqlite3.Connection, *, email: str, password: str) -> User:
-        cursor = connection.cursor()
-        query = r"""
-            SELECT * FROM USERS WHERE EMAIL = ? AND PASSWORD = ? AND ROLE = 'USER'
-        """
-        hashed_password = Password(password)
+    def from_email(cls, db: SQLAlchemy, *, email: str, password: str) -> User:
+        from .server.models import Users
 
-        cursor.execute(
-            query,
-            (email, hashed_password.hex),
-        )
-        row = cursor.fetchone()
+        user = Users.query.filter_by(EMAIL=email, PASSWORD=Password(password).hex, ROLE="USER").first()
 
-        if row is None:
+        if user is None:
             error = "User not found. Either email or password is incorrect."
             raise ValueError(error) from None
 
-        return cls(connection, **row)
+        return cls(db, **user.__dict__)
 
     @classmethod
-    def from_id(cls, connection: sqlite3.Connection, user_id: int):
-        cursor = connection.cursor()
-        query = r"""
-            SELECT * FROM USERS WHERE ID = ?
-        """
-        cursor.execute(query, (user_id,))
-        row = cursor.fetchone()
-        if row is None:
+    def from_id(cls, db: SQLAlchemy, user_id: int):
+        from .server.models import Users
+
+        user = Users.query.get(user_id)
+        if user is None:
             error = "User not found."
             raise ValueError(error) from None
-        return cls(connection, **row)
+
+        return cls(db, **user.__dict__)
 
     @classmethod
     def create(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         email: str,
         name: str,
@@ -119,20 +108,20 @@ class User:
         phone: str,
         role: str = "user",
     ) -> User:
-        cursor = connection.cursor()
-        query = r"""
-            INSERT INTO USERS (EMAIL, PASSWORD, NAME, ADDRESS, PHONE)
-                VALUES (?, ?, ?, ?, ?)
-            RETURNING *
-        """
+        from .server.models import Users
 
-        hashed_password = Password(password)
+        user = Users(
+            EMAIL=email,
+            PASSWORD=Password(password).hex,
+            NAME=name,
+            ROLE=role,
+            ADDRESS=address,
+            PHONE=phone,
+        )
+        db.session.add(user)
+        db.session.commit()
 
-        result = cursor.execute(query, (email, hashed_password.hex, name, address, phone))
-        data = result.fetchone()
-        connection.commit()
-
-        return cls(connection, **data)
+        return cls(db, **user.__dict__)
 
     def add_review(self, *, product: Product, stars: VALID_STARS, review: str):
         product.add_review(user_id=self.id, stars=stars, review=review)
@@ -152,21 +141,21 @@ class User:
     def add_to_fav(self, *, product: Product) -> Favourite:
         from .favourite import Favourite
 
-        return Favourite.add(self.__conn, user=self, product=product)
+        return Favourite.add(self.__db, user=self, product=product)
 
     def remove_from_fav(self, *, product: Product) -> None:
         from .favourite import Favourite
 
-        if fav := Favourite.from_user(self.__conn, user=self, product=product):
+        if fav := Favourite.from_user(self.__db, user=self, product=product):
             fav[0].delete()
 
     def is_fav(self, *, product: Product) -> bool:
-        return Favourite.exists(self.__conn, user=self, product=product)
+        return Favourite.exists(self.__db, user=self, product=product)
 
     def partial_checkout(self, *, gift_code: str = "", status: str | None = None) -> list[Order]:
         from .product import GiftCard
 
-        gift_card = GiftCard.from_code(self.__conn, code=gift_code)
+        gift_card = GiftCard.from_code(self.__db, code=gift_code)
         self.cart.update_to_database(gift_card=gift_card, status=status or "PEND")
         self.clear_cart()
 
@@ -174,71 +163,80 @@ class User:
 
     def __fetch_orders(self, status: str | None = None) -> list[Order]:
         from .order import Order
+        from .server.models import Orders
 
-        orders: list[Order] = []
-        query = r"SELECT * FROM ORDERS WHERE USER_ID = ? AND STATUS = ?"
-        cursor = self.__conn.cursor()
-        cursor.execute(query, (self.id, status or "PEND"))
+        orders = (
+            self.__db.session.query(Orders)
+            .filter_by(user_id=self.id, status=status or "PEND")
+            .order_by(Orders.CREATED_AT.desc())
+            .all()
+        )
 
-        while row := cursor.fetchone():
-            orders.append(Order(self.__conn, **row))
-
-        return orders
+        return [Order(self.__db, **order.__dict__) for order in orders]
 
     def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
+        from .server.models import Orders
+
         orders: list[Order] = self.partial_checkout(gift_code=gift_code)
 
         if not orders:
             error = "No orders found to checkout."
-            query = r"SELECT RAZORPAY_ORDER_ID FROM ORDERS WHERE USER_ID = ? AND STATUS != 'PAID' AND RAZORPAY_ORDER_ID IS NOT NULL"
-            cursor = self.__conn.cursor()
-            cursor.execute(query, (self.id,))
-            if row := cursor.fetchone():
-                order_id = row[0]
+            order_id = (
+                self.__db.session.query(Orders.RAZORPAY_ORDER_ID)
+                .filter(
+                    Orders.USER_ID == self.id,
+                    Orders.STATUS != "PAID",
+                    Orders.RAZORPAY_ORDER_ID.isnot(None),
+                )
+                .scalar()
+            )
+            if order_id:
                 return razorpay_client.order.fetch(order_id)
 
             raise ValueError(error)
 
         total_price = sum(order.total_price for order in orders)
-        notes = {
-            "products": [
-                {
-                    "name": order.product.name,
-                    "quantity": order.quantity,
-                    "price": order.product.price,
-                }
-                for order in orders
-            ],
-            "user": {
-                "name": self.name,
-                "email": self.email,
-                "phone": self.phone,
-                "id": self.id,
-            },
-            "gift_card": False,
-        }
+
         final_payload = {
             "amount": int(total_price * 100),
             "currency": "INR",
-            "notes": notes,
+            "notes": {
+                "products": [
+                    {
+                        "name": order.product.name,
+                        "quantity": order.quantity,
+                        "price": order.product.price,
+                    }
+                    for order in orders
+                ],
+                "user": {
+                    "name": self.name,
+                    "email": self.email,
+                    "phone": self.phone,
+                    "id": self.id,
+                },
+                "gift_card": False,
+            },
         }
 
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
         order_id = api_response["id"]
 
-        query = r"""
-            UPDATE `ORDERS` 
-            SET `RAZORPAY_ORDER_ID` = ?, `STATUS` = 'CONF'
-            WHERE `USER_ID` = ? AND `STATUS` = 'PEND' AND `RAZORPAY_ORDER_ID` IS NULL
-        """
-        cursor = self.__conn.cursor()
-        update = cursor.execute(query, (order_id, self.id))
+        update = (
+            self.__db.session.query(Orders)
+            .filter(
+                Orders.USER_ID == self.id,
+                Orders.STATUS == "PEND",
+                Orders.RAZORPAY_ORDER_ID.is_(None),
+            )
+            .update({Orders.RAZORPAY_ORDER_ID: order_id, Orders.STATUS: "CONF"})
+        )
 
-        if update.rowcount == 0:
+        if update == 0:
             error = "No orders found to checkout."
             raise ValueError(error)
 
-        self.__conn.commit()
+        self.__db.session.commit()
 
         assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
 
@@ -253,43 +251,29 @@ class User:
         return amount_correct and currency_correct and notes_correct and status_correct
 
     @staticmethod
-    def exists(connection: sqlite3.Connection, email: str) -> bool:
-        cursor = connection.cursor()
-        query = r"""
-            SELECT 1 FROM USERS WHERE EMAIL = ?
-        """
-        cursor.execute(query, (email,))
-        return cursor.fetchone() is not None
+    def exists(db: SQLAlchemy, email: str) -> bool:
+        from .server.models import Users
+
+        return db.session.query(Users).filter_by(EMAIL=email).scalar() is not None
 
     @classmethod
     def all(
         cls,
-        connection: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         limit: int | None = None,
         offset: int = 0,
     ) -> list[User]:
-        cursor = connection.cursor()
-        if limit is None:
-            query = r"""
-                SELECT * FROM USERS WHERE ROLE = 'USER'
-            """
-            cursor.execute(query)
-        else:
-            query = r"""
-                SELECT * FROM USERS WHERE ROLE = 'USER' LIMIT ? OFFSET ?
-            """
-            cursor.execute(query, (limit, offset))
-        return [cls(connection, **row) for row in cursor.fetchall()]
+        from .server.models import Users
+
+        users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
+        return [cls(db, **user.__dict__) for user in users]
 
     @staticmethod
-    def total_count(connection: sqlite3.Connection) -> int:
-        cursor = connection.cursor()
-        query = r"""
-            SELECT COUNT(*) FROM USERS WHERE ROLE = 'USER'
-        """
-        cursor.execute(query)
-        return cursor.fetchone()[0]
+    def total_count(db: SQLAlchemy) -> int:
+        from .server.models import Users
+
+        return db.session.query(Users).filter_by(ROLE="USER").count()
 
     def full_checkout_giftcard(self, razorpay_client: RazorpayClient, amount: int) -> RazorPayOrderDict:
         final_payload = {
@@ -315,7 +299,7 @@ class User:
     def _buy_gift_card(self, amount: int) -> GiftCard:
         from .product import GiftCard
 
-        return GiftCard.create(self.__conn, user=self, amount=amount)
+        return GiftCard.create(self.__db, user=self, amount=amount)
 
 
 class Admin(User):
@@ -323,38 +307,26 @@ class Admin(User):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def from_email(cls, connection: sqlite3.Connection, *, email: str = "", password: str) -> Admin:
-        cursor = connection.cursor()
-        query = r"""
-            SELECT * FROM USERS WHERE EMAIL = "" AND PASSWORD = ? AND ROLE = 'ADMIN'
-        """
-        hashed_password = Password(password)
+    def from_email(cls, db: SQLAlchemy, *, email: str = "", password: str) -> Admin:
+        from .server.models import Users
 
-        cursor.execute(
-            query,
-            (hashed_password.hex,),
-        )
-        row = cursor.fetchone()
-        if row is None:
+        user = Users.query.filter_by(EMAIL=email, PASSWORD=Password(password).hex, ROLE="ADMIN").first()
+
+        if user is None:
             error = "Admin not found. Either email or password is incorrect."
             raise ValueError(error) from None
-        return cls(connection, **row)
+
+        return cls(db, **user.__dict__)
 
     @classmethod
-    def delete_user(cls, connection: sqlite3.Connection, user_id: int) -> None:
-        cursor = connection.cursor()
-        query = r"""
-            DELETE FROM USERS WHERE ID = ? AND ROLE = 'USER'
-        """
-        cursor.execute(query, (user_id,))
-        connection.commit()
+    def delete_user(cls, db: SQLAlchemy, user_id: int) -> None:
+        from .server.models import Users
+
+        db.session.query(Users).filter_by(ID=user_id, ROLE="USER").delete()
+        db.session.commit()
 
     @classmethod
-    def delete_product(cls, connection: sqlite3.Connection, product_id: int) -> None:
-        cursor = connection.cursor()
-        query = r"""
-            DELETE FROM PRODUCTS WHERE ID = ?
-        """
+    def delete_product(cls, db: SQLAlchemy, product_id: int) -> None:
+        from .server.models import Products
 
-        cursor.execute(query, (product_id,))
-        connection.commit()
+        db.session.query(Products).filter_by(ID=product_id).delete()

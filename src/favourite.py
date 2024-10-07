@@ -74,7 +74,7 @@ class Favourite:
 
         return [
             cls(db, id=fav.ID, user_id=fav.USER_ID, product_unique_id=fav.PRODUCT_UNIQUE_ID)
-            for fav in Favourites.query.filter_by(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id)
+            for fav in Favourites.query.filter_by(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id).all()
         ]
 
     @classmethod
