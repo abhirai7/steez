@@ -10,6 +10,7 @@ from flask_login import LoginManager, current_user
 from flask_sitemapper import Sitemapper
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from flask_bcrypt import Bcrypt
 
 from src.user import User
 
@@ -29,20 +30,21 @@ else:
 TODAY = "2024-09-15"
 
 app = Flask(__name__)
-app.secret_key = f"{SECRET_KEY}"
+app.config["SECRET_KEY"] = f"{SECRET_KEY}"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.sqlite"
 
 login_manager = LoginManager()
 sitemapper = Sitemapper()
 db = SQLAlchemy()
 csrf = CSRFProtect()
+bcrypt = Bcrypt()
 
 login_manager.init_app(app)
 sitemapper.init_app(app)
 db.init_app(app)
 csrf.init_app(app)
+bcrypt.init_app(app)
 
-conn = db
 
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})

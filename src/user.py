@@ -13,8 +13,6 @@ if TYPE_CHECKING:
 
 from flask_sqlalchemy import SQLAlchemy
 
-from .utils import Password
-
 
 class User:
     def __init__(
@@ -53,9 +51,16 @@ class User:
         from .order import Order
         from .server.models import Orders
 
-        orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.CREATED_AT.desc()).all()
+        orders = (
+            Orders.query.filter_by(user_id=self.id)
+            .order_by(Orders.CREATED_AT.desc())
+            .all()
+        )
 
-        return [Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
+        return [
+            Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()})
+            for row in orders
+        ]
 
     @property
     def is_admin(self):
@@ -72,15 +77,18 @@ class User:
         return Cart(self.__db, user_id=self.id)
 
     def __str__(self) -> str:
-        return f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
+        return (
+            f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
+        )
 
     @classmethod
     def from_email(cls, db: SQLAlchemy, *, email: str, password: str) -> User:
         from .server.models import Users
+        from .server import bcrypt
 
-        user = Users.query.filter_by(EMAIL=email, PASSWORD=Password(password).hex, ROLE="USER").first()
+        user = Users.query.filter_by(EMAIL=email, ROLE="USER").first()
 
-        if user is None:
+        if user is None or not bcrypt.check_password_hash(user.PASSWORD, password):
             error = "User not found. Either email or password is incorrect."
             raise ValueError(error) from None
 
@@ -104,7 +112,7 @@ class User:
         *,
         email: str,
         name: str,
-        password: str,
+        password_hash: str,
         address: str,
         phone: str,
         role: str = "user",
@@ -113,7 +121,7 @@ class User:
 
         user = Users(
             EMAIL=email,
-            PASSWORD=Password(password).hex,
+            PASSWORD=password_hash,
             NAME=name,
             ROLE=role,
             ADDRESS=address,
@@ -153,7 +161,9 @@ class User:
     def is_fav(self, *, product: Product) -> bool:
         return Favourite.exists(self.__db, user=self, product=product)
 
-    def partial_checkout(self, *, gift_code: str = "", status: str | None = None) -> list[Order]:
+    def partial_checkout(
+        self, *, gift_code: str = "", status: str | None = None
+    ) -> list[Order]:
         from .product import GiftCard
 
         gift_card = GiftCard.from_code(self.__db, code=gift_code)
@@ -173,9 +183,14 @@ class User:
             .all()
         )
 
-        return [Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()}) for order in orders]
+        return [
+            Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()})
+            for order in orders
+        ]
 
-    def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
+    def full_checkout(
+        self, razorpay_client: RazorpayClient, *, gift_code: str = ""
+    ) -> RazorPayOrderDict:
         from .server.models import Orders
 
         orders: list[Order] = self.partial_checkout(gift_code=gift_code)
@@ -239,11 +254,15 @@ class User:
 
         self.__db.session.commit()
 
-        assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
+        assert self.__check_api_response(
+            full_paylaod=final_payload, api_response=api_response
+        )
 
         return api_response  # type: ignore
 
-    def __check_api_response(self, *, full_paylaod: dict, api_response: RazorPayOrderDict) -> bool:
+    def __check_api_response(
+        self, *, full_paylaod: dict, api_response: RazorPayOrderDict
+    ) -> bool:
         amount_correct = full_paylaod["amount"] == api_response["amount"]
         currency_correct = full_paylaod["currency"] == api_response["currency"]
         notes_correct = full_paylaod["notes"] == api_response["notes"]
@@ -267,8 +286,17 @@ class User:
     ) -> list[User]:
         from .server.models import Users
 
-        users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
-        return [cls(db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
+        users = (
+            db.session.query(Users)
+            .filter_by(ROLE="USER")
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
+        return [
+            cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
+            for user in users
+        ]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
@@ -276,7 +304,9 @@ class User:
 
         return db.session.query(Users).filter_by(ROLE="USER").count()
 
-    def full_checkout_giftcard(self, razorpay_client: RazorpayClient, amount: int) -> RazorPayOrderDict:
+    def full_checkout_giftcard(
+        self, razorpay_client: RazorpayClient, amount: int
+    ) -> RazorPayOrderDict:
         final_payload = {
             "amount": int(amount * 100),
             "currency": "INR",
@@ -293,7 +323,9 @@ class User:
 
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
 
-        assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
+        assert self.__check_api_response(
+            full_paylaod=final_payload, api_response=api_response
+        )
 
         return api_response
 
@@ -310,14 +342,28 @@ class Admin(User):
     @classmethod
     def from_email(cls, db: SQLAlchemy, *, password: str) -> Admin:
         from .server.models import Users
+        from .server import bcrypt
 
-        user = Users.query.filter_by(PASSWORD=Password(password).hex, ROLE="ADMIN").first()
+        users = Users.query.filter_by(ROLE="ADMIN").all()
+
+        user = None
+
+        for usr in users:
+            if bcrypt.check_password_hash(usr.PASSWORD, password):
+                user = usr
+                break
 
         if user is None:
             error = "Admin not found. Either email or password is incorrect."
             raise ValueError(error) from None
 
-        return cls(db, **{k.lower(): v for k, v in {k.lower(): v for k, v in user.__dict__.items()}.items()})
+        return cls(
+            db,
+            **{
+                k.lower(): v
+                for k, v in {k.lower(): v for k, v in user.__dict__.items()}.items()
+            },
+        )
 
     @classmethod
     def delete_user(cls, db: SQLAlchemy, user_id: int) -> None:

@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import base64
-import hashlib
 import locale
-import os
 import pathlib
 import random
-import secrets
 import string
 from typing import TYPE_CHECKING
 
@@ -40,95 +37,6 @@ class _CaseInsensitiveDict(dict):
 
     def pop(self, key, default=None) -> str:
         return super().pop(key.casefold(), default)
-
-
-class Password:
-    ITERATIONS = int(os.environ.get("ITERATIONS", 1000))
-    ALGORITHM = os.environ.get("ALGORITHM", "sha256")
-
-    def __init__(self, password: str, /) -> None:
-        self.__password = password
-        self.__salt = int(os.getenv("SALT", 0))
-        self.__hashed_password = ""
-
-        self.hash_password()
-
-    def __call__(self) -> str:
-        return self.__hashed_password
-
-    @property
-    def hex(self) -> str:
-        return self.__hashed_password
-
-    @property
-    def salt(self) -> int:
-        return self.__salt
-
-    @salt.setter
-    def salt(self, salt: int) -> None:
-        self.__salt = salt
-        self.hash_password()
-
-    def set_salt(self, max_length: int = 16) -> None:
-        self.__salt = int(secrets.token_hex(max_length), 16)
-
-    def hash_password(self, /) -> None:
-        self.__hashed_password = hashlib.pbkdf2_hmac(
-            Password.ALGORITHM,
-            self.__password.encode("utf-8"),
-            self.__salt.to_bytes(16, "big"),
-            Password.ITERATIONS,
-        ).hex()
-
-    def __eq__(self, other: Password | str):
-        if isinstance(other, Password):
-            return self.__hashed_password == other.hex
-        return (
-            self.__hashed_password
-            == hashlib.pbkdf2_hmac(
-                Password.ALGORITHM,
-                other.encode("utf-8"),
-                self.__salt.to_bytes(16, "big"),
-                Password.ITERATIONS,
-            ).hex()
-        )
-
-    def __repr__(self) -> str:
-        return self.__hashed_password
-
-    def __str__(self) -> str:
-        return self.__hashed_password
-
-    @staticmethod
-    def random(
-        length: int = 16,
-        /,
-        *,
-        contain_lower: bool = True,
-        contain_upper: bool = True,
-        contain_digits: bool = True,
-        contain_punctuation: bool = True,
-    ) -> str:
-        characters = ""
-        if contain_lower:
-            characters += string.ascii_lowercase
-        if contain_upper:
-            characters += string.ascii_uppercase
-        if contain_digits:
-            characters += string.digits
-        if contain_punctuation:
-            characters += string.punctuation
-        return "".join(random.choices(characters, k=length))
-
-    @staticmethod
-    def is_strong(password: str, /) -> bool:
-        valids: list[bool] = [
-            (any(char.islower() for char in password)),
-            (any(char.isupper() for char in password)),
-            (any(char.isdigit() for char in password)),
-            (any(char in string.punctuation for char in password)),
-        ]
-        return all(valids) and len(password) >= 8
 
 
 special_letters = {

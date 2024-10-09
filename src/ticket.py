@@ -1,18 +1,20 @@
 from __future__ import annotations
 
-import sqlite3
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import arrow
+from flask_sqlalchemy import SQLAlchemy
 
 if TYPE_CHECKING:
     from .user import Admin, User
+
+VALID_STATUS = Literal["OPEN", "CLOS", "PROC"]
 
 
 class Ticket:
     def __init__(
         self,
-        conn: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         id: int,
         replied_to: int | None,
@@ -23,7 +25,7 @@ class Ticket:
         created_at: str,
         **_,
     ):
-        self.conn = conn
+        self.db = db
         self.id = id
         self._replied_to = replied_to
         self.user_id = user_id
@@ -38,57 +40,68 @@ class Ticket:
         if not self._user:
             from .user import User
 
-            self._user = User.from_id(self.conn, self.user_id)
+            self._user = User.from_id(self.db, self.user_id)
         return self._user
 
     @classmethod
     def create(
         cls,
-        conn: sqlite3.Connection,
+        db: SQLAlchemy,
         *,
         user: User | Admin,
         replied_to: int | None,
         subject: str,
         message: str,
     ) -> Ticket:
-        query = r"""
-            INSERT INTO TICKETS (REPLIED_TO, USER_ID, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?) RETURNING *
-        """
+        from .server.models import Tickets
 
-        cursor = conn.cursor()
-        cursor.execute(query, (replied_to, user.id, subject, message))
-        data = cursor.fetchone()
-        conn.commit()
+        ticket = Tickets(
+            REPLIED_TO=replied_to, USER_ID=user.id, SUBJECT=subject, MESSAGE=message
+        )
+        db.session.add(ticket)
+        db.session.commit()
 
-        return cls(conn, **data)
+        return cls(
+            db,
+            id=ticket.ID,
+            replied_to=ticket.REPLIED_TO,
+            user_id=ticket.USER_ID,
+            subject=ticket.SUBJECT,
+            message=ticket.MESSAGE,
+            status=ticket.STATUS,
+            created_at=ticket.CREATED_AT,
+        )
 
     @classmethod
-    def from_id(cls, conn: sqlite3.Connection, id: int) -> Ticket:
-        query = r"""
-            SELECT * FROM TICKETS WHERE ID = ?
-        """
+    def from_id(cls, db: SQLAlchemy, id: int) -> Ticket:
+        from .server.models import Tickets
 
-        cursor = conn.cursor()
-        cursor.execute(query, (id,))
-        data = cursor.fetchone()
+        ticket = Tickets.query.get(id)
+        if ticket is None:
+            raise ValueError(f"Ticket with id {id} does not exist.")
 
-        return cls(conn, **data)
+        return cls(
+            db,
+            id=ticket.ID,
+            replied_to=ticket.REPLIED_TO,
+            user_id=ticket.USER_ID,
+            subject=ticket.SUBJECT,
+            message=ticket.MESSAGE,
+            status=ticket.STATUS,
+            created_at=ticket.CREATED_AT,
+        )
 
-    def update_status(self, status: str) -> None:
-        valid_status = ["OPEN", "PROC", "CLOS"]
-        query = r"""
-            UPDATE TICKETS SET STATUS = ? WHERE ID = ?
-        """
-        if status not in valid_status:
-            raise ValueError("Invalid status")
+    def update_status(self, status: VALID_STATUS) -> None:
+        from .server.models import Tickets
 
-        cursor = self.conn.cursor()
-        cursor.execute(query, (status, self.id))
-        self.conn.commit()
+        self.db.session.query(Tickets).filter(Tickets.ID == self.id).update(
+            {"STATUS": status}
+        )
+        self.db.session.commit()
 
     def reply(self, user: User | Admin, message: str) -> Ticket:
         return Ticket.create(
-            self.conn,
+            self.db,
             user=user,
             replied_to=self.id,
             subject=self.subject,
@@ -99,7 +112,7 @@ class Ticket:
     def reference(self) -> Ticket | None:
         if not self._replied_to:
             return None
-        return Ticket.from_id(self.conn, self._replied_to)
+        return Ticket.from_id(self.db, self._replied_to)
 
     def chain(self) -> list[Ticket]:
         chain: list[Ticket] = [self]
@@ -110,61 +123,58 @@ class Ticket:
         return chain
 
     @classmethod
-    def all(cls, conn: sqlite3.Connection) -> list[Ticket]:
-        query = r"""
-            SELECT * FROM TICKETS
-        """
+    def all(cls, db: SQLAlchemy) -> list[Ticket]:
+        from .server.models import Tickets
 
-        cursor = conn.cursor()
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-        return [cls(conn, **row) for row in data]
-
-    @classmethod
-    def open(cls, conn: sqlite3.Connection) -> list[Ticket]:
-        query = r"""
-            SELECT * FROM TICKETS WHERE STATUS = 'OPEN'
-        """
-
-        cursor = conn.cursor()
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-        return [cls(conn, **row) for row in data]
+        all_tickets = Tickets.query.all()
+        return [
+            cls(
+                db,
+                id=ticket.ID,
+                replied_to=ticket.REPLIED_TO,
+                user_id=ticket.USER_ID,
+                subject=ticket.SUBJECT,
+                message=ticket.MESSAGE,
+                status=ticket.STATUS,
+                created_at=ticket.CREATED_AT,
+            )
+            for ticket in all_tickets
+        ]
 
     @classmethod
-    def closed(cls, conn: sqlite3.Connection) -> list[Ticket]:
-        query = r"""
-            SELECT * FROM TICKETS WHERE STATUS = 'CLOS'
-        """
+    def get_by_status(cls, db: SQLAlchemy, *, status: VALID_STATUS) -> list[Ticket]:
+        from .server.models import Tickets
 
-        cursor = conn.cursor()
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-        return [cls(conn, **row) for row in data]
-
-    @classmethod
-    def processing(cls, conn: sqlite3.Connection) -> list[Ticket]:
-        query = r"""
-            SELECT * FROM TICKETS WHERE STATUS = 'PROC'
-        """
-
-        cursor = conn.cursor()
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-        return [cls(conn, **row) for row in data]
+        tickets = Tickets.query.filter_by(STATUS=status).all()
+        return [
+            cls(
+                db,
+                id=ticket.ID,
+                replied_to=ticket.REPLIED_TO,
+                user_id=ticket.USER_ID,
+                subject=ticket.SUBJECT,
+                message=ticket.MESSAGE,
+                status=ticket.STATUS,
+                created_at=ticket.CREATED_AT,
+            )
+            for ticket in tickets
+        ]
 
     @classmethod
-    def user_tickets(cls, conn: sqlite3.Connection, user: User) -> list[Ticket]:
-        query = r"""
-            SELECT * FROM TICKETS WHERE USER_ID = ?
-        """
+    def user_tickets(cls, db: SQLAlchemy, user: User) -> list[Ticket]:
+        from .server.models import Tickets
 
-        cursor = conn.cursor()
-        cursor.execute(query, (user.id,))
-        data = cursor.fetchall()
-
-        return [cls(conn, **row) for row in data]
+        tickets = Tickets.query.filter_by(USER_ID=user.id).all()
+        return [
+            cls(
+                db,
+                id=ticket.ID,
+                replied_to=ticket.REPLIED_TO,
+                user_id=ticket.USER_ID,
+                subject=ticket.SUBJECT,
+                message=ticket.MESSAGE,
+                status=ticket.STATUS,
+                created_at=ticket.CREATED_AT,
+            )
+            for ticket in tickets
+        ]

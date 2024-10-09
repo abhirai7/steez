@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from flask import Request, render_template
 from flask_login import current_user
 
-from src.server import db, login_manager
+from src.server import db, login_manager, bcrypt
 from src.server.models import Users
 from src.user import Admin, User
 
@@ -36,7 +36,7 @@ def load_user_from_request(request: Request) -> User | None:
 
     if email and password:
         try:
-            return User.from_email(db, email=email, password=password)
+            return User.from_email(db, email=email, password_hash=bcrypt.generate_password_hash(password).decode())
         except ValueError:
             return None
 

@@ -5,7 +5,6 @@ from colorama import Fore, Style, init
 
 from src.server import app, db
 from src.server.models import Users
-from src.utils import Password
 
 init(autoreset=True)
 
@@ -60,7 +59,7 @@ def create_admin():
     return {
         "name": name,
         "email": email,
-        "password": password_hashed,  # Storing the hashed password
+        "password": password_hashed,
         "phone": phone,
         "address": address,
         "role": "ADMIN",
