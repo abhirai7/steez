@@ -34,9 +34,7 @@ class Carousel:
 
         smt = select(Carousels)
         carousels = db.session.execute(smt).mappings().all()
-        return [
-            cls(db, **{k.lower(): v for k, v in caro.items()}) for caro in carousels
-        ]
+        return [cls(db, **{k.lower(): v for k, v in caro.items()}) for caro in carousels]
 
     @classmethod
     def get(cls, db: SQLAlchemy, id: int) -> Carousel:
