@@ -45,13 +45,14 @@ db.init_app(app)
 csrf.init_app(app)
 bcrypt.init_app(app)
 
-
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})
 
 from .models import *  # noqa
 
 with app.app_context():
+    db.engine.echo = True
+
     db.create_all()
 
 app.jinja_env.trim_blocks = True

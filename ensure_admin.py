@@ -3,7 +3,7 @@ import os
 
 from colorama import Fore, Style, init
 
-from src.server import app, db
+from src.server import app, db, bcrypt
 from src.server.models import Users
 
 init(autoreset=True)
@@ -39,7 +39,7 @@ def create_admin():
     phone = log_input("Enter admin phone: ")
     address = log_input("Enter admin address: ")
 
-    password_hashed = Password(password_raw).hex
+    password_hashed = bcrypt.generate_password_hash(password_raw).decode("utf-8")
 
     with app.app_context():
         admin_user = Users(
