@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .user import User
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import insert, literal_column
 
 VALID_STATUS = Literal["PEND", "CONF", "PAID", "COD"]
 # PEND - Pending
@@ -56,21 +57,23 @@ class Order:
     ) -> Order:
         from src.server.models import Orders
 
-        order = Orders(USER_ID=user_id, PRODUCT_ID=product_id, QUANTITY=quantity, TOTAL_PRICE=total_price)
+        smt = (
+            insert(Orders)
+            .values(
+                USER_ID=user_id,
+                PRODUCT_ID=product_id,
+                QUANTITY=quantity,
+                TOTAL_PRICE=total_price,
+            )
+            .returning(literal_column("*"))
+        )
+        order = db.session.execute(smt).mappings().first()
         db.session.add(order)
         db.session.commit()
 
-        return cls(
-            db,
-            id=order.ID,
-            user_id=order.USER_ID,
-            product_id=order.PRODUCT_ID,
-            quantity=order.QUANTITY,
-            total_price=order.TOTAL_PRICE,
-            created_at=order.CREATED_AT,
-            status=order.STATUS,
-            razorpay_order_id=order.RAZORPAY_ORDER_ID,
-        )
+        assert order is not None
+
+        return cls(db, **{k.lower(): v for k, v in order.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, order_id: int) -> Order:

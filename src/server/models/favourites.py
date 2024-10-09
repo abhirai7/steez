@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy import VARCHAR, Column, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
+
 from src.server import db
 
 

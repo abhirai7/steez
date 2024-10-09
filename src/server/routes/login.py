@@ -1,7 +1,7 @@
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from src.server import app, db, sitemapper, bcrypt
+from src.server import app, bcrypt, db, sitemapper
 from src.server.forms import LoginForm, RegisterForm
 from src.user import User
 
@@ -16,7 +16,9 @@ def login_route():
         assert login.email.data and login.password.data
 
         try:
-            user = User.from_email(db, email=login.email.data, password_hash=bcrypt.generate_password_hash(login.password.data).decode())
+            user = User.from_email(
+                db, email=login.email.data, password_hash=bcrypt.generate_password_hash(login.password.data).decode()
+            )
         except ValueError:
             redirect(url_for("home"))
 

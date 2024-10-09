@@ -3,7 +3,7 @@ import os
 
 from colorama import Fore, Style, init
 
-from src.server import app, db, bcrypt
+from src.server import app, bcrypt, db
 from src.server.models import Users
 
 init(autoreset=True)

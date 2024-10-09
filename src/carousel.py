@@ -8,6 +8,8 @@ if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
     from typing_extensions import Self
 
+from sqlalchemy import insert, literal_column
+
 
 class Carousel:
     def __init__(
@@ -46,7 +48,7 @@ class Carousel:
     def get(cls, db: SQLAlchemy, id: int) -> Carousel:
         from src.server.models import Carousels
 
-        caro = db.session.query(Carousels).filter_by(ID=id).first()
+        caro = db.session.query(Carousels).get(id)
         if not caro:
             raise ValueError("Carousel not found")
 
@@ -69,20 +71,22 @@ class Carousel:
     ) -> Carousel:
         from src.server.models import Carousels
 
-        carousel = Carousels()
-        carousel.IMAGE = image
-        carousel.HEADING = heading
-        carousel.DESCRIPTION = description
-        db.session.add(carousel)
+        smt = (
+            insert(Carousels)
+            .values(
+                IMAGE=image,
+                HEADING=heading,
+                DESCRIPTION=description,
+            )
+            .returning(literal_column("*"))
+        )
+
+        carousel = db.session.execute(smt).mappings().first()
         db.session.commit()
 
-        return cls(
-            db,
-            id=carousel.ID,
-            image=carousel.IMAGE,
-            heading=carousel.HEADING,
-            description=carousel.DESCRIPTION,
-        )
+        assert carousel is not None
+
+        return cls(db, **{k.lower(): v for k, v in carousel.items()})
 
     def delete(self):
         from src.server.models import Carousels

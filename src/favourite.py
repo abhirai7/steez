@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .user import User
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import insert, literal_column
 
 
 class Favourite:
@@ -55,11 +56,14 @@ class Favourite:
     def add(cls, db: SQLAlchemy, *, user: User, product: Product) -> Favourite:
         from src.server.models import Favourites
 
-        favourite = Favourites(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id)
-        db.session.add(favourite)
+        smt = insert(Favourites).values(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id).returning(literal_column("*"))
+        favourite = db.session.execute(smt).mappings().first()
+
         db.session.commit()
 
-        return cls(db, id=favourite.ID, user_id=favourite.USER_ID, product_unique_id=favourite.PRODUCT_UNIQUE_ID)
+        assert favourite is not None
+
+        return cls(db, **{k.lower(): v for k, v in favourite.items()})
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Favourite]:

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Literal
 
 import arrow
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import insert, literal_column
 
 if TYPE_CHECKING:
     from .user import Admin, User
@@ -55,22 +56,17 @@ class Ticket:
     ) -> Ticket:
         from .server.models import Tickets
 
-        ticket = Tickets(
-            REPLIED_TO=replied_to, USER_ID=user.id, SUBJECT=subject, MESSAGE=message
+        smt = (
+            insert(Tickets)
+            .values(REPLIED_TO=replied_to, USER_ID=user.id, SUBJECT=subject, MESSAGE=message)
+            .returning(literal_column("*"))
         )
-        db.session.add(ticket)
+        ticket = db.session.execute(smt).mappings().first()
         db.session.commit()
 
-        return cls(
-            db,
-            id=ticket.ID,
-            replied_to=ticket.REPLIED_TO,
-            user_id=ticket.USER_ID,
-            subject=ticket.SUBJECT,
-            message=ticket.MESSAGE,
-            status=ticket.STATUS,
-            created_at=ticket.CREATED_AT,
-        )
+        assert ticket is not None
+
+        return cls(db, **{k.lower(): v for k, v in ticket.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, id: int) -> Ticket:
@@ -94,9 +90,7 @@ class Ticket:
     def update_status(self, status: VALID_STATUS) -> None:
         from .server.models import Tickets
 
-        self.db.session.query(Tickets).filter(Tickets.ID == self.id).update(
-            {"STATUS": status}
-        )
+        self.db.session.query(Tickets).filter(Tickets.ID == self.id).update({"STATUS": status})
         self.db.session.commit()
 
     def reply(self, user: User | Admin, message: str) -> Ticket:

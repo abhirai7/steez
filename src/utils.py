@@ -173,9 +173,7 @@ def newsletter_email_add_to_db(conn: Connection, /, *, email: str) -> None:
     conn.commit()
 
 
-def backup_sqlite_database(
-    conn: Connection, /, *, path: str = "database-bak.sqlite"
-) -> None:
+def backup_sqlite_database(conn: Connection, /, *, path: str = "database-bak.sqlite") -> None:
     backup_path_connection = Connection(path)
     with backup_path_connection:
         conn.backup(backup_path_connection)

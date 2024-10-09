@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from .type_hints import RazorPayOrderDict
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import insert, literal_column
 
 
 class User:
@@ -51,16 +52,9 @@ class User:
         from .order import Order
         from .server.models import Orders
 
-        orders = (
-            Orders.query.filter_by(user_id=self.id)
-            .order_by(Orders.CREATED_AT.desc())
-            .all()
-        )
+        orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.CREATED_AT.desc()).all()
 
-        return [
-            Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()})
-            for row in orders
-        ]
+        return [Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
 
     @property
     def is_admin(self):
@@ -77,14 +71,12 @@ class User:
         return Cart(self.__db, user_id=self.id)
 
     def __str__(self) -> str:
-        return (
-            f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
-        )
+        return f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
 
     @classmethod
     def from_email(cls, db: SQLAlchemy, *, email: str, password: str) -> User:
-        from .server.models import Users
         from .server import bcrypt
+        from .server.models import Users
 
         user = Users.query.filter_by(EMAIL=email, ROLE="USER").first()
 
@@ -119,18 +111,23 @@ class User:
     ) -> User:
         from .server.models import Users
 
-        user = Users(
-            EMAIL=email,
-            PASSWORD=password_hash,
-            NAME=name,
-            ROLE=role,
-            ADDRESS=address,
-            PHONE=phone,
+        smt = (
+            insert(Users)
+            .values(
+                EMAIL=email,
+                NAME=name,
+                PASSWORD=password_hash,
+                ADDRESS=address,
+                PHONE=phone,
+                ROLE=role,
+            )
+            .returning(literal_column("*"))
         )
-        db.session.add(user)
+        user = db.session.execute(smt).mappings().first()
+        assert user is not None
         db.session.commit()
 
-        return cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
+        return cls(db, **{k.lower(): v for k, v in user.items()})
 
     def add_review(self, *, product: Product, stars: VALID_STARS, review: str):
         product.add_review(user_id=self.id, stars=stars, review=review)
@@ -161,9 +158,7 @@ class User:
     def is_fav(self, *, product: Product) -> bool:
         return Favourite.exists(self.__db, user=self, product=product)
 
-    def partial_checkout(
-        self, *, gift_code: str = "", status: str | None = None
-    ) -> list[Order]:
+    def partial_checkout(self, *, gift_code: str = "", status: str | None = None) -> list[Order]:
         from .product import GiftCard
 
         gift_card = GiftCard.from_code(self.__db, code=gift_code)
@@ -183,14 +178,9 @@ class User:
             .all()
         )
 
-        return [
-            Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()})
-            for order in orders
-        ]
+        return [Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()}) for order in orders]
 
-    def full_checkout(
-        self, razorpay_client: RazorpayClient, *, gift_code: str = ""
-    ) -> RazorPayOrderDict:
+    def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
         from .server.models import Orders
 
         orders: list[Order] = self.partial_checkout(gift_code=gift_code)
@@ -254,15 +244,11 @@ class User:
 
         self.__db.session.commit()
 
-        assert self.__check_api_response(
-            full_paylaod=final_payload, api_response=api_response
-        )
+        assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
 
         return api_response  # type: ignore
 
-    def __check_api_response(
-        self, *, full_paylaod: dict, api_response: RazorPayOrderDict
-    ) -> bool:
+    def __check_api_response(self, *, full_paylaod: dict, api_response: RazorPayOrderDict) -> bool:
         amount_correct = full_paylaod["amount"] == api_response["amount"]
         currency_correct = full_paylaod["currency"] == api_response["currency"]
         notes_correct = full_paylaod["notes"] == api_response["notes"]
@@ -286,17 +272,8 @@ class User:
     ) -> list[User]:
         from .server.models import Users
 
-        users = (
-            db.session.query(Users)
-            .filter_by(ROLE="USER")
-            .limit(limit)
-            .offset(offset)
-            .all()
-        )
-        return [
-            cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
-            for user in users
-        ]
+        users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
+        return [cls(db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
@@ -304,9 +281,7 @@ class User:
 
         return db.session.query(Users).filter_by(ROLE="USER").count()
 
-    def full_checkout_giftcard(
-        self, razorpay_client: RazorpayClient, amount: int
-    ) -> RazorPayOrderDict:
+    def full_checkout_giftcard(self, razorpay_client: RazorpayClient, amount: int) -> RazorPayOrderDict:
         final_payload = {
             "amount": int(amount * 100),
             "currency": "INR",
@@ -323,9 +298,7 @@ class User:
 
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
 
-        assert self.__check_api_response(
-            full_paylaod=final_payload, api_response=api_response
-        )
+        assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
 
         return api_response
 
@@ -341,8 +314,8 @@ class Admin(User):
 
     @classmethod
     def from_email(cls, db: SQLAlchemy, *, password: str) -> Admin:
-        from .server.models import Users
         from .server import bcrypt
+        from .server.models import Users
 
         users = Users.query.filter_by(ROLE="ADMIN").all()
 
@@ -359,10 +332,7 @@ class Admin(User):
 
         return cls(
             db,
-            **{
-                k.lower(): v
-                for k, v in {k.lower(): v for k, v in user.__dict__.items()}.items()
-            },
+            **{k.lower(): v for k, v in {k.lower(): v for k, v in user.__dict__.items()}.items()},
         )
 
     @classmethod

@@ -11,9 +11,10 @@ from sqlalchemy import (
     Integer,
     UniqueConstraint,
 )
+from sqlalchemy.orm import Mapped, mapped_column
 
 from src.server import db
-from sqlalchemy.orm import Mapped, mapped_column
+
 
 class GiftCards(db.Model):
     """

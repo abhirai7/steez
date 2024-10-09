@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 import arrow
 from flask_sqlalchemy import SQLAlchemy
 from fuzzywuzzy.fuzz import partial_ratio
-from sqlalchemy import func, or_
+from sqlalchemy import func, insert, literal_column, or_
 
 from .utils import generate_gift_card_code, get_product_pictures, size_names
 
@@ -62,8 +62,9 @@ class Review:
     ) -> Review:
         from src.server.models import Reviews
 
-        r = Reviews(USER_ID=user_id, PRODUCT_ID=product_id, REVIEW=review, STARS=stars)
-        db.session.add(r)
+        smt = insert(Reviews).values(USER_ID=user_id, PRODUCT_ID=product_id, REVIEW=review, STARS=stars).returning(literal_column("*"))
+
+        r = db.session.execute(smt).mappings().fetchone()
         db.session.commit()
 
         return cls(db, **{k.lower(): v for k, v in r.__dict__.items()})
@@ -92,7 +93,7 @@ class Review:
 
 
 class Category:
-    def __init__(self, db: SQLAlchemy, *, id: int, name: str, description: str):
+    def __init__(self, db: SQLAlchemy, *, id: int, name: str, description: str, **_):
         self.__db = db
         self.id = id
         self.name = name
@@ -114,8 +115,8 @@ class Category:
     def create(cls, db: SQLAlchemy, *, name: str, description: str) -> Category:
         from src.server.models import Categories
 
-        category = Categories(NAME=name, DESCRIPTION=description)
-        db.session.add(category)
+        smt = insert(Categories).values(NAME=name, DESCRIPTION=description).returning(literal_column("*"))
+        category = db.session.execute(smt).mappings().fetchone()
         db.session.commit()
 
         return cls(db, **{k.lower(): v for k, v in category.__dict__.items()})
@@ -356,22 +357,29 @@ class Product:
     ) -> Product:
         from src.server.models import Products
 
-        product = Products(
-            UNIQUE_ID=unique_id,
-            NAME=name,
-            PRICE=price,
-            DISPLAY_PRICE=display_price,
-            DESCRIPTION=description,
-            STOCK=stock,
-            SIZE=size,
-            CATEGORY=category,
-            KEYWORDS=keywords,
+        smt = (
+            insert(Products)
+            .values(
+                UNIQUE_ID=unique_id,
+                NAME=name,
+                PRICE=price,
+                DISPLAY_PRICE=display_price,
+                DESCRIPTION=description,
+                STOCK=stock,
+                SIZE=size,
+                CATEGORY=category,
+                KEYWORDS=keywords,
+            )
+            .returning(literal_column("*"))
         )
 
-        db.session.add(product)
-        db.session.commit()
+        product = db.session.execute(smt).mappings().fetchone()
+        if product is None:
+            error = "Product not found."
+            raise ValueError(error) from None
 
-        return cls(db, **{k.lower(): v for k, v in product.__dict__.items()})
+        db.session.commit()
+        return cls(db, **{k.lower(): v for k, v in product.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, product_id: PRODUCT_ID) -> Product:
@@ -515,8 +523,8 @@ class Cart:
         if cart_item:
             cart_item.QUANTITY += quantity
         else:
-            cart_item = Carts(USER_ID=self.user_id, PRODUCT_ID=product.id, QUANTITY=quantity)
-            self.__db.session.add(cart_item)
+            smt = insert(Carts).values(USER_ID=self.user_id, PRODUCT_ID=product.id, QUANTITY=quantity)
+            self.__db.session.execute(smt)
 
         self.__db.session.commit()
 
@@ -566,15 +574,8 @@ class Cart:
         )
         total_price = total_price_query if total_price_query is not None else 1
 
-        new_order = Orders(
-            USER_ID=self.user_id,
-            PRODUCT_ID=Carts.PRODUCT_ID,
-            QUANTITY=Carts.QUANTITY,
-            TOTAL_PRICE=total_price,
-            STATUS=status,
-        )
-
-        self.__db.session.add(new_order)
+        smt = insert(Orders).values(USER_ID=self.user_id, TOTAL_PRICE=total_price, STATUS=status).returning(literal_column("*"))
+        self.__db.session.execute(smt).mappings().fetchone()
         if gift_card:
             gift_card.use()
 
@@ -645,8 +646,13 @@ class GiftCard:
 
         assert user.is_admin, "Only admins can create gift cards."
 
-        giftcard = GiftCards(USER_ID=user.id, PRICE=amount, CODE=generate_gift_card_code())
-        db.session.add(giftcard)
+        smt = insert(GiftCards).values(USER_ID=user.id, PRICE=amount, CODE=generate_gift_card_code()).returning(literal_column("*"))
+        giftcard = db.session.execute(smt).mappings().fetchone()
+
+        if giftcard is None:
+            error = "Gift card not found."
+            raise ValueError(error) from None
+
         db.session.commit()
 
         return GiftCard(db, **{k.lower(): v for k, v in giftcard.__dict__.items()})
@@ -655,9 +661,12 @@ class GiftCard:
     def create(cls, db: SQLAlchemy, *, user: User, amount: int) -> GiftCard:
         from src.server.models import GiftCards
 
-        giftcard = GiftCards(USER_ID=user.id, PRICE=amount, CODE=generate_gift_card_code())
-        db.session.add(giftcard)
+        smt = insert(GiftCards).values(USER_ID=user.id, PRICE=amount, CODE=generate_gift_card_code()).returning(literal_column("*"))
+        giftcard = db.session.execute(smt).mappings().fetchone()
         db.session.commit()
+        if giftcard is None:
+            error = "Gift card not found."
+            raise ValueError(error) from None
 
         return cls(db, **{k.lower(): v for k, v in giftcard.__dict__.items()})
 

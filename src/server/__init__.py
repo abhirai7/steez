@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING
 import razorpay
 from dotenv import load_dotenv
 from flask import Flask
+from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, current_user
 from flask_sitemapper import Sitemapper
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
-from flask_bcrypt import Bcrypt
 
 from src.user import User
 
