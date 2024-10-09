@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
     from typing_extensions import Self
 
-from sqlalchemy import insert, literal_column
+from sqlalchemy import insert, literal_column, select
 
 
 class Carousel:
@@ -32,16 +32,10 @@ class Carousel:
     def all(cls, db: SQLAlchemy) -> list[Self]:
         from src.server.models import Carousels
 
-        caros = db.session.query(Carousels).all()
+        smt = select(Carousels)
+        carousels = db.session.execute(smt).mappings().all()
         return [
-            cls(
-                db,
-                id=caro.ID,
-                image=caro.IMAGE,
-                heading=caro.HEADING,
-                description=caro.DESCRIPTION,
-            )
-            for caro in caros
+            cls(db, **{k.lower(): v for k, v in caro.items()}) for caro in carousels
         ]
 
     @classmethod

@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, current_user
+from flask_migrate import Migrate
 from flask_sitemapper import Sitemapper
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -33,17 +34,12 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = f"{SECRET_KEY}"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.sqlite"
 
-login_manager = LoginManager()
-sitemapper = Sitemapper()
-db = SQLAlchemy()
-csrf = CSRFProtect()
-bcrypt = Bcrypt()
-
-login_manager.init_app(app)
-sitemapper.init_app(app)
-db.init_app(app)
-csrf.init_app(app)
-bcrypt.init_app(app)
+login_manager = LoginManager(app)
+sitemapper = Sitemapper(app, https=True)
+db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
+bcrypt = Bcrypt(app)
+migrate = Migrate(app, db)
 
 razorpay_client: RazorpayClient = RazorpayClient(auth=(RAZORPAY_KEY, RAZORPAY_SECRET))
 razorpay_client.set_app_details({"title": "SteezTM App", "version": "1.0"})
