@@ -115,7 +115,7 @@ class User:
         password_hash: str,
         address: str,
         phone: str,
-        role: str = "user",
+        role: str = "USER",
     ) -> User:
         from .server.models import Users
 
