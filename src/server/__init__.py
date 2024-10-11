@@ -15,6 +15,8 @@ from flask_wtf import CSRFProtect
 
 from src.user import User
 
+from .ensure_admins import ensure_admins
+
 load_dotenv()
 
 RAZORPAY_KEY = os.getenv("RAZORPAY_KEY")
@@ -50,6 +52,7 @@ with app.app_context():
     db.engine.echo = True
 
     db.create_all()
+    ensure_admins(db)
 
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True

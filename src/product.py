@@ -119,7 +119,9 @@ class Category:
         category = db.session.execute(smt).mappings().fetchone()
         db.session.commit()
 
-        return cls(db, **{k.lower(): v for k, v in category.__dict__.items()})
+        assert category, "Category not found."
+
+        return cls(db, **{k.lower(): v for k, v in category.items()})
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, category_id: int) -> Category:
