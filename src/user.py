@@ -225,17 +225,18 @@ class User:
             },
         }
 
-        print(final_payload)
-
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
         order_id = api_response["id"]
 
         update = (
             self.__db.session.query(Orders)
             .filter(
-                Orders.ID == order_id,
+                Orders.USER_ID == self.id,
+                Orders.STATUS == "PEND",
+                Orders.RAZORPAY_ORDER_ID.is_(None),
+                Orders.SEEN.is_(False),
             )
-            .update({Orders.RAZORPAY_ORDER_ID: order_id, Orders.STATUS: "CONF"})
+            .update({Orders.RAZORPAY_ORDER_ID: order_id, Orders.STATUS: "CONF", Orders.SEEN: True})
         )
 
         if update == 0:

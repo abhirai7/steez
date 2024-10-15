@@ -31,6 +31,7 @@ class Order:
         created_at: str,
         status: str = "PEND",
         razorpay_order_id: str | None = None,
+        seen: bool = False,
         **_,
     ) -> None:
         self.__db = db
@@ -42,6 +43,7 @@ class Order:
         self.created_at = arrow.get(created_at)
         self.status = status
         self.razorpay_order_id = razorpay_order_id
+        self.seen = seen
 
     def is_recent(self, days: int = 7) -> bool:
         return self.created_at > arrow.utcnow().shift(days=-days)
@@ -165,12 +167,16 @@ class Order:
 
         return Orders.query.count()
 
-    def update_order_status(self, *, status: VALID_STATUS, razorpay_order_id: str) -> None:
+    def update_order_status(
+        self, *, status: VALID_STATUS, razorpay_order_id: str
+    ) -> None:
         from src.server.models import Orders
 
         assert razorpay_order_id == self.razorpay_order_id
 
-        order_query = Orders.query.filter_by(ID=self.id, STATUS="CONF", USER_ID=self.user_id)
+        order_query = Orders.query.filter_by(
+            ID=self.id, STATUS="CONF", USER_ID=self.user_id
+        )
         orders = order_query.all()
 
         if not orders:

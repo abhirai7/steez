@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import CHAR, DECIMAL, TEXT, TIMESTAMP, Column, ForeignKey, Integer
+from sqlalchemy import CHAR, DECIMAL, TEXT, TIMESTAMP, Column, ForeignKey, Integer, Boolean
 
 from src.server import db
 
@@ -16,6 +16,7 @@ class Orders(db.Model):
         `CREATED_AT` TIMESTAMP      DEFAULT         CURRENT_TIMESTAMP,
         `STATUS`    CHAR(4)         DEFAULT         'PEND',
         `RAZORPAY_ORDER_ID` TEXT    DEFAULT         NULL,
+        `SEEN`      BOOLEAN         DEFAULT         FALSE,
 
         FOREIGN KEY (`USER_ID`)     REFERENCES `USERS`(`ID`)    ON DELETE CASCADE,
         FOREIGN KEY (`PRODUCT_ID`)  REFERENCES `PRODUCTS`(`ID`) ON DELETE CASCADE
@@ -32,3 +33,4 @@ class Orders(db.Model):
     CREATED_AT = Column(TIMESTAMP, default=datetime.now)
     STATUS = Column(CHAR(4), default="PEND")
     RAZORPAY_ORDER_ID = Column(TEXT, default=None)
+    SEEN = Column(Boolean, default=False)
