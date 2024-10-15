@@ -17,10 +17,10 @@ def login_route():
 
         try:
             user = User.from_email(
-                db, email=login.email.data, password_hash=bcrypt.generate_password_hash(login.password.data).decode()
+                db, email=login.email.data, password=login.password.data
             )
         except ValueError:
-            redirect(url_for("home"))
+            return redirect(url_for("home"))
 
         login_user(user)
         return redirect(url_for("home"))

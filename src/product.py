@@ -576,7 +576,11 @@ class Cart:
         )
         total_price = total_price_query if total_price_query is not None else 1
 
-        smt = insert(Orders).values(USER_ID=self.user_id, TOTAL_PRICE=total_price, STATUS=status).returning(literal_column("*"))
+        smt = (
+            insert(Orders)
+            .values(USER_ID=self.user_id, TOTAL_PRICE=total_price, STATUS=status)
+            .returning(literal_column("*"))
+        )
         self.__db.session.execute(smt).mappings().fetchone()
         if gift_card:
             gift_card.use()

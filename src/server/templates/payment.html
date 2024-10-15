@@ -40,7 +40,7 @@
                     window.location.href = `{{ url_for('payment_failure') }}`;
                 });
         }
-        var options = {
+        const options = {
             key: `{{ razorpay_key }}`,
             amount: `{{ amount }}`,
             currency: "INR",
