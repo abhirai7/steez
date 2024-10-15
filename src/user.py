@@ -52,7 +52,7 @@ class User:
         from .order import Order
         from .server.models import Orders
 
-        orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.CREATED_AT.desc()).all()
+        orders = Orders.query.filter_by(USER_ID=self.id).order_by(Orders.CREATED_AT.desc()).all()
 
         return [Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
 
@@ -173,7 +173,7 @@ class User:
 
         orders = (
             self.__db.session.query(Orders)
-            .filter_by(user_id=self.id, status=status or "PEND")
+            .filter_by(USER_ID=self.id, STATUS=status or "PEND")
             .order_by(Orders.CREATED_AT.desc())
             .all()
         )
@@ -209,9 +209,9 @@ class User:
             "notes": {
                 "products": [
                     {
-                        "name": order.product.name,
-                        "quantity": order.quantity,
-                        "price": order.product.price,
+                        "name": str(order.product.name),
+                        "quantity": int(order.quantity),
+                        "price": float(order.product.price),
                     }
                     for order in orders
                 ],
@@ -225,15 +225,15 @@ class User:
             },
         }
 
+        print(final_payload)
+
         api_response: RazorPayOrderDict = razorpay_client.order.create(final_payload)
         order_id = api_response["id"]
 
         update = (
             self.__db.session.query(Orders)
             .filter(
-                Orders.USER_ID == self.id,
-                Orders.STATUS == "PEND",
-                Orders.RAZORPAY_ORDER_ID.is_(None),
+                Orders.ID == order_id,
             )
             .update({Orders.RAZORPAY_ORDER_ID: order_id, Orders.STATUS: "CONF"})
         )

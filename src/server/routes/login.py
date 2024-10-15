@@ -16,9 +16,7 @@ def login_route():
         assert login.email.data and login.password.data
 
         try:
-            user = User.from_email(
-                db, email=login.email.data, password=login.password.data
-            )
+            user = User.from_email(db, email=login.email.data, password=login.password.data)
         except ValueError:
             return redirect(url_for("home"))
 

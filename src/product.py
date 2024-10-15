@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 import arrow
 from flask_sqlalchemy import SQLAlchemy
 from fuzzywuzzy.fuzz import partial_ratio
-from sqlalchemy import func, insert, literal_column, or_
+from sqlalchemy import func, insert, literal, literal_column, or_, select, delete
 
 from .utils import generate_gift_card_code, get_product_pictures, size_names
 
@@ -574,19 +574,33 @@ class Cart:
             .filter(Carts.USER_ID == self.user_id)
             .scalar()
         )
-        total_price = total_price_query if total_price_query is not None else 1
-
+        total_price = max(total_price_query or -float("inf"), 1)
         smt = (
             insert(Orders)
-            .values(USER_ID=self.user_id, TOTAL_PRICE=total_price, STATUS=status)
+            .from_select(
+                [
+                    Orders.USER_ID,
+                    Orders.PRODUCT_ID,
+                    Orders.QUANTITY,
+                    Orders.TOTAL_PRICE,
+                    Orders.STATUS,
+                ],
+                select(
+                    Carts.USER_ID,
+                    Carts.PRODUCT_ID,
+                    Carts.QUANTITY,
+                    total_price,
+                    literal(status.upper()),
+                ).where(Carts.USER_ID == self.user_id),
+            )
             .returning(literal_column("*"))
         )
         self.__db.session.execute(smt).mappings().fetchone()
         if gift_card:
             gift_card.use()
 
-        self.__db.session.delete(Carts.query.get(self.user_id))
-        self.__db.commit()
+        self.__db.session.query(Carts).filter(Carts.USER_ID == self.user_id).delete()
+        self.__db.session.commit()
 
     def clear(self, *, product: Product | None = None) -> None:
         from src.server.models import Carts

@@ -29,4 +29,7 @@ HOST = os.getenv("HOST", "0.0.0.0")
 asgi_app = WsgiToAsgi(app)
 
 if __name__ == "__main__":
-    uvicorn.run(asgi_app, host=HOST, port=PORT, log_level="debug", lifespan="off")
+    if DEBUG:
+        app.run(host=HOST, port=PORT, debug=True)
+    else:
+        uvicorn.run(asgi_app, host=HOST, port=PORT, log_level="debug", lifespan="off")
