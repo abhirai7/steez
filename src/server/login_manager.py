@@ -7,7 +7,7 @@ from flask import Request, render_template
 from flask_login import current_user
 
 from src.server import db, login_manager
-from src.server.models import Users
+from src.server.models import User as Users
 from src.user import Admin, User
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ def load_user(user_id: str | int) -> User | None:
 
     user = Users.query.get(user_id)
     if user:
-        if user.ROLE == "ADMIN":
+        if user.role == "ADMIN":
             admin = Admin(db, **{k.lower(): v for k, v in user.__dict__.items()})
             return admin
 

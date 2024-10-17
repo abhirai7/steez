@@ -31,9 +31,9 @@ class Refund:
 
     @classmethod
     def create(cls, db: SQLAlchemy, *, order: Order, reason: str) -> Refund:
-        from .server.models import ReturnRequests
+        from .server.models import ReturnRequest
 
-        smt = insert(ReturnRequests).values(ORDER_ID=order.id, REASON=reason).returning(literal_column("*"))
+        smt = insert(ReturnRequest).values(order_id=order.id, reason=reason).returning(literal_column("*"))
         refund = db.session.execute(smt).mappings().first()
         db.session.commit()
 
@@ -43,52 +43,53 @@ class Refund:
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, id: int) -> Refund:
-        from .server.models import ReturnRequests
+        from .server.models import ReturnRequest
 
-        refund = ReturnRequests.query.get(id)
+        refund = ReturnRequest.query.get(id)
         if refund is None:
             raise ValueError(f"Refund with id {id} does not exist.")
 
         return cls(
             db,
-            id=refund.ID,
-            order_id=refund.ORDER_ID,
-            reason=refund.REASON,
-            created_at=refund.CREATED_AT,
+            id=refund.id,
+            order_id=refund.order_id,
+            reason=refund.reason,
+            created_at=refund.created_at,
         )
 
     @classmethod
     def from_order(cls, db: SQLAlchemy, order: Order) -> Refund:
-        from .server.models import ReturnRequests
+        from .server.models import ReturnRequest
 
-        refund = ReturnRequests.query.filter_by(ORDER_ID=order.id).first()
+        refund = ReturnRequest.query.filter_by(order_id=order.id).first()
         if refund is None:
             raise ValueError(f"Refund for order with id {order.id} does not exist.")
 
         return cls(
             db,
-            id=refund.ID,
-            order_id=refund.ORDER_ID,
-            reason=refund.REASON,
-            created_at=refund.CREATED_AT,
+            id=refund.id,
+            order_id=refund.order_id,
+            reason=refund.reason,
+            created_at=refund.created_at,
         )
 
     @classmethod
     def all(cls, db: SQLAlchemy, *, user: User | None = None) -> list[Refund]:
-        from .server.models import Orders, ReturnRequests
+        from .server.models import Order as Orders
+        from .server.models import ReturnRequest
 
-        query = ReturnRequests.query
+        query = ReturnRequest.query
         if user:
-            query = query.join(Orders).filter(Orders.USER_ID == user.id)
+            query = query.join(Orders).filter(Orders.user_id == user.id)
 
         refunds = query.all()
         return [
             cls(
                 db,
-                id=refund.ID,
-                order_id=refund.ORDER_ID,
-                reason=refund.REASON,
-                created_at=refund.CREATED_AT,
+                id=refund.id,
+                order_id=refund.order_id,
+                reason=refund.reason,
+                created_at=refund.created_at,
             )
             for refund in refunds
         ]

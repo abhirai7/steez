@@ -18,7 +18,7 @@ from src.server.forms import (
     SubscribeNewsLetterForm,
     TicketForm,
 )
-from src.utils import FAQ_DATA, newsletter_email_add_to_db
+from src.utils import FAQ_DATA
 
 if TYPE_CHECKING:
     from src.user import User
@@ -173,7 +173,7 @@ def subscribe():
 
     if form.validate_on_submit() and form.email.data:
         email = form.email.data
-        newsletter_email_add_to_db(db, email=email)
+        # newsletter_email_add_to_db(db, email=email)
 
     return redirect(url_for("home"))
 

@@ -57,15 +57,15 @@ class Order:
         quantity: int,
         total_price: float,
     ) -> Order:
-        from src.server.models import Orders
+        from src.server.models import Order as Orders
 
         smt = (
             insert(Orders)
             .values(
-                USER_ID=user_id,
-                PRODUCT_ID=product_id,
-                QUANTITY=quantity,
-                TOTAL_PRICE=total_price,
+                user_id=user_id,
+                product_id=product_id,
+                quantity=quantity,
+                total_price=total_price,
             )
             .returning(literal_column("*"))
         )
@@ -79,44 +79,44 @@ class Order:
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, order_id: int) -> Order:
-        from src.server.models import Orders
+        from src.server.models import Order as Orders
 
-        order = Orders.query.filter_by(ID=order_id).first()
+        order = Orders.query.filter_by(id=order_id).first()
         if order is None:
             error = "Order not found."
             raise ValueError(error) from None
 
         return cls(
             db,
-            id=order.ID,
-            user_id=order.USER_ID,
-            product_id=order.PRODUCT_ID,
-            quantity=order.QUANTITY,
-            total_price=order.TOTAL_PRICE,
-            created_at=order.CREATED_AT,
-            status=order.STATUS,
-            razorpay_order_id=order.RAZORPAY_ORDER_ID,
+            id=order.id,
+            user_id=order.user_id,
+            product_id=order.product_id,
+            quantity=order.quantity,
+            total_price=order.total_price,
+            created_at=order.created_at,
+            status=order.status,
+            razorpay_order_id=order.razorpay_order_id,
         )
 
     @classmethod
     def from_razorpay_order_id(cls, db: SQLAlchemy, razorpay_order_id: str) -> Order:
-        from src.server.models import Orders
+        from src.server.models import Order as Orders
 
-        order = Orders.query.filter_by(RAZORPAY_ORDER_ID=razorpay_order_id).first()
+        order = Orders.query.filter_by(razorpay_order_id=razorpay_order_id).first()
         if order is None:
             error = "Order not found."
             raise ValueError(error) from None
 
         return cls(
             db,
-            id=order.ID,
-            user_id=order.USER_ID,
-            product_id=order.PRODUCT_ID,
-            quantity=order.QUANTITY,
-            total_price=order.TOTAL_PRICE,
-            created_at=order.CREATED_AT,
-            status=order.STATUS,
-            razorpay_order_id=order.RAZORPAY_ORDER_ID,
+            id=order.id,
+            user_id=order.user_id,
+            product_id=order.product_id,
+            quantity=order.quantity,
+            total_price=order.total_price,
+            created_at=order.created_at,
+            status=order.status,
+            razorpay_order_id=order.razorpay_order_id,
         )
 
     @property
@@ -139,7 +139,7 @@ class Order:
         limit: int | None = None,
         offset: int = 0,
     ) -> list[Order]:
-        from src.server.models import Orders
+        from src.server.models import Order as Orders
 
         orders = Orders.query.limit(limit).offset(offset).all()
         ls = []
@@ -148,14 +148,14 @@ class Order:
             ls.append(
                 cls(
                     db,
-                    id=order.ID,
-                    user_id=order.USER_ID,
-                    product_id=order.PRODUCT_ID,
-                    quantity=order.QUANTITY,
-                    total_price=order.TOTAL_PRICE,
-                    created_at=order.CREATED_AT,
-                    status=order.STATUS,
-                    razorpay_order_id=order.RAZORPAY_ORDER_ID,
+                    id=order.id,
+                    user_id=order.user_id,
+                    product_id=order.product_id,
+                    quantity=order.quantity,
+                    total_price=order.total_price,
+                    created_at=order.created_at,
+                    status=order.status,
+                    razorpay_order_id=order.razorpay_order_id,
                 )
             )
 
@@ -163,20 +163,16 @@ class Order:
 
     @classmethod
     def total_count(cls, db: SQLAlchemy) -> int:
-        from src.server.models import Orders
+        from src.server.models import Order as Orders
 
         return Orders.query.count()
 
-    def update_order_status(
-        self, *, status: VALID_STATUS, razorpay_order_id: str
-    ) -> None:
-        from src.server.models import Orders
+    def update_order_status(self, *, status: VALID_STATUS, razorpay_order_id: str) -> None:
+        from src.server.models import Order as Orders
 
         assert razorpay_order_id == self.razorpay_order_id
 
-        order_query = Orders.query.filter_by(
-            ID=self.id, STATUS="CONF", USER_ID=self.user_id
-        )
+        order_query = Orders.query.filter_by(id=self.id, status="CONF", user_id=self.user_id)
         orders = order_query.all()
 
         if not orders:
@@ -184,8 +180,8 @@ class Order:
             raise ValueError(error) from None
 
         for order in orders:
-            order.STATUS = status
-            order.RAZORPAY_ORDER_ID = razorpay_order_id
+            order.status = status
+            order.razorpay_order_id = razorpay_order_id
 
             self.__db.session.commit()
 
@@ -194,7 +190,7 @@ class Order:
 
     @classmethod
     def delete(cls, db: SQLAlchemy, *, order_id: int, user_id: int) -> None:
-        from src.server.models import Orders
+        from src.server.models import Order as Orders
 
-        db.session.delete(Orders.query.filter_by(ID=order_id, USER_ID=user_id).first())
+        db.session.delete(Orders.query.filter_by(id=order_id, user_id=user_id).first())
         db.session.commit()

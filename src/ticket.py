@@ -54,11 +54,11 @@ class Ticket:
         subject: str,
         message: str,
     ) -> Ticket:
-        from .server.models import Tickets
+        from .server.models import Ticket as Tickets
 
         smt = (
             insert(Tickets)
-            .values(REPLIED_TO=replied_to, USER_ID=user.id, SUBJECT=subject, MESSAGE=message)
+            .values(replied_to=replied_to, user_id=user.id, subject=subject, message=message)
             .returning(literal_column("*"))
         )
         ticket = db.session.execute(smt).mappings().first()
@@ -70,7 +70,7 @@ class Ticket:
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, id: int) -> Ticket:
-        from .server.models import Tickets
+        from .server.models import Ticket as Tickets
 
         ticket = Tickets.query.get(id)
         if ticket is None:
@@ -78,19 +78,19 @@ class Ticket:
 
         return cls(
             db,
-            id=ticket.ID,
-            replied_to=ticket.REPLIED_TO,
-            user_id=ticket.USER_ID,
-            subject=ticket.SUBJECT,
-            message=ticket.MESSAGE,
-            status=ticket.STATUS,
-            created_at=ticket.CREATED_AT,
+            id=ticket.id,
+            replied_to=ticket.replied_to,
+            user_id=ticket.user_id,
+            subject=ticket.subject,
+            message=ticket.message,
+            status=ticket.status,
+            created_at=ticket.created_at,
         )
 
     def update_status(self, status: VALID_STATUS) -> None:
-        from .server.models import Tickets
+        from .server.models import Ticket as Tickets
 
-        self.db.session.query(Tickets).filter(Tickets.ID == self.id).update({"STATUS": status})
+        self.db.session.query(Tickets).filter(Tickets.id == self.id).update({"status": status})
         self.db.session.commit()
 
     def reply(self, user: User | Admin, message: str) -> Ticket:
@@ -118,57 +118,57 @@ class Ticket:
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Ticket]:
-        from .server.models import Tickets
+        from .server.models import Ticket as Tickets
 
         all_tickets = Tickets.query.all()
         return [
             cls(
                 db,
-                id=ticket.ID,
-                replied_to=ticket.REPLIED_TO,
-                user_id=ticket.USER_ID,
-                subject=ticket.SUBJECT,
-                message=ticket.MESSAGE,
-                status=ticket.STATUS,
-                created_at=ticket.CREATED_AT,
+                id=ticket.id,
+                replied_to=ticket.replied_to,
+                user_id=ticket.user_id,
+                subject=ticket.subject,
+                message=ticket.message,
+                status=ticket.status,
+                created_at=ticket.created_at,
             )
             for ticket in all_tickets
         ]
 
     @classmethod
     def get_by_status(cls, db: SQLAlchemy, *, status: VALID_STATUS) -> list[Ticket]:
-        from .server.models import Tickets
+        from .server.models import Ticket as Tickets
 
-        tickets = Tickets.query.filter_by(STATUS=status).all()
+        tickets = Tickets.query.filter_by(status=status).all()
         return [
             cls(
                 db,
-                id=ticket.ID,
-                replied_to=ticket.REPLIED_TO,
-                user_id=ticket.USER_ID,
-                subject=ticket.SUBJECT,
-                message=ticket.MESSAGE,
-                status=ticket.STATUS,
-                created_at=ticket.CREATED_AT,
+                id=ticket.id,
+                replied_to=ticket.replied_to,
+                user_id=ticket.user_id,
+                subject=ticket.subject,
+                message=ticket.message,
+                status=ticket.status,
+                created_at=ticket.created_at,
             )
             for ticket in tickets
         ]
 
     @classmethod
     def user_tickets(cls, db: SQLAlchemy, user: User) -> list[Ticket]:
-        from .server.models import Tickets
+        from .server.models import Ticket as Tickets
 
-        tickets = Tickets.query.filter_by(USER_ID=user.id).all()
+        tickets = Tickets.query.filter_by(user_id=user.id).all()
         return [
             cls(
                 db,
-                id=ticket.ID,
-                replied_to=ticket.REPLIED_TO,
-                user_id=ticket.USER_ID,
-                subject=ticket.SUBJECT,
-                message=ticket.MESSAGE,
-                status=ticket.STATUS,
-                created_at=ticket.CREATED_AT,
+                id=ticket.id,
+                replied_to=ticket.replied_to,
+                user_id=ticket.user_id,
+                subject=ticket.subject,
+                message=ticket.message,
+                status=ticket.status,
+                created_at=ticket.created_at,
             )
             for ticket in tickets
         ]

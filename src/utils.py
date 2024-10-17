@@ -165,21 +165,6 @@ for faq_entity in faq_data["faq"]:
 FAQ_DATA = faq
 
 
-def newsletter_email_add_to_db(conn: Connection, /, *, email: str) -> None:
-    cur = conn.cursor()
-    query = "INSERT OR IGNORE INTO NEWSLETTERS (EMAIL) VALUES (?)"
-
-    cur.execute(query, (email,))
-    conn.commit()
-
-
-def backup_sqlite_database(conn: Connection, /, *, path: str = "database-bak.sqlite") -> None:
-    backup_path_connection = Connection(path)
-    with backup_path_connection:
-        conn.backup(backup_path_connection)
-    backup_path_connection.close()
-
-
 class OrderQR:
     BASE62_CHARS = string.digits + string.ascii_lowercase + string.ascii_uppercase
     BASE = len(BASE62_CHARS)

@@ -30,15 +30,15 @@ class Carousel:
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Self]:
-        from src.server.models import Carousels
+        from src.server.models import Carousel as Carousels
 
         smt = select(Carousels)
         carousels = db.session.execute(smt).mappings().all()
-        return [cls(db, **{k.lower(): v for k, v in caro.items()}) for caro in carousels]
+        return [cls(db, **caro) for caro in carousels]
 
     @classmethod
     def get(cls, db: SQLAlchemy, id: int) -> Carousel:
-        from src.server.models import Carousels
+        from src.server.models import Carousel as Carousels
 
         caro = db.session.query(Carousels).get(id)
         if not caro:
@@ -46,10 +46,10 @@ class Carousel:
 
         return cls(
             db,
-            id=caro.ID,
-            image=caro.IMAGE,
-            heading=caro.HEADING,
-            description=caro.DESCRIPTION,
+            id=caro.id,
+            image=caro.image,
+            heading=caro.heading,
+            description=caro.description,
         )
 
     @classmethod
@@ -61,14 +61,14 @@ class Carousel:
         heading: str,
         description: str,
     ) -> Carousel:
-        from src.server.models import Carousels
+        from src.server.models import Carousel as Carousels
 
         smt = (
             insert(Carousels)
             .values(
-                IMAGE=image,
-                HEADING=heading,
-                DESCRIPTION=description,
+                image=image,
+                heading=heading,
+                description=description,
             )
             .returning(literal_column("*"))
         )
@@ -81,6 +81,6 @@ class Carousel:
         return cls(db, **{k.lower(): v for k, v in carousel.items()})
 
     def delete(self):
-        from src.server.models import Carousels
+        from src.server.models import Carousel as Carousels
 
-        Carousels.query.filter_by(ID=self.id).delete()
+        Carousels.query.filter_by(id=self.id).delete()

@@ -1,42 +1,45 @@
-from .carousels import Carousels  # noqa
-from .carts import Carts  # noqa
-from .categories import Categories  # noqa
-from .favourites import Favourites  # noqa
-from .gift_cards import GiftCards  # noqa
-from .newsletters import Newsletters  # noqa
-from .orders import Orders  # noqa
-from .products import Products  # noqa
-from .return_requests import ReturnRequests  # noqa
-from .reviews import Reviews  # noqa
-from .tickets import Tickets  # noqa
-from .users import Users  # noqa
+from .carousel import Carousel  # noqa
+from .cart import Cart  # noqa
+from .category import Category  # noqa
+from .favourite import Favourite  # noqa
+from .gift_card import GiftCard  # noqa
+from .newsletter import Newsletter  # noqa
+from .order import Order  # noqa
+from .product import Product  # noqa
+from .return_request import ReturnRequest  # noqa
+from .review import Review  # noqa
+from .role import Role
+from .ticket import Ticket  # noqa
+from .user import User  # noqa
 
 __all__ = [
-    "Carousels",
-    "Carts",
-    "Categories",
-    "Favourites",
-    "GiftCards",
-    "Newsletters",
-    "Orders",
-    "Products",
-    "ReturnRequests",
-    "Reviews",
-    "Tickets",
-    "Users",
+    "Carousel",
+    "Cart",
+    "Category",
+    "Favourite",
+    "GiftCard",
+    "Newsletter",
+    "Order",
+    "Product",
+    "ReturnRequest",
+    "Review",
+    "Ticket",
+    "User",
+    "Role",
 ]
 
 __models__ = [
-    Carousels,
-    Carts,
-    Categories,
-    Favourites,
-    GiftCards,
-    Newsletters,
-    Orders,
-    Products,
-    ReturnRequests,
-    Reviews,
-    Tickets,
-    Users,
+    User,
+    Product,
+    Order,
+    Carousel,
+    Cart,
+    Category,
+    Favourite,
+    GiftCard,
+    Newsletter,
+    ReturnRequest,
+    Review,
+    Ticket,
+    Role,
 ]

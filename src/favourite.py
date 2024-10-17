@@ -38,25 +38,25 @@ class Favourite:
         return self.__product
 
     def delete(self) -> None:
-        from src.server.models import Favourites
+        from src.server.models import Favourite as Favourites
 
         self.__db.session.delete(Favourites.query.get(self.id))
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, id: int) -> Favourite:
-        from src.server.models import Favourites
+        from src.server.models import Favourite as Favourites
 
         favourite = Favourites.query.get(id)
         if favourite is None:
             raise ValueError(f"Favourite with id {id} does not exist.")
 
-        return cls(db, id=favourite.ID, user_id=favourite.USER_ID, product_unique_id=favourite.PRODUCT_UNIQUE_ID)
+        return cls(db, id=favourite.id, user_id=favourite.user_id, product_unique_id=favourite.product_unique_id)
 
     @classmethod
     def add(cls, db: SQLAlchemy, *, user: User, product: Product) -> Favourite:
-        from src.server.models import Favourites
+        from src.server.models import Favourite as Favourites
 
-        smt = insert(Favourites).values(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id).returning(literal_column("*"))
+        smt = insert(Favourites).values(user_id=user.id, product_unique_id=product.unique_id).returning(literal_column("*"))
         favourite = db.session.execute(smt).mappings().first()
 
         db.session.commit()
@@ -67,22 +67,22 @@ class Favourite:
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Favourite]:
-        from src.server.models import Favourites
+        from src.server.models import Favourite as Favourites
 
         all_favourites = Favourites.query.all()
-        return [cls(db, id=fav.ID, user_id=fav.USER_ID, product_unique_id=fav.PRODUCT_UNIQUE_ID) for fav in all_favourites]
+        return [cls(db, id=fav.id, user_id=fav.user_id, product_unique_id=fav.product_unique_id) for fav in all_favourites]
 
     @classmethod
     def from_user(cls, db: SQLAlchemy, *, user: User, product: Product) -> list[Favourite]:
-        from src.server.models import Favourites
+        from src.server.models import Favourite as Favourites
 
         return [
-            cls(db, id=fav.ID, user_id=fav.USER_ID, product_unique_id=fav.PRODUCT_UNIQUE_ID)
-            for fav in Favourites.query.filter_by(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id).all()
+            cls(db, id=fav.id, user_id=fav.user_id, product_unique_id=fav.product_unique_id)
+            for fav in Favourites.query.filter_by(user_id=user.id, product_unique_id=product.unique_id).all()
         ]
 
     @classmethod
     def exists(cls, db: SQLAlchemy, *, user: User, product: Product) -> bool:
-        from src.server.models import Favourites
+        from src.server.models import Favourite as Favourites
 
-        return Favourites.query.filter_by(USER_ID=user.id, PRODUCT_UNIQUE_ID=product.unique_id).first() is not None
+        return Favourites.query.filter_by(user_id=user.id, product_unique_id=product.unique_id).first() is not None

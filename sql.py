@@ -9,6 +9,7 @@ DEFAULT_DIR = r"instance/database.sqlite"
 conn = sqlalchemy.create_engine(f"sqlite:///{DEFAULT_DIR}").connect()
 conn.engine.echo = True
 
+
 @click.command()
 @click.option("--query", "-q", help="SQL query to execute", required=True, type=str)
 def main(query: str):

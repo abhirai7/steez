@@ -50,9 +50,9 @@ class User:
     @property
     def orders(self) -> list[Order]:
         from .order import Order
-        from .server.models import Orders
+        from .server.models import Order as Orders
 
-        orders = Orders.query.filter_by(USER_ID=self.id).order_by(Orders.CREATED_AT.desc()).all()
+        orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.created_at.desc()).all()
 
         return [Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
 
@@ -76,11 +76,11 @@ class User:
     @classmethod
     def from_email(cls, db: SQLAlchemy, *, email: str, password: str) -> User:
         from .server import bcrypt
-        from .server.models import Users
+        from .server.models import User as Users
 
-        user = Users.query.filter_by(EMAIL=email, ROLE="USER").first()
+        user = Users.query.filter_by(email=email, role="USER").first()
 
-        if user is None or not bcrypt.check_password_hash(user.PASSWORD, password):
+        if user is None or not bcrypt.check_password_hash(user.password, password):
             error = "User not found. Either email or password is incorrect."
             raise ValueError(error) from None
 
@@ -88,7 +88,7 @@ class User:
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, user_id: int):
-        from .server.models import Users
+        from .server.models import User as Users
 
         user = Users.query.get(user_id)
         if user is None:
@@ -109,14 +109,14 @@ class User:
         phone: str,
         role: str = "USER",
     ) -> User:
-        from .server.models import Users
+        from .server.models import User as Users
 
         smt = (
             insert(Users)
             .values(
-                EMAIL=email,
-                NAME=name,
-                PASSWORD=password_hash,
+                email=email,
+                name=name,
+                password=password_hash,
                 ADDRESS=address,
                 PHONE=phone,
                 ROLE=role,
@@ -169,30 +169,30 @@ class User:
 
     def __fetch_orders(self, status: str | None = None) -> list[Order]:
         from .order import Order
-        from .server.models import Orders
+        from .server.models import Order as Orders
 
         orders = (
             self.__db.session.query(Orders)
-            .filter_by(USER_ID=self.id, STATUS=status or "PEND")
-            .order_by(Orders.CREATED_AT.desc())
+            .filter_by(user_id=self.id, status=status or "PEND")
+            .order_by(Orders.created_at.desc())
             .all()
         )
 
         return [Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()}) for order in orders]
 
     def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
-        from .server.models import Orders
+        from .server.models import Order as Orders
 
         orders: list[Order] = self.partial_checkout(gift_code=gift_code)
 
         if not orders:
             error = "No orders found to checkout."
             order_id = (
-                self.__db.session.query(Orders.RAZORPAY_ORDER_ID)
+                self.__db.session.query(Orders.razorpay_order_id)
                 .filter(
-                    Orders.USER_ID == self.id,
-                    Orders.STATUS != "PAID",
-                    Orders.RAZORPAY_ORDER_ID.isnot(None),
+                    Orders.user_id == self.id,
+                    Orders.status != "PAID",
+                    Orders.razorpay_order_id.isnot(None),
                 )
                 .scalar()
             )
@@ -231,12 +231,18 @@ class User:
         update = (
             self.__db.session.query(Orders)
             .filter(
-                Orders.USER_ID == self.id,
-                Orders.STATUS == "PEND",
-                Orders.RAZORPAY_ORDER_ID.is_(None),
-                Orders.SEEN.is_(False),
+                Orders.user_id == self.id,
+                Orders.status == "PEND",
+                Orders.razorpay_order_id.is_(None),
+                Orders.seen.is_(False),
             )
-            .update({Orders.RAZORPAY_ORDER_ID: order_id, Orders.STATUS: "CONF", Orders.SEEN: True})
+            .update(
+                {
+                    Orders.razorpay_order_id: order_id,
+                    Orders.status: "CONF",
+                    Orders.seen: True,
+                }
+            )
         )
 
         if update == 0:
@@ -259,9 +265,9 @@ class User:
 
     @staticmethod
     def exists(db: SQLAlchemy, email: str) -> bool:
-        from .server.models import Users
+        from .server.models import User as Users
 
-        return db.session.query(Users).filter_by(EMAIL=email).scalar() is not None
+        return db.session.query(Users).filter_by(email=email).scalar() is not None
 
     @classmethod
     def all(
@@ -271,14 +277,14 @@ class User:
         limit: int | None = None,
         offset: int = 0,
     ) -> list[User]:
-        from .server.models import Users
+        from .server.models import User as Users
 
         users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
         return [cls(db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
-        from .server.models import Users
+        from .server.models import User as Users
 
         return db.session.query(Users).filter_by(ROLE="USER").count()
 
@@ -316,14 +322,14 @@ class Admin(User):
     @classmethod
     def from_email(cls, db: SQLAlchemy, *, password: str) -> Admin:
         from .server import bcrypt
-        from .server.models import Users
+        from .server.models import User as Users
 
         users = Users.query.filter_by(ROLE="ADMIN").all()
 
         user = None
 
         for usr in users:
-            if bcrypt.check_password_hash(usr.PASSWORD, password):
+            if bcrypt.check_password_hash(usr.password, password):
                 user = usr
                 break
 
@@ -338,13 +344,13 @@ class Admin(User):
 
     @classmethod
     def delete_user(cls, db: SQLAlchemy, user_id: int) -> None:
-        from .server.models import Users
+        from .server.models import User as Users
 
-        db.session.query(Users).filter_by(ID=user_id, ROLE="USER").delete()
+        db.session.query(Users).filter_by(id=user_id, ROLE="USER").delete()
         db.session.commit()
 
     @classmethod
     def delete_product(cls, db: SQLAlchemy, product_id: int) -> None:
-        from .server.models import Products
+        from .server.models import Product as Products
 
-        db.session.query(Products).filter_by(ID=product_id).delete()
+        db.session.query(Products).filter_by(id=product_id).delete()
