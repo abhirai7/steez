@@ -5,7 +5,7 @@ from src.server import app, db
 from src.server.models import __models__
 
 admin = Admin(
-    app, url="/api/sql", template_mode="bootstrap4", endpoint="sql", name=""
+    app, url="/admin", template_mode="bootstrap4", endpoint="sql", name=""
 )
 
 
