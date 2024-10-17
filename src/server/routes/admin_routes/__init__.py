@@ -5,3 +5,4 @@ from .admin_login import *  # noqa
 from .admin_product import *  # noqa
 from .admin_razorpay import *  # noqa
 from .admin_user import *  # noqa
+from .admin_database import *  # noqa
