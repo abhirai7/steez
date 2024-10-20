@@ -7,9 +7,10 @@ import string
 import markdown
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user
+from flask_security.decorators import roles_required
 
 from src.product import Category, Product
-from src.server import admin_login_required, app, db
+from src.server import app, db
 from src.server.forms import ProductAddForm, ProductUpdateForm
 from src.utils import size_names
 
@@ -21,7 +22,7 @@ def generate_unique_identifier():
 
 
 @app.route("/admin/manage/product", methods=["GET"])
-@admin_login_required
+@roles_required("admin")
 def admin_manage_product():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -43,7 +44,7 @@ def admin_manage_product():
 
 
 @app.route("/admin/manage/product/add", methods=["POST"])
-@admin_login_required
+@roles_required("admin")
 def admin_add_product():
     addform: ProductAddForm = ProductAddForm(db)
 
@@ -79,7 +80,7 @@ def admin_add_product():
 
 
 @app.route("/admin/manage/product/edit/<int:id>", methods=["POST"])
-@admin_login_required
+@roles_required("admin")
 def admin_edit_product(id: int):
     product = Product.from_id(db, id)
     product_update_form: ProductUpdateForm = ProductUpdateForm(db, product=product)
@@ -104,7 +105,7 @@ def admin_edit_product(id: int):
 
 
 @app.route("/admin/manage/product/delete/<int:id>")
-@admin_login_required
+@roles_required("admin")
 def admin_delete_product(id: int):
     current_user.delete_product(db, id)
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .carousel import Carousel  # noqa
 from .cart import Cart  # noqa
 from .category import Category  # noqa
@@ -28,7 +30,7 @@ __all__ = [
     "Role",
 ]
 
-__models__ = [
+__models__: list = [
     User,
     Product,
     Order,

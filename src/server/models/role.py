@@ -4,4 +4,6 @@ from src.server import db
 
 
 class Role(db.Model, fsqla.FsRoleMixin):
+    db = db
+
     pass

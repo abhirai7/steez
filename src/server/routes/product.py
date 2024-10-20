@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING
 import arrow
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from flask_security.forms import LoginForm
 
 from src.favourite import Favourite
 from src.product import Product
-from src.server import app, db, sitemapper
+from src.server import app, db
 from src.server.forms import (
     AddReviewForm,
     AddToCartForm,
-    LoginForm,
     SearchForm,
     SubscribeNewsLetterForm,
 )
@@ -23,18 +23,7 @@ if TYPE_CHECKING:
     assert isinstance(current_user, User)
 
 
-def product_ids():
-    with app.app_context():
-        return [product.id for product in Product.all(db)]
-
-
-@sitemapper.include(
-    url_variables={"product_id": product_ids()},
-    lastmod=arrow.now().format("YYYY-MM-DD"),
-    changefreq="daily",
-)
 @app.route("/products/<int:product_id>", methods=["GET"])
-@app.route("/products/<int:product_id>/", methods=["GET"])
 def product(product_id: int):
     product = Product.from_id(db, product_id)
     pictures = get_product_pictures(product.unique_id)
@@ -104,7 +93,6 @@ def add_review(product_id: int):
 
 
 @app.route("/products/<int:product_id>/is-favourite", methods=["GET"])
-@app.route("/products/<int:product_id>/is-favourite/", methods=["GET"])
 @login_required
 def is_favourite(product_id: int):
     product = Product.from_id(db, product_id)
@@ -112,7 +100,6 @@ def is_favourite(product_id: int):
 
 
 @app.route("/products/<int:product_id>/add-to-favourites", methods=["GET"])
-@app.route("/products/<int:product_id>/add-to-favourites/", methods=["GET"])
 @login_required
 def add_to_favourites(product_id: int):
     product = Product.from_id(db, product_id)
@@ -121,7 +108,6 @@ def add_to_favourites(product_id: int):
 
 
 @app.route("/products/<int:product_id>/remove-from-favourites", methods=["GET"])
-@app.route("/products/<int:product_id>/remove-from-favourites/", methods=["GET"])
 @login_required
 def remove_from_favourites(product_id: int):
     current_user.remove_from_fav(product=Product.from_id(db, product_id))

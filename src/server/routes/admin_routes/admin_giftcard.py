@@ -1,22 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from flask import redirect, render_template, url_for
 from flask_login import current_user
+from flask_security.decorators import roles_required
 
 from src.product import GiftCard
-from src.server import admin_login_required, app, db
+from src.server import app, db
 from src.server.forms import GiftCardForm
-
-if TYPE_CHECKING:
-    from src.user import Admin
-
-    assert isinstance(current_user, Admin)
 
 
 @app.route("/admin/giftcards")
-@admin_login_required
+@roles_required("admin")
 def admin_giftcards():
     gift_cards = GiftCard.all(db)
     form = GiftCardForm()
@@ -24,7 +18,7 @@ def admin_giftcards():
 
 
 @app.route("/admin/giftcards/add", methods=["POST"])
-@admin_login_required
+@roles_required("admin")
 def admin_giftcard_add():
     form: GiftCardForm = GiftCardForm()
 

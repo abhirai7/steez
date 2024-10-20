@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import arrow
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, url_for
 from flask_login import current_user, login_user, logout_user
+from flask_security.decorators import roles_required
+from flask_security.forms import LoginForm
 
 from src.order import Order
 from src.product import Product
-from src.server import admin_login_required, app, db, razorpay_client
-from src.server.forms import AdminForm
-from src.user import Admin, User
+from src.server import app, db, razorpay_client
+from src.user import User
 
 
 def todays_settlement(response: dict):
@@ -21,20 +22,17 @@ def todays_settlement(response: dict):
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
-    form: AdminForm = AdminForm(db)
+    form: LoginForm = LoginForm()
 
-    if form.validate_on_submit() and request.method == "POST":
-        assert form.password.data
-
-        admin = Admin.from_email(db, password=form.password.data)
-        login_user(admin)
+    if form.validate_on_submit() and form.user:
+        login_user(form.user)
         return redirect(url_for("admin_dashboard"))
 
-    return render_template("admin/admin_login.html", form=form, current_user=current_user)
+    return render_template("login.html", login_user_form=form, current_user=current_user)
 
 
 @app.route("/admin/logout")
-@admin_login_required
+@roles_required("admin")
 def admin_logout():
     logout_user()
     return redirect(url_for("home"))
@@ -42,7 +40,7 @@ def admin_logout():
 
 @app.route("/admin/dashboard")
 @app.route("/admin/dashboard/")
-@admin_login_required
+@roles_required("admin")
 def admin_dashboard():
     assert current_user.is_admin
 

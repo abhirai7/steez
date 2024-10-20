@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import arrow
+from flask_security.core import RoleMixin, UserMixin, WebAuthnMixin
 
 if TYPE_CHECKING:
     from .favourite import Favourite
@@ -10,42 +10,45 @@ if TYPE_CHECKING:
     from .product import VALID_STARS, Cart, GiftCard, Product
     from .type_hints import Client as RazorpayClient
     from .type_hints import RazorPayOrderDict
+    from typing_extensions import Self
+
+from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import insert, literal_column
 
 
-class User:
-    def __init__(
-        self,
-        db: SQLAlchemy,
-        *,
-        id: int,
-        email: str,
-        name: str,
-        password: str,
-        created_at: str | None = None,
-        role: str = "USER",
-        address: str,
-        phone: str,
-        **_,
-    ):
-        self.__db = db
-        self.id = id
-        self.email = email
-        self.password = password
-        self.name = name
-        self.created_at = arrow.get(created_at) if created_at else arrow.now()
-        self.address = address
-        self.phone = phone
+class User(UserMixin):
+    db: SQLAlchemy
 
-        self.is_active = True
-        self.is_anonymous = False
-        self.is_authenticated = True
-        self.__role = role
+    if TYPE_CHECKING:  # pragma: no cover
+        id: int
+        email: str
+        username: str | None
+        password: str | None
+        active: bool
+        fs_uniquifier: str
+        fs_token_uniquifier: str
+        fs_webauthn_user_handle: str
+        confirmed_at: datetime | None
+        last_login_at: datetime
+        current_login_at: datetime
+        last_login_ip: str | None
+        current_login_ip: str | None
+        login_count: int
+        tf_primary_method: str | None
+        tf_totp_secret: str | None
+        tf_phone_number: str | None
+        mf_recovery_codes: list[str] | None
+        us_phone_number: str | None
+        us_totp_secrets: str | bytes | None
+        create_datetime: datetime
+        update_datetime: datetime
+        roles: list[RoleMixin]
+        webauthn: list[WebAuthnMixin]
 
-    def get_id(self):
-        return str(self.id)
+        #
+    name: str | None
+    phone: str | None
 
     @property
     def orders(self) -> list[Order]:
@@ -54,37 +57,13 @@ class User:
 
         orders = Orders.query.filter_by(user_id=self.id).order_by(Orders.created_at.desc()).all()
 
-        return [Order(self.__db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
-
-    @property
-    def is_admin(self):
-        return self.role == "ADMIN"
-
-    @property
-    def role(self):
-        return self.__role
+        return [Order(self.db, **{k.lower(): v for k, v in row.__dict__.items()}) for row in orders]
 
     @property
     def cart(self) -> Cart:
         from .product import Cart
 
-        return Cart(self.__db, user_id=self.id)
-
-    def __str__(self) -> str:
-        return f"User(id={self.id!r} email={self.email!r} created_at={self.created_at!r})"
-
-    @classmethod
-    def from_email(cls, db: SQLAlchemy, *, email: str, password: str) -> User:
-        from .server import bcrypt
-        from .server.models import User as Users
-
-        user = Users.query.filter_by(email=email, role="USER").first()
-
-        if user is None or not bcrypt.check_password_hash(user.password, password):
-            error = "User not found. Either email or password is incorrect."
-            raise ValueError(error) from None
-
-        return cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
+        return Cart(self.db, user_id=self.id)
 
     @classmethod
     def from_id(cls, db: SQLAlchemy, user_id: int):
@@ -95,39 +74,7 @@ class User:
             error = "User not found."
             raise ValueError(error) from None
 
-        return cls(db, **{k.lower(): v for k, v in user.__dict__.items()})
-
-    @classmethod
-    def create(
-        cls,
-        db: SQLAlchemy,
-        *,
-        email: str,
-        name: str,
-        password_hash: str,
-        address: str,
-        phone: str,
-        role: str = "USER",
-    ) -> User:
-        from .server.models import User as Users
-
-        smt = (
-            insert(Users)
-            .values(
-                email=email,
-                name=name,
-                password=password_hash,
-                ADDRESS=address,
-                PHONE=phone,
-                ROLE=role,
-            )
-            .returning(literal_column("*"))
-        )
-        user = db.session.execute(smt).mappings().first()
-        assert user is not None
-        db.session.commit()
-
-        return cls(db, **{k.lower(): v for k, v in user.items()})
+        return cls(**{k.lower(): v for k, v in user.__dict__.items()})
 
     def add_review(self, *, product: Product, stars: VALID_STARS, review: str):
         product.add_review(user_id=self.id, stars=stars, review=review)
@@ -147,21 +94,21 @@ class User:
     def add_to_fav(self, *, product: Product) -> Favourite:
         from .favourite import Favourite
 
-        return Favourite.add(self.__db, user=self, product=product)
+        return Favourite.add(self.db, user=self, product=product)
 
     def remove_from_fav(self, *, product: Product) -> None:
         from .favourite import Favourite
 
-        if fav := Favourite.from_user(self.__db, user=self, product=product):
+        if fav := Favourite.from_user(self.db, user=self, product=product):
             fav[0].delete()
 
     def is_fav(self, *, product: Product) -> bool:
-        return Favourite.exists(self.__db, user=self, product=product)
+        return Favourite.exists(self.db, user=self, product=product)
 
     def partial_checkout(self, *, gift_code: str = "", status: str | None = None) -> list[Order]:
         from .product import GiftCard
 
-        gift_card = GiftCard.from_code(self.__db, code=gift_code)
+        gift_card = GiftCard.from_code(self.db, code=gift_code)
         self.cart.update_to_database(gift_card=gift_card, status=status or "PEND")
         self.clear_cart()
 
@@ -172,13 +119,10 @@ class User:
         from .server.models import Order as Orders
 
         orders = (
-            self.__db.session.query(Orders)
-            .filter_by(user_id=self.id, status=status or "PEND")
-            .order_by(Orders.created_at.desc())
-            .all()
+            self.db.session.query(Orders).filter_by(user_id=self.id, status=status or "PEND").order_by(Orders.created_at.desc()).all()
         )
 
-        return [Order(self.__db, **{k.lower(): v for k, v in order.__dict__.items()}) for order in orders]
+        return [Order(self.db, **{k.lower(): v for k, v in order.__dict__.items()}) for order in orders]
 
     def full_checkout(self, razorpay_client: RazorpayClient, *, gift_code: str = "") -> RazorPayOrderDict:
         from .server.models import Order as Orders
@@ -188,7 +132,7 @@ class User:
         if not orders:
             error = "No orders found to checkout."
             order_id = (
-                self.__db.session.query(Orders.razorpay_order_id)
+                self.db.session.query(Orders.razorpay_order_id)
                 .filter(
                     Orders.user_id == self.id,
                     Orders.status != "PAID",
@@ -229,7 +173,7 @@ class User:
         order_id = api_response["id"]
 
         update = (
-            self.__db.session.query(Orders)
+            self.db.session.query(Orders)
             .filter(
                 Orders.user_id == self.id,
                 Orders.status == "PEND",
@@ -249,7 +193,7 @@ class User:
             error = "No orders found to checkout."
             raise ValueError(error)
 
-        self.__db.session.commit()
+        self.db.session.commit()
 
         assert self.__check_api_response(full_paylaod=final_payload, api_response=api_response)
 
@@ -276,11 +220,11 @@ class User:
         *,
         limit: int | None = None,
         offset: int = 0,
-    ) -> list[User]:
+    ) -> list[Self]:
         from .server.models import User as Users
 
         users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
-        return [cls(db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
+        return [cls(db=db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
@@ -312,45 +256,8 @@ class User:
     def _buy_gift_card(self, amount: int) -> GiftCard:
         from .product import GiftCard
 
-        return GiftCard.create(self.__db, user=self, amount=amount)
-
-
-class Admin(User):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        return GiftCard.create(self.db, user=self, amount=amount)
 
     @classmethod
-    def from_email(cls, db: SQLAlchemy, *, password: str) -> Admin:
-        from .server import bcrypt
-        from .server.models import User as Users
-
-        users = Users.query.filter_by(ROLE="ADMIN").all()
-
-        user = None
-
-        for usr in users:
-            if bcrypt.check_password_hash(usr.password, password):
-                user = usr
-                break
-
-        if user is None:
-            error = "Admin not found. Either email or password is incorrect."
-            raise ValueError(error) from None
-
-        return cls(
-            db,
-            **{k.lower(): v for k, v in {k.lower(): v for k, v in user.__dict__.items()}.items()},
-        )
-
-    @classmethod
-    def delete_user(cls, db: SQLAlchemy, user_id: int) -> None:
-        from .server.models import User as Users
-
-        db.session.query(Users).filter_by(id=user_id, ROLE="USER").delete()
-        db.session.commit()
-
-    @classmethod
-    def delete_product(cls, db: SQLAlchemy, product_id: int) -> None:
-        from .server.models import Product as Products
-
-        db.session.query(Products).filter_by(id=product_id).delete()
+    def from_usermixin(cls, db: SQLAlchemy, usermixin: UserMixin) -> User:
+        return cls(**{k.lower(): v for k, v in usermixin.__dict__.items()}, db=db)

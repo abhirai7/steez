@@ -71,21 +71,43 @@
             STEEZ<sup>TM</sup> - LOGIN
         </p>
         <div class="container shadow-sm">
-            <form action="{{ url_for("login_route") }}" method="POST" class="mt-5">
-                {{ form.csrf_token }}
-                {% if error %}
-                    <div class="alert alert-danger mt-2" role="alert">
-                        <i class="bi bi-exclamation-circle"></i> {{ error }}
+            <form action="{{ url_for("login_route") }}" method="POST" class="mt-5" name="login_user_form">
+                {% if login_user_form %}
+                    {{ login_user_form.hidden_tag() }}
+                    {% if login_user_form.errors %}
+                        {% for error in login_user_form.errors %}
+                            <div class="alert alert-danger mt-2 p-2 rounded rounded-0" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="input-group mb-3">
+                        {{ login_user_form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}
+                        {% if login_user_form.email.errors %}
+                            {% for error in login_user_form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="input-group mb-2">
+                        {{ login_user_form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}
+                        {% if login_user_form.password.errors %}
+                            {% for error in login_user_form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="text-center">
+                        <p class="fs-6 mt-3">
+                            Don't have an account? <a href="{{ url_for("register") }}" class="link-secondary">Register here</a>
+                        </p>
+                        {{ login_user_form.submit(class="btn btn-primary") }}
                     </div>
                 {% endif %}
-                <div class="input-group mb-3">{{ form.email(class="form-control", id="email", placeholder="Enter your registered STEEZ™ email", **{"aria-label": "Enter your registered STEEZ™ email", "aria-describedby": "email"}) }}</div>
-                <div class="input-group mb-2">{{ form.password(class="form-control", id="password", placeholder="Enter the password", **{"aria-label": "Enter the password", "aria-describedby": "show-password"}) }}</div>
-                <div class="text-center">
-                    <p class="fs-6 mt-3">
-                        Don't have an account? <a href="{{ url_for("register") }}" class="link-secondary">Register here</a>
-                    </p>
-                    {{ form.submit(class="btn btn-primary") }}
-                </div>
             </form>
         </div>
     </div>

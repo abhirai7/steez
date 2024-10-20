@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import arrow
 from flask import jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from flask_security.forms import LoginForm
 
 from src.carousel import Carousel
 from src.product import Category, Product
@@ -13,7 +14,6 @@ from src.server import TODAY, app, db, sitemapper
 from src.server.forms import (
     AddToCartForm,
     GiftCardForm,
-    LoginForm,
     SearchForm,
     SubscribeNewsLetterForm,
     TicketForm,

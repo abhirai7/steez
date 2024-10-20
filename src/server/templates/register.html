@@ -71,49 +71,49 @@
             STEEZ<sup>TM</sup> - REGISTER
         </p>
         <div class="form-container p-lg-5 p-3">
-            <form action="{{ url_for("register") }}" method="POST">
-                {{ form.csrf_token }}
+            <form action="{{ url_for("register") }}" method="POST" name="register_user_form">
+                {{ register_user_form.csrf_token }}
                 {% if error %}
                     <div class="alert alert-danger mb-3" role="alert">
                         <i class="bi bi-exclamation-circle"></i> {{ error }}
                     </div>
                 {% endif %}
                 <div class="mb-3">
-                    {{ form.name.label(class="form-label fs-5") }}
-                    {{ form.name(class="form-control", id="username", placeholder="Enter your Full Name") }}
-                    {% if form.name.errors %}
+                    {{ register_user_form.name.label(class="form-label fs-5") }}
+                    {{ register_user_form.name(class="form-control", id="username", placeholder="Enter your Full Name") }}
+                    {% if register_user_form.name.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
                             {% for error in form.name.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
                 <div class="mb-3">
-                    {{ form.email(class="form-control", id="email", placeholder="Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
-                    {% if form.email.errors %}
+                    {{ register_user_form.email(class="form-control", id="email", placeholder="Enter your Email", **{'aria-describedby': 'emailHelp'}) }}
+                    {% if register_user_form.email.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.email.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                            {% for error in register_user_form.email.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
                 <div class="mb-3">
-                    {{ form.password(class="form-control", id="password", placeholder="Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
-                    {% if form.password.errors %}
+                    {{ register_user_form.password(class="form-control", id="password", placeholder="Enter your Password", **{'aria-describedby': 'passwordHelp'}) }}
+                    {% if register_user_form.password.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.password.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                            {% for error in register_user_form.password.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
                 <div class="mb-4">
-                    {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="Confirm your Password") }}
-                    {% if form.confirm_password.errors %}
+                    {{ register_user_form.password_confirm(class="form-control", id="password_confirm", placeholder="Confirm your Password") }}
+                    {% if register_user_form.password_confirm.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.confirm_password.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                            {% for error in register_user_form.password_confirm.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
                 <div class="mb-3">
-                    {{ form.address_line1.label(class="form-label fs-5") }}
-                    {{ form.address_line1(class="form-control",
+                    {{ register_user_form.address.label(class="form-label fs-5") }}
+                    {{ register_user_form.address(class="form-control",
                                         id="address_line",
                                         placeholder="Enter your Address",
                                         **{
@@ -123,9 +123,9 @@
                                         "data-bs-custom-class": "address-tooltip"
                                         }) 
                     }}
-                    {% if form.address_line1.errors %}
+                    {% if register_user_form.address.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.address_line1.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                            {% for error in register_user_form.address.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
@@ -135,38 +135,38 @@
                     });
                 </script>
                 <div class="mb-3">
-                    {{ form.pincode(class="form-control", id="pincode", placeholder="Enter your Pincode") }}
-                    {% if form.pincode.errors %}
+                    {{ register_user_form.pincode(class="form-control", id="pincode", placeholder="Enter your Pincode") }}
+                    {% if register_user_form.pincode.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.pincode.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                            {% for error in register_user_form.pincode.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
                 <div class="mb-3">
                     <div class="row">
                         <div class="col">
-                            {{ form.city(class="form-control", id="city", placeholder="Enter your City", **{"readonly": ""}) }}
-                            {% if form.city.errors %}
+                            {{ register_user_form.city(class="form-control", id="city", placeholder="Enter your City", **{"readonly": ""}) }}
+                            {% if register_user_form.city.errors %}
                                 <div class="alert alert-danger mt-2 p-2" role="alert">
-                                    {% for error in form.city.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                                    {% for error in register_user_form.city.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>
                         <div class="col">
-                            {{ form.state(class="form-control", id="state", placeholder="Enter your State", **{"readonly": ""}) }}
-                            {% if form.state.errors %}
+                            {{ register_user_form.state(class="form-control", id="state", placeholder="Enter your State", **{"readonly": ""}) }}
+                            {% if register_user_form.state.errors %}
                                 <div class="alert alert-danger mt-2 p-2" role="alert">
-                                    {% for error in form.state.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                                    {% for error in register_user_form.state.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    {{ form.phone(class="form-control", id="phone", placeholder="Enter your Phone Number") }}
-                    {% if form.phone.errors %}
+                    {{ register_user_form.phone(class="form-control", id="phone", placeholder="Enter your Phone Number") }}
+                    {% if register_user_form.phone.errors %}
                         <div class="alert alert-danger mt-2 p-2" role="alert">
-                            {% for error in form.phone.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
+                            {% for error in register_user_form.phone.errors %}<i class="bi bi-exclamation-circle"></i> {{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
@@ -174,7 +174,7 @@
                     <p class="fs-6">
                         Already have an account? <a href="{{ url_for("login_route") }}" class="link-secondary">Login here</a>
                     </p>
-                    {{ form.submit(class="btn btn-success") }}
+                    {{ register_user_form.submit(class="btn btn-success") }}
                 </div>
             </form>
         </div>

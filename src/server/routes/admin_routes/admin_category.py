@@ -1,12 +1,13 @@
 from flask import redirect, render_template, request, url_for
+from flask_security.decorators import roles_required
 
 from src.product import Category
-from src.server import admin_login_required, app, db
+from src.server import app, db
 from src.server.forms import CategoryAddForm
 
 
 @app.route("/admin/manage/category", methods=["GET"])
-@admin_login_required
+@roles_required("admin")
 def admin_manage_category():
     categories = Category.all(db)
     addform: CategoryAddForm = CategoryAddForm()
@@ -14,7 +15,7 @@ def admin_manage_category():
 
 
 @app.route("/admin/manage/category/add", methods=["POST"])
-@admin_login_required
+@roles_required("admin")
 def admin_add_category():
     addform: CategoryAddForm = CategoryAddForm()
 
@@ -28,7 +29,7 @@ def admin_add_category():
 
 
 @app.route("/admin/manage/category/delete/<int:id>", methods=["GET"])
-@admin_login_required
+@roles_required("admin")
 def admin_delete_category(id):
     category = Category.from_id(db, id)
     category.delete()

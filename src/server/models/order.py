@@ -20,6 +20,8 @@ __all__ = ["Order"]
 
 
 class Order(db.Model):
+    db = db
+
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"), nullable=False)  # type: ignore[valid-type]
     product_id = Column(Integer, ForeignKey(Product.id, ondelete="CASCADE"), nullable=False)

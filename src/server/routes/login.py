@@ -1,61 +1,56 @@
-from flask import redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask import redirect, render_template, url_for
+from flask_login import current_user
+from flask_security.forms import LoginForm
+from flask_security.utils import login_user, logout_user
 
-from src.server import app, bcrypt, db, sitemapper
-from src.server.forms import LoginForm, RegisterForm
-from src.user import User
+from src.server import app, db, security
+from src.server.forms import RegisterForm
 
 
-@sitemapper.include()
 @app.route("/login", methods=["GET", "POST"])
-@app.route("/login/", methods=["GET", "POST"])
 def login_route():
     login: LoginForm = LoginForm()
-
-    if login.validate_on_submit() and request.method == "POST":
-        assert login.email.data and login.password.data
-
-        try:
-            user = User.from_email(db, email=login.email.data, password=login.password.data)
-        except ValueError:
-            return redirect(url_for("home"))
-
-        login_user(user)
+    if login.validate_on_submit() and login.user:
+        login_user(login.user)
         return redirect(url_for("home"))
 
-    return render_template("login.html", form=login, current_user=current_user)
+    return render_template("login.html", login_user_form=login, current_user=current_user)
 
 
 @app.route("/logout")
-@app.route("/logout/")
-@login_required
 def logout():
     logout_user()
 
     return redirect(url_for("home"))
 
 
-@sitemapper.include()
 @app.route("/register", methods=["GET", "POST"])
-@app.route("/register/", methods=["GET", "POST"])
 def register():
-    register: RegisterForm = RegisterForm(db)
+    register: RegisterForm = RegisterForm()
 
-    if register.validate_on_submit() and request.method == "POST":
-        assert register.email.data and register.password.data and register.name.data and register.phone.data
+    if register.validate_on_submit() and isinstance(register, RegisterForm):
+        if security.datastore.find_user(email=register.email.data, db=db):
+            return render_template(
+                "register.html",
+                register_user_form=register,
+                current_user=current_user,
+                error="User already exists",
+            )
 
-        address = f"{register.address_line1.data}".strip()
-        address += f", {register.city.data}, {register.state.data}, {register.pincode.data}"
-
-        User.create(
-            db,
-            name=register.name.data,
+        security.datastore.create_user(
             email=register.email.data,
-            password_hash=bcrypt.generate_password_hash(register.password.data).decode(),
-            address=address,
-            phone=str(register.phone.data),
+            password=register.password.data,
+            roles=["user"],
+            db=db,
+            #
+            name=register.name.data,
+            phone=register.phone.data,
+            address=register.address.data,
+            city=register.city.data,
+            state=register.state.data,
+            pincode=register.pincode.data,
         )
-
+        db.session.commit()
         return redirect(url_for("login_route"))
 
-    return render_template("register.html", form=register)
+    return render_template("register.html", register_user_form=register, current_user=current_user)

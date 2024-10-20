@@ -4,16 +4,12 @@ from typing import TYPE_CHECKING
 
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from flask_security.forms import LoginForm
 from razorpay.errors import SignatureVerificationError
 
 from src.order import Order
 from src.server import RAZORPAY_KEY, app, db, razorpay_client
-from src.server.forms import (
-    LoginForm,
-    PaymentMethod,
-    SearchForm,
-    SubscribeNewsLetterForm,
-)
+from src.server.forms import PaymentMethod, SearchForm, SubscribeNewsLetterForm
 from src.user import User
 from src.utils import format_number
 

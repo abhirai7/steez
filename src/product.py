@@ -667,7 +667,7 @@ class GiftCard:
     def admin_create(db: SQLAlchemy, *, user: User, amount: int) -> GiftCard:
         from src.server.models import GiftCard as GiftCards
 
-        assert user.is_admin, "Only admins can create gift cards."
+        assert "admin" in user.roles, "Only admins can create gift cards."
 
         smt = insert(GiftCards).values(user_id=user.id, price=amount, CODE=generate_gift_card_code()).returning(literal_column("*"))
         giftcard = db.session.execute(smt).mappings().fetchone()

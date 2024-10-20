@@ -3,13 +3,14 @@ from __future__ import annotations
 import json
 
 from flask import render_template, request
+from flask_security.decorators import roles_required
 
 from src.order import Order
-from src.server import admin_login_required, app, db, razorpay_client
+from src.server import app, db, razorpay_client
 
 
 @app.route("/admin/manage/razorpay-orders", methods=["GET"])
-@admin_login_required
+@roles_required("admin")
 def admin_manage_razorpay_order():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -35,7 +36,7 @@ def admin_manage_razorpay_order():
 
 
 @app.route("/admin/manage/orders", methods=["GET"])
-@admin_login_required
+@roles_required("admin")
 def admin_manage_order():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))
@@ -53,7 +54,7 @@ def admin_manage_order():
 
 
 @app.route("/admin/payouts", methods=["GET"])
-@admin_login_required
+@roles_required("admin")
 def admin_payments():
     page = max(int(request.args.get("page", 1)), 1)
     limit = int(request.args.get("limit", 15))

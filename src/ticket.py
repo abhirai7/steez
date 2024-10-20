@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import insert, literal_column
 
 if TYPE_CHECKING:
-    from .user import Admin, User
+    from .user import User
 
 VALID_STATUS = Literal["OPEN", "CLOS", "PROC"]
 
@@ -49,7 +49,7 @@ class Ticket:
         cls,
         db: SQLAlchemy,
         *,
-        user: User | Admin,
+        user: User,
         replied_to: int | None,
         subject: str,
         message: str,
@@ -93,7 +93,7 @@ class Ticket:
         self.db.session.query(Tickets).filter(Tickets.id == self.id).update({"status": status})
         self.db.session.commit()
 
-    def reply(self, user: User | Admin, message: str) -> Ticket:
+    def reply(self, user: User, message: str) -> Ticket:
         return Ticket.create(
             self.db,
             user=user,
