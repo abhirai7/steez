@@ -6,6 +6,7 @@ import arrow
 from flask_sqlalchemy import SQLAlchemy
 from fuzzywuzzy.fuzz import partial_ratio
 from sqlalchemy import func, insert, literal, literal_column, or_, select
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .utils import generate_gift_card_code, get_product_pictures, size_names
 
@@ -242,8 +243,9 @@ class Product:
         with self.__db.session() as conn:
             ls = []
 
-            for row in conn.execute(products_query).mappings():
-                ls.append(Product(self.__db, **row))
+            for row in conn.execute(products_query).mappings().all():
+                _product = row["Product"]
+                ls.append(Product(self.__db, **{k.lower(): v for k, v in _product.__dict__.items()}))
 
             return ls
 
@@ -520,14 +522,16 @@ class Cart:
             error = "Product is not available."
             raise ValueError(error)
 
-        cart_item = Carts.query.filter_by(user_id=self.user_id, product_id=product.id).first()
+        smt = (
+            sqlite_insert(Carts)
+            .values(user_id=self.user_id, product_id=product.id, quantity=quantity)
+            .on_conflict_do_update(
+                index_elements=[Carts.user_id, Carts.product_id],
+                set_=dict(quantity=Carts.quantity + quantity),
+            )
+        )
 
-        if cart_item:
-            cart_item.quantity += quantity
-        else:
-            smt = insert(Carts).values(user_id=self.user_id, product_id=product.id, quantity=quantity)
-            self.__db.session.execute(smt)
-
+        self.__db.session.execute(smt)
         self.__db.session.commit()
 
     def remove_product(self, *, product: Product, _: quantity = 1) -> None:
@@ -569,7 +573,7 @@ class Cart:
         from src.server.models import Order as Orders
         from src.server.models import Product as Products
 
-        total_price_query = (
+        total_price_query: float = (
             self.__db.session.query(
                 func.max((Carts.quantity * Products.price) - (gift_card.price if gift_card and gift_card.is_valid else 0))
             )
@@ -588,12 +592,12 @@ class Cart:
                     Orders.total_price,
                     Orders.status,
                 ],
-                select(
+                select(  # type: ignore
                     Carts.user_id,
                     Carts.product_id,
                     Carts.quantity,
-                    total_price,
-                    literal(status.upper()),
+                    total_price,  # type: ignore
+                    literal(status.upper())
                 ).where(Carts.user_id == self.user_id),
             )
             .returning(literal_column("*"))

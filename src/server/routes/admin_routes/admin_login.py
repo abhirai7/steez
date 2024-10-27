@@ -28,7 +28,7 @@ def admin_login():
         login_user(form.user)
         return redirect(url_for("admin_dashboard"))
 
-    return render_template("login.html", login_user_form=form, current_user=current_user)
+    return render_template("admin/admin_login.html", form=form, current_user=current_user)
 
 
 @app.route("/admin/logout")
@@ -42,8 +42,6 @@ def admin_logout():
 @app.route("/admin/dashboard/")
 @roles_required("admin")
 def admin_dashboard():
-    assert current_user.is_admin
-
     product_count = Product.total_count(db)
     user_count = User.total_count(db)
     order_count = Order.total_count(db)

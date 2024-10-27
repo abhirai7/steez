@@ -50,6 +50,13 @@ class User(UserMixin):
     name: str | None
     phone: str | None
 
+    def __init__(self, **kwargs):
+        self.db = kwargs.pop("db")
+
+        for k, v in kwargs.items():
+            if not hasattr(self, k):
+                setattr(self, k, v)
+
     @property
     def orders(self) -> list[Order]:
         from .order import Order
@@ -223,14 +230,14 @@ class User(UserMixin):
     ) -> list[Self]:
         from .server.models import User as Users
 
-        users = db.session.query(Users).filter_by(ROLE="USER").limit(limit).offset(offset).all()
-        return [cls(db=db, **{k.lower(): v for k, v in user.__dict__.items()}) for user in users]
+        users = db.session.query(Users).limit(limit).offset(offset).all()
+        return [cls.from_usermixin(db, user) for user in users]
 
     @staticmethod
     def total_count(db: SQLAlchemy) -> int:
         from .server.models import User as Users
 
-        return db.session.query(Users).filter_by(ROLE="USER").count()
+        return db.session.query(Users).count()
 
     def full_checkout_giftcard(self, razorpay_client: RazorpayClient, amount: int) -> RazorPayOrderDict:
         final_payload = {

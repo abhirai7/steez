@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arrow
-from flask import redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from flask_security.forms import LoginForm
 
@@ -59,6 +59,7 @@ def add_to_cart(product_id: int):
         product = Product.from_size(db, id=product.id, size=form.size.data)
 
         current_user.add_to_cart(product=product, quantity=int(form.quantity.data))
+        flash(f"{product.name} added to cart", "success")
 
         return redirect(url_for("product", product_id=product_id))
     return redirect(url_for("product", product_id=product_id))

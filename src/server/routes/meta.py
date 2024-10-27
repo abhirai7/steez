@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import make_response, render_template, request
+from flask import make_response, render_template, request, flash
 
 from src.server import app, sitemapper
 
@@ -51,3 +51,9 @@ def payment_success():
 @app.route("/payment-failure")
 def payment_failure():
     return render_template("payment_status.html", status="error")
+
+
+@app.route("/flash/<text>")
+def flash_text(text):
+    flash(text)
+    return render_template("base.html", )

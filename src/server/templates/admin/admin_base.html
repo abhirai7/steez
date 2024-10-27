@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% import 'navbar.html' as navbar %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-2">{{ navbar.admin_navbar(current_user) }}</div>
+        <div class="col-10 overflow-y-auto" style="height: 100vh;">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}
