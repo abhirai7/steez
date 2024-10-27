@@ -46,7 +46,6 @@ class User(UserMixin):
         roles: list[RoleMixin]
         webauthn: list[WebAuthnMixin]
 
-        #
     name: str | None
     phone: str | None
 

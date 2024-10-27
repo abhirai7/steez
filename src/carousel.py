@@ -33,13 +33,19 @@ class Carousel:
         from src.server.models import Carousel as Carousels
 
         smt = select(Carousels)
-        carousels = db.session.execute(smt).mappings().all()
+        carousels = db.session.execute(smt).all()
         ls = []
 
         for caro in carousels:
-            _caro = caro["Carousel"].__dict__
-            ls.append(cls(db, **{k.lower(): v for k, v in _caro.items()}))
-
+            ls.append(
+                cls(
+                    db,
+                    id=caro.id,
+                    image=caro.image,
+                    heading=caro.heading,
+                    description=caro.description,
+                )
+            )
         return ls
 
     @classmethod
@@ -79,14 +85,15 @@ class Carousel:
             .returning(literal_column("*"))
         )
 
-        carousel = db.session.execute(smt).mappings().first()
+        carousel = db.session.execute(smt).first()
         db.session.commit()
 
-        assert carousel is not None
+        assert carousel is not None, "Carousel not created"
 
-        return cls(db, **{k.lower(): v for k, v in carousel.items()})
+        return cls(db, id=carousel.id, image=carousel.image, heading=carousel.heading, description=carousel.description)
 
     def delete(self):
         from src.server.models import Carousel as Carousels
 
         Carousels.query.filter_by(id=self.id).delete()
+        self.db.session.commit()

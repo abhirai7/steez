@@ -65,10 +65,20 @@ class Review:
 
         smt = insert(Reviews).values(user_id=user_id, product_id=product_id, REVIEW=review, STARS=stars).returning(literal_column("*"))
 
-        r = db.session.execute(smt).mappings().fetchone()
+        r = db.session.execute(smt).fetchone()
         db.session.commit()
 
-        return cls(db, **{k.lower(): v for k, v in r.__dict__.items()})
+        assert r, "Review not found."
+
+        return cls(
+            db,
+            id=r.id,
+            user_id=r.user_id,
+            product_id=r.product_id,
+            review=r.review,
+            stars=r.stars,
+            created_at=r.created_at,
+        )
 
     @classmethod
     def from_user(cls, db: SQLAlchemy, *, user_id: int) -> list[Review]:
@@ -117,7 +127,7 @@ class Category:
         from src.server.models import Category as Categories
 
         smt = insert(Categories).values(name=name, description=description).returning(literal_column("*"))
-        category = db.session.execute(smt).mappings().fetchone()
+        category = db.session.execute(smt).fetchone()
         db.session.commit()
 
         assert category, "Category not found."
@@ -245,7 +255,12 @@ class Product:
 
             for row in conn.execute(products_query).mappings().all():
                 _product = row["Product"]
-                ls.append(Product(self.__db, **{k.lower(): v for k, v in _product.__dict__.items()}))
+                ls.append(
+                    Product(
+                        self.__db,
+                        **{k.lower(): v for k, v in _product.__dict__.items()},
+                    )
+                )
 
             return ls
 
@@ -597,7 +612,7 @@ class Cart:
                     Carts.product_id,
                     Carts.quantity,
                     total_price,  # type: ignore
-                    literal(status.upper())
+                    literal(status.upper()),
                 ).where(Carts.user_id == self.user_id),
             )
             .returning(literal_column("*"))

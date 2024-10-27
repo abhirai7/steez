@@ -57,13 +57,13 @@ class Favourite:
         from src.server.models import Favourite as Favourites
 
         smt = insert(Favourites).values(user_id=user.id, product_unique_id=product.unique_id).returning(literal_column("*"))
-        favourite = db.session.execute(smt).mappings().first()
+        favourite = db.session.execute(smt).first()
 
         db.session.commit()
 
         assert favourite is not None
 
-        return cls(db, **{k.lower(): v for k, v in favourite.items()})
+        return cls(db, id=favourite.id, user_id=favourite.user_id, product_unique_id=favourite.product_unique_id)
 
     @classmethod
     def all(cls, db: SQLAlchemy) -> list[Favourite]:
